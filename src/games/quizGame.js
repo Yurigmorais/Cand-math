@@ -1,117 +1,110 @@
 import { G } from '../state/gameState.js';
 import { showStudyOverlay } from '../ui/studyOverlay.js';
-import { pickQuestion } from '../engine/questionGenerator.js';
+import { renderVisual } from '../ui/visuals.js';
+import { novaPergunta } from '../engine/questionGenerator.js';
 import { $ } from '../utils/dom.js';
 import { MSGS } from '../data/messages.js';
-import { pick } from '../engine/questionGenerator.js';
+import { pick } from '../engine/questionUtils.js';
 import { playSound, speakText } from '../audio/soundManager.js';
-import { showConfetti } from '../effects/particles.js';
+import { showConfetti, burstStars } from '../effects/particles.js';
 import { saveState } from '../storage/persistence.js';
-import { finishRound } from './gameUtils.js';
-import { progressQuest } from './gameManager.js';
+import { finishRound, startTimer, elapsed, marcarProgresso, pontosPorAcerto } from './gameUtils.js';
+import { depoisDaRodada } from './roundCycle.js';
+import { registrarTentativa } from '../state/gameState.js';
 
-let quizDotResults = [];
+const TOTAL = 5;
+let resultados = [];
 
 export function startQuizRound() {
   G.quizIndex = 0;
   G.roundCorrect = 0;
-  quizDotResults = [];
-  updateQuizDots();
+  resultados = [];
+  updateDots();
   loadQuizQuestion();
 }
 
 export function loadQuizQuestion() {
-  G.currentQ = pickQuestion(G.selectedLevel || 1);
+  G.currentQ = novaPergunta({ trackId: G.selectedTrack, grade: G.grade });
   const q = G.currentQ;
 
-  $('quizProg').textContent   = `${G.quizIndex+1}/5`;
-  $('quizStarsBar').textContent = G.stars;
-  $('quizDiff').textContent   = q.diff;
-  $('quizEmoji').innerHTML    = `<i class="fa-solid ${q.icon || 'fa-candy-cane'}"></i>`;
-  $('quizText').textContent   = q.text;
+  marcarProgresso('quiz', G.quizIndex + 1, TOTAL);
+  $('quizDiff').textContent = `${q.trilhaNome} · ${q.codes ? q.codes[0] : ''}`;
+  $('quizText').textContent = q.prompt;
+  const vis = $('quizVisual');
+  if (vis) vis.innerHTML = renderVisual(q.visual);
   $('quizFeedback').classList.remove('show');
 
-  // Shuffle options
-  const shuffled = shuffleOpts(q.opts, q.ans);
-  renderQuizAnswers(shuffled.opts, shuffled.correctIdx);
-  updateQuizDots('current', G.quizIndex);
+  embaralharERenderizar(q);
+  updateDots('current', G.quizIndex);
 
-  // Animate card
-  $('quizCard').style.animation = 'none';
-  void $('quizCard').offsetWidth;
-  $('quizCard').style.animation = 'slideUp 0.4s ease';
-  
-  if (G.autoTTS) speakText(q.text);
+  const card = $('quizCard');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = 'slideUp 0.4s ease';
+
+  startTimer();
+  if (G.autoTTS) speakText(q.prompt);
 }
 
-export function shuffleOpts(opts, correctIdx) {
-  const correctAnswer = opts[correctIdx];
-  const shuffled = [...opts].sort(() => Math.random() - 0.5);
-  const newCorrectIdx = shuffled.indexOf(correctAnswer);
-  return { opts: shuffled, correctIdx: newCorrectIdx };
+function embaralharERenderizar(q) {
+  const idx = q.options.map((_, i) => i);
+  const ordem = idx.sort(() => Math.random() - 0.5);
+  renderQuizAnswers(ordem.map(i => q.options[i]), ordem.indexOf(q.answer));
 }
 
-export function renderQuizAnswers(opts, correctIdx) {
+export function renderQuizAnswers(opts, correta) {
   const grid = $('quizAnswers');
   grid.innerHTML = '';
   opts.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'ans-btn';
     btn.textContent = opt;
-    btn.addEventListener('click', () => handleQuizAnswer(i, correctIdx, btn));
+    btn.addEventListener('click', () => handleQuizAnswer(i, correta, btn));
     grid.appendChild(btn);
   });
 }
 
-export function handleQuizAnswer(chosen, correct, btn) {
-  const btns = document.querySelectorAll('#screenQuiz .ans-btn');
-  btns.forEach(b => b.disabled = true);
+export function handleQuizAnswer(escolha, correta, btn) {
+  const botoes = document.querySelectorAll('#screenQuiz .ans-btn');
+  botoes.forEach(b => b.disabled = true);
 
-  // Track stats
-  const op = G.currentQ.op;
-  if (op && G.stats[op]) {
-    if (chosen === correct) G.stats[op].c++;
-    else G.stats[op].w++;
-  }
+  const q = G.currentQ;
+  const acertou = escolha === correta;
+  const ms = elapsed();
 
-  if (chosen === correct) {
+  registrarTentativa(q, acertou, ms, 'quiz');
+
+  if (acertou) {
     btn.classList.add('correct');
-    G.stars += 10;
-    G.totalCorrect++;
+    G.stars += pontosPorAcerto('quiz');
     G.streak++;
     G.roundCorrect++;
     if (G.streak > G.bestStreak) G.bestStreak = G.streak;
     playSound('correct');
     showConfetti();
-    const msg = G.streak >= 3 ? pick(MSGS.streak) : pick(MSGS.correct);
-    showQuizFeedback(msg);
-    updateQuizDots('done', G.quizIndex);
-    if (G.streak % 3 === 0) G.stars += 5; // streak bonus
-    progressQuest('correct_math', 1);
+    if (btn.getBoundingClientRect) burstStars(btn.getBoundingClientRect());
+    showQuizFeedback(G.streak >= 3 ? pick(MSGS.streak) : pick(MSGS.correct));
+    updateDots('done', G.quizIndex);
+    if (G.streak % 3 === 0) G.stars += 5;
+    // a missão "acertos" sobe em registrarTentativa(), para valer em todos os modos
   } else {
     btn.classList.add('wrong');
-    btns[correct].classList.add('correct-reveal');
-    const correctValue = G.currentQ.opts[G.currentQ.ans];
-    showQuizFeedback(`A resposta certa é ${correctValue}! Memorize!`);
-    showStudyOverlay(G.currentQ.text, correctValue);
-    
+    if (botoes[correta]) botoes[correta].classList.add('correct-reveal');
+    showQuizFeedback(`A resposta certa é ${q.answerText}!`);
+    showStudyOverlay(q);
     G.streak = 0;
     playSound('wrong');
-    updateQuizDots('wrong', G.quizIndex);
+    updateDots('wrong', G.quizIndex);
   }
 
   $('quizStarsBar').textContent = G.stars;
   saveState();
 
-  const delay = (chosen === correct) ? 1600 : 4000;
-  setTimeout(() => {
+  depoisDaRodada(acertou ? 1500 : 4200, () => {
     G.quizIndex++;
-    if (G.quizIndex >= 5) {
-      finishRound('quiz');
-    } else {
-      loadQuizQuestion();
-    }
-  }, delay);
+    if (G.quizIndex >= TOTAL) finishRound('quiz');
+    else loadQuizQuestion();
+  });
 }
 
 export function showQuizFeedback(msg) {
@@ -119,13 +112,11 @@ export function showQuizFeedback(msg) {
   $('quizFeedback').classList.add('show');
 }
 
-export function updateQuizDots(state, index) {
-  if (state === 'done' || state === 'wrong') {
-    quizDotResults[index] = state;
-  }
+export function updateDots(estado, indice) {
+  if (estado === 'done' || estado === 'wrong') resultados[indice] = estado;
   document.querySelectorAll('#qDots .qdot').forEach((dot, i) => {
-    dot.classList.remove('done','wrong','current');
-    if (quizDotResults[i]) dot.classList.add(quizDotResults[i]);
-    if (state === 'current' && i === index) dot.classList.add('current');
+    dot.classList.remove('done', 'wrong', 'current');
+    if (resultados[i]) dot.classList.add(resultados[i]);
+    if (estado === 'current' && i === indice) dot.classList.add('current');
   });
 }

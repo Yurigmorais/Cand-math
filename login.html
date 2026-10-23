@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Candy Math - Login</title>
   
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Comic+Neue:wght@400;700&family=Lexend:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,7 +21,7 @@
   </div>
 
   <div class="login-container">
-    <div class="login-koala">
+    <div class="login-koala login-mascote">
       <img src="/assets/images/jaguar.jpg" alt="Juju" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;">
     </div>
     <h1 class="login-title">Bem-vindo(a) ao<br>Candy Math!</h1>
@@ -52,12 +53,33 @@
           <input type="number" id="childAge" placeholder="Ex: 8" min="3" max="15" required>
         </div>
         <div class="form-group">
+          <label for="childGrade"><i class="fa-solid fa-school"></i> Ano escolar</label>
+          <select id="childGrade" required>
+            <option value="" disabled selected>Selecione o ano</option>
+            <option value="1">1º ano — Ensino Fundamental I</option>
+            <option value="2">2º ano — Ensino Fundamental I</option>
+            <option value="3">3º ano — Ensino Fundamental I</option>
+            <option value="4">4º ano — Ensino Fundamental I</option>
+            <option value="5">5º ano — Ensino Fundamental I</option>
+            <option value="6">6º ano — Ensino Fundamental II</option>
+            <option value="7">7º ano — Ensino Fundamental II</option>
+            <option value="8">8º ano — Ensino Fundamental II</option>
+            <option value="9">9º ano — Ensino Fundamental II</option>
+          </select>
+          <small class="form-tip">É o ano que decide a dificuldade das perguntas.</small>
+        </div>
+        <div class="form-group">
           <label for="guardianName"><i class="fa-solid fa-user-shield"></i> Nome do Responsável</label>
           <input type="text" id="guardianName" placeholder="Ex: Maria (Mãe)" required>
         </div>
         <div class="form-group">
           <label for="guardianEmail"><i class="fa-solid fa-envelope"></i> E-mail do Responsável</label>
           <input type="email" id="guardianEmail" placeholder="Ex: maria@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="parentPin"><i class="fa-solid fa-lock"></i> PIN dos Pais (4 números)</label>
+          <input type="password" id="parentPin" inputmode="numeric" minlength="4" maxlength="4" placeholder="Ex: 2468" required>
+          <small class="form-tip">Protege a Área dos Pais, onde você acompanha o progresso.</small>
         </div>
         
         <button type="submit" class="btn-login-submit">

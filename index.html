@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Candy Math</title>
-  <meta name="description" content="Candy Math - Jogo educativo de matemática com temática de doces para crianças. Aprenda adição, subtração, multiplicação e divisão de forma divertida!">
+  <title>Candy Math — Matemática com Juju Candy</title>
+  <meta name="description" content="Candy Math - jogo educativo de matemática com temática de doces para crianças do Ensino Fundamental. Trilhas alinhadas à BNCC: números, álgebra, geometria, grandezas e medidas e estatística.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Comic+Neue:wght@400;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Comic+Neue:wght@400;700&family=Lexend:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -23,6 +23,9 @@
       <div class="candy-float" style="--d:1.8s;--x:65%"><i class="fa-solid fa-ice-cream"></i></div>
       <div class="candy-float" style="--d:0.9s;--x:90%"><i class="fa-solid fa-star"></i></div>
       <div class="candy-float" style="--d:2.1s;--x:35%"><i class="fa-solid fa-heart"></i></div>
+      <div class="candy-float" style="--d:1.5s;--x:58%"><i class="fa-solid fa-gift"></i></div>
+      <div class="candy-float" style="--d:2.6s;--x:14%"><i class="fa-solid fa-shop"></i></div>
+      <div class="candy-float" style="--d:0.5s;--x:73%"><i class="fa-solid fa-cubes"></i></div>
       <div class="splash-stripe"></div>
     </div>
     <div class="splash-content">
@@ -38,6 +41,13 @@
         <div class="splash-feat feat-pink"><i class="fa-solid fa-calculator"></i> Cálculos</div>
         <div class="splash-feat feat-yellow"><i class="fa-solid fa-star"></i> Estrelas</div>
         <div class="splash-feat feat-mint"><i class="fa-solid fa-shirt"></i> Figurinhas</div>
+      </div>
+      <div class="splash-trilhas" id="splashTrilhas">
+        <span><i class="fa-solid fa-cubes"></i> Números</span>
+        <span><i class="fa-solid fa-scale-balanced"></i> Álgebra</span>
+        <span><i class="fa-solid fa-shapes"></i> Geometria</span>
+        <span><i class="fa-solid fa-ruler-combined"></i> Medidas</span>
+        <span><i class="fa-solid fa-chart-column"></i> Dados</span>
       </div>
       <button class="btn-play" id="btnPlay">
         <i class="fa-solid fa-gamepad"></i> Jogar!
@@ -78,64 +88,110 @@
       </div>
     </div>
 
-    <h2 class="hub-title">Escolha o jogo!</h2>
+    <div class="hub-scroll">
+      <button class="hub-trilha-strip" id="hubTrilhaStrip" onclick="openModal('modalTracks')">
+        <span class="hts-icon" id="hubTrilhaIcon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+        <span class="hts-txt">
+          <strong id="hubTrilhaNome">Mix de Doces</strong>
+          <small id="hubTrilhaSub">Todo o seu ano misturado</small>
+        </span>
+        <span class="hts-change"><i class="fa-solid fa-pen"></i> trocar</span>
+      </button>
 
-    <h3 class="hub-topic-title"><i class="fa-solid fa-bolt"></i> Agilidade e Decisão</h3>
-    <div class="mode-grid">
-      <div class="mode-card mc-falling" onclick="openDifficulty('falling')">
-        <div class="mc-glow"></div>
-        <div class="mc-icon"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
-        <div class="mc-name">Chuva de Doces</div>
-        <div class="mc-desc">Pegue a resposta correta caindo!</div>
-        <div class="mc-stars"><i class="fa-solid fa-star"></i> +15 por acerto</div>
-      </div>
-      <div class="mode-card mc-tf" onclick="openDifficulty('tf')">
-        <div class="mc-glow"></div>
-        <div class="mc-icon"><i class="fa-solid fa-check-double"></i></div>
-        <div class="mc-name">V ou F</div>
-        <div class="mc-desc">Decida rápido se está certo!</div>
-        <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 por acerto</div>
-      </div>
-    </div>
+      <h2 class="hub-title">Escolha o jogo!</h2>
 
-    <h3 class="hub-topic-title"><i class="fa-solid fa-brain"></i> Raciocínio e Memória</h3>
-    <div class="mode-grid">
-      <div class="mode-card mc-quiz" onclick="openDifficulty('quiz')">
-        <div class="mc-glow"></div>
-        <div class="mc-icon"><i class="fa-solid fa-candy-cane"></i></div>
-        <div class="mc-name">Quiz Doce</div>
-        <div class="mc-desc">Perguntas de matemática com doces!</div>
-        <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 por acerto</div>
+      <h3 class="hub-topic-title"><i class="fa-solid fa-bolt"></i> Agilidade e Decisão</h3>
+      <div class="mode-grid">
+        <div class="mode-card mc-falling" onclick="openTracks('falling')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+          <div class="mc-name">Chuva de Doces</div>
+          <div class="mc-desc">Pegue a resposta correta caindo!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +15 por acerto</div>
+        </div>
+        <div class="mode-card mc-race" onclick="openTracks('race')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-flag-checkered"></i></div>
+          <div class="mc-name">Corrida Doce</div>
+          <div class="mc-desc">Escolha a pista certa e acelere!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +15 por acerto</div>
+        </div>
+        <div class="mode-card mc-tf" onclick="openTracks('tf')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-check-double"></i></div>
+          <div class="mc-name">V ou F</div>
+          <div class="mc-desc">Decida rápido se está certo!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 por acerto</div>
+        </div>
       </div>
-      <div class="mode-card mc-memory" onclick="openDifficulty('memory')">
-        <div class="mc-glow"></div>
-        <div class="mc-icon"><i class="fa-solid fa-clone"></i></div>
-        <div class="mc-name">Memória Doce</div>
-        <div class="mc-desc">Encontre os pares corretos!</div>
-        <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por partida</div>
-      </div>
-      <div class="mode-card mc-puzzle" onclick="startMode('puzzle')">
-        <div class="mc-glow"></div>
-        <div class="mc-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
-        <div class="mc-name">Cruzadinha</div>
-        <div class="mc-desc">Complete a grade de números!</div>
-        <div class="mc-stars"><i class="fa-solid fa-star"></i> +30 por puzzle</div>
-      </div>
-    </div>
 
-    <div class="hub-actions">
-      <button class="btn-hub-action bha-shop" onclick="openShop()">
-        <i class="fa-solid fa-shirt"></i><span>Figurinhas</span>
-      </button>
-      <button class="btn-hub-action bha-quests" onclick="openModal('modalQuests')">
-        <i class="fa-solid fa-list-check"></i><span>Missões</span>
-      </button>
-      <button class="btn-hub-action bha-records" onclick="openModal('modalRecords')">
-        <i class="fa-solid fa-trophy"></i><span>Recordes</span>
-      </button>
-      <button class="btn-hub-action bha-settings" onclick="openModal('modalSettings')">
-        <i class="fa-solid fa-gear"></i><span>Config</span>
-      </button>
+      <h3 class="hub-topic-title"><i class="fa-solid fa-brain"></i> Raciocínio e Memória</h3>
+      <div class="mode-grid">
+        <div class="mode-card mc-quiz" onclick="openTracks('quiz')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-candy-cane"></i></div>
+          <div class="mc-name">Quiz Doce</div>
+          <div class="mc-desc">Perguntas de matemática com doces!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 por acerto</div>
+        </div>
+        <div class="mode-card mc-memory" onclick="openTracks('memory')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-clone"></i></div>
+          <div class="mc-name">Memória Doce</div>
+          <div class="mc-desc">Case cada conta com o resultado!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por partida</div>
+        </div>
+        <div class="mode-card mc-puzzle" onclick="startMode('puzzle')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+          <div class="mc-name">Cruzadinha</div>
+          <div class="mc-desc">Complete a grade de números!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +30 por puzzle</div>
+        </div>
+      </div>
+
+      <h3 class="hub-topic-title"><i class="fa-solid fa-hand-holding-heart"></i> Mãos na Massa</h3>
+      <div class="mode-grid">
+        <div class="mode-card mc-fraction" onclick="startMode('fraction')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-cake-candles"></i></div>
+          <div class="mc-name">Fatia de Bolo</div>
+          <div class="mc-desc">Pinte as frações do bolo da Juju!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por acerto</div>
+        </div>
+        <div class="mode-card mc-balance" onclick="startMode('balance')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div class="mc-name">Balança da Juju</div>
+          <div class="mc-desc">Descubra o que está na sacola!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por acerto</div>
+        </div>
+        <div class="mode-card mc-market" onclick="startMode('market')">
+          <div class="mc-glow"></div>
+          <div class="mc-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+          <div class="mc-name">Mercadinho</div>
+          <div class="mc-desc">Monte a conta e dê o troco!</div>
+          <div class="mc-stars"><i class="fa-solid fa-star"></i> +25 por acerto</div>
+        </div>
+      </div>
+
+      <div class="hub-actions">
+        <button class="btn-hub-action bha-shop" onclick="openShop()">
+          <i class="fa-solid fa-shirt"></i><span>Figurinhas</span>
+        </button>
+        <button class="btn-hub-action bha-quests" onclick="openModal('modalQuests')">
+          <i class="fa-solid fa-list-check"></i><span>Missões</span>
+        </button>
+        <button class="btn-hub-action bha-records" onclick="openModal('modalRecords')">
+          <i class="fa-solid fa-trophy"></i><span>Recordes</span>
+        </button>
+        <button class="btn-hub-action bha-parents" onclick="openParents()">
+          <i class="fa-solid fa-user-shield"></i><span>Área dos Pais</span>
+        </button>
+        <button class="btn-hub-action bha-settings" onclick="openModal('modalSettings')">
+          <i class="fa-solid fa-gear"></i><span>Config</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -159,14 +215,12 @@
 
     <div class="quiz-card" id="quizCard">
       <div class="qcard-top">
-        <span class="diff-tag" id="quizDiff">Fácil</span>
+        <span class="diff-tag" id="quizDiff">Trilha</span>
         <button class="btn-speak" onclick="speakText()" title="Ouvir">
           <i class="fa-solid fa-volume-high"></i>
         </button>
       </div>
-      <div class="qcard-emoji" id="quizEmoji">
-        <i class="fa-solid fa-candy-cane"></i>
-      </div>
+      <div class="quiz-visual" id="quizVisual"></div>
       <p class="qcard-text" id="quizText">Carregando...</p>
     </div>
 
@@ -189,7 +243,7 @@
     </div>
 
     <div class="falling-question-wrap">
-      <div class="falling-diff-tag" id="fallingDiff">Nível 1</div>
+      <div class="falling-diff-tag" id="fallingDiff">Trilha</div>
       <p class="falling-q-text" id="fallingText">Carregando...</p>
     </div>
 
@@ -200,6 +254,52 @@
     <div class="falling-feedback" id="fallingFeedback">
       <span><img src="/assets/images/jaguar_happy.jpg" alt="Juju" style="width:28px;height:28px;object-fit:contain;mix-blend-mode:multiply;"></span>
       <div class="falling-feedback-msg" id="fallingFeedbackMsg">Pegue a resposta!</div>
+    </div>
+  </div>
+
+  <!-- ===== RACE SCREEN ===== -->
+  <div id="screenRace" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" onclick="goHub()"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-flag-checkered"></i> Corrida Doce</div>
+      <div class="gtb-info">
+        <span id="raceProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="raceStarsBar">0</span>
+      </div>
+    </div>
+
+    <div class="race-question-wrap">
+      <div class="race-diff-tag" id="raceDiff">Trilha</div>
+      <p class="race-q-text" id="raceText">Carregando...</p>
+    </div>
+
+    <div class="race-stage" id="raceStage">
+      <div class="race-road">
+        <div class="road-dash"></div>
+        <div class="road-side-l">
+          <i class="fa-solid fa-candy-cane"></i>
+          <i class="fa-solid fa-cookie"></i>
+          <i class="fa-solid fa-candy-cane"></i>
+        </div>
+        <div class="road-side-r">
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-heart"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+        <div class="race-gates" id="raceGates"></div>
+        <div class="race-car" id="raceCar"><i class="fa-solid fa-car-side"></i></div>
+        <div class="finish-line" id="finishLine">
+          <i class="fa-solid fa-flag-checkered"></i>
+          <i class="fa-solid fa-flag-checkered"></i>
+          <i class="fa-solid fa-flag-checkered"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="race-lane-btns" id="raceLaneBtns"></div>
+
+    <div class="race-feedback" id="raceFeedback">
+      <span><img src="/assets/images/jaguar_happy.jpg" alt="Juju" style="width:32px;height:32px;object-fit:contain;mix-blend-mode:multiply;"></span>
+      <div class="race-feedback-msg" id="raceFeedbackMsg">Escolha a pista certa!</div>
     </div>
   </div>
 
@@ -241,7 +341,7 @@
         <span id="memoryProg">Pares: 0/4</span> · <i class="fa-solid fa-star"></i><span id="memoryStarsBar">0</span>
       </div>
     </div>
-    
+
     <div class="memory-outer">
       <div class="memory-grid" id="memoryGrid"></div>
     </div>
@@ -272,19 +372,17 @@
 
     <div class="quiz-card" id="tfCard">
       <div class="qcard-top">
-        <span class="diff-tag" id="tfDiff">Fácil</span>
+        <span class="diff-tag" id="tfDiff">Trilha</span>
       </div>
-      <div class="qcard-emoji" id="tfEmoji">
-        <i class="fa-solid fa-question"></i>
-      </div>
-      <p class="qcard-text" id="tfText" style="font-size:24px; margin-bottom:20px;">Carregando...</p>
+      <div class="quiz-visual" id="tfVisual"></div>
+      <p class="qcard-text tf-text" id="tfText">Carregando...</p>
     </div>
 
-    <div class="tf-answers" style="display:flex; gap:16px; padding:16px; justify-content:center;">
-      <button class="ans-btn" style="flex:1; background:linear-gradient(135deg,var(--green),#4da34d); color:#fff;" onclick="handleTFAnswer(true)">
+    <div class="tf-answers">
+      <button class="ans-btn tf-verdadeiro" onclick="handleTFAnswer(true)">
         <i class="fa-solid fa-check"></i> Verdadeiro
       </button>
-      <button class="ans-btn" style="flex:1; background:linear-gradient(135deg,var(--red),#cc2222); color:#fff;" onclick="handleTFAnswer(false)">
+      <button class="ans-btn tf-falso" onclick="handleTFAnswer(false)">
         <i class="fa-solid fa-xmark"></i> Falso
       </button>
     </div>
@@ -295,44 +393,204 @@
     </div>
   </div>
 
-  <!-- ===== MODAL: DIFFICULTY ===== -->
-  <div id="modalDifficulty" class="modal" style="display:none">
-    <div class="modal-box diff-box">
+  <!-- ===== FRACTION (BOLO) SCREEN ===== -->
+  <div id="screenFraction" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" onclick="goHub()"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-cake-candles"></i> Fatia de Bolo</div>
+      <div class="gtb-info">
+        <span id="fracProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="fracStarsBar">0</span>
+      </div>
+    </div>
+
+    <div class="frac-mesa">
+      <div class="frac-ordem">
+        <p class="frac-pergunta">Pinte esta fração do bolo:</p>
+        <div class="frac-alvo" id="fracAlvo"></div>
+        <p class="frac-placar" id="fracPlacar">0 de 0 pedaços pintados</p>
+      </div>
+      <div class="bolo-prato">
+        <div class="bolo-tabua" id="fracBolo"></div>
+      </div>
+    </div>
+
+    <div class="frac-acoes">
+      <button class="btn-conferir" onclick="conferirBolo()"><i class="fa-solid fa-check"></i> Está pronto!</button>
+    </div>
+
+    <div class="quiz-feedback" id="fracFeedback">
+      <span class="qf-jaguar"><img src="/assets/images/jaguar_happy.jpg" alt="Juju" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;"></span>
+      <div class="qf-bubble" id="fracFeedbackMsg">Cada pedaço conta!</div>
+    </div>
+  </div>
+
+  <!-- ===== BALANCE SCREEN ===== -->
+  <div id="screenBalance" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" onclick="goHub()"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-scale-balanced"></i> Balança da Juju</div>
+      <div class="gtb-info">
+        <span id="balProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="balStarsBar">0</span>
+      </div>
+    </div>
+
+    <p class="bal-enunciado">Os dois pratos precisam ter a <strong>mesma quantidade</strong>. Quantos doces estão na sacola?</p>
+
+    <div class="bal-corpo">
+      <div class="bal-pilar"></div>
+      <div class="bal-trave">
+        <span class="bal-pino"></span>
+      </div>
+      <div class="bal-bandeja bal-esquerda-wrap">
+        <div class="bal-prato" id="balEsquerda"></div>
+        <div class="bal-corrente"></div>
+      </div>
+      <div class="bal-bandeja bal-direita-wrap">
+        <div class="bal-prato" id="balDireita"></div>
+        <div class="bal-corrente"></div>
+      </div>
+      <div class="bal-base"></div>
+    </div>
+
+    <p class="bal-pega">Escolha o número da sacola:</p>
+    <div class="bal-opcoes" id="balOpcoes"></div>
+
+    <div class="frac-acoes">
+      <button class="btn-conferir" onclick="conferirBalanca()"><i class="fa-solid fa-scale-balanced"></i> Equilibrar!</button>
+    </div>
+
+    <div class="quiz-feedback" id="balFeedback">
+      <span class="qf-jaguar"><img src="/assets/images/jaguar_happy.jpg" alt="Juju" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;"></span>
+      <div class="qf-bubble" id="balFeedbackMsg">Mete a sacola aí!</div>
+    </div>
+  </div>
+
+  <!-- ===== MARKET SCREEN ===== -->
+  <div id="screenMarket" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" onclick="goHub()"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-cart-shopping"></i> Mercadinho</div>
+      <div class="gtb-info">
+        <span id="merProg">1/4</span> · <i class="fa-solid fa-star"></i><span id="merStarsBar">0</span>
+      </div>
+    </div>
+
+    <div class="mer-caixa">
+      <div class="mer-vitrine">
+        <h4><i class="fa-solid fa-basket-shopping"></i> A compra</h4>
+        <ul class="mer-lista" id="merLista"></ul>
+        <p class="mer-enunciado" id="merEnunciado">Carregando...</p>
+      </div>
+      <div class="mer-bandeja-wrap">
+        <h4><i class="fa-solid fa-cash-register"></i> Na bandeja: <span id="merSoma">R$ 0,00</span></h4>
+        <div class="mer-bandeja" id="merBandeja"></div>
+      </div>
+    </div>
+
+    <div class="mer-gaveta-wrap">
+      <h4><i class="fa-solid fa-money-bill-wave"></i> Gaveta do caixa</h4>
+      <div class="mer-gaveta" id="merGaveta"></div>
+    </div>
+
+    <div class="frac-acoes">
+      <button class="btn-conferir" onclick="fecharCompra()"><i class="fa-solid fa-check"></i> Fechar a conta</button>
+    </div>
+
+    <div class="quiz-feedback" id="merFeedback">
+      <span class="qf-jaguar"><img src="/assets/images/jaguar_happy.jpg" alt="Juju" style="width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;"></span>
+      <div class="qf-bubble" id="merFeedbackMsg">Toca nas notas para montar!</div>
+    </div>
+  </div>
+
+  <!-- ===== TELA: ÁREA DOS PAIS ===== -->
+  <div id="screenParents" class="screen">
+    <div class="game-top-bar parents-bar">
+      <button class="btn-back" onclick="sairDosPais()"><i class="fa-solid fa-arrow-left"></i> Voltar ao jogo</button>
+      <div class="gtb-title"><i class="fa-solid fa-user-shield"></i> Área dos Pais</div>
+      <div class="gtb-info"><span id="parentsAnoLabel">3º ano</span></div>
+    </div>
+
+    <!-- etapa 1: PIN -->
+    <div class="pin-gate" id="parentPinGate">
+      <div class="pin-card">
+        <div class="pin-mascote"><img src="/assets/images/jaguar.jpg" alt="Juju" style="mix-blend-mode:multiply;"></div>
+        <h3>Área protegida</h3>
+        <p>Esta parte é para os adultos. Digite o PIN criado no cadastro<span id="pinTemConta"> da sua conta</span>.</p>
+        <input type="password" id="parentPinInput" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="••••">
+        <p class="pin-erro" id="parentPinErro"></p>
+        <button class="btn-pin-ok" onclick="conferirPin()"><i class="fa-solid fa-lock-open"></i> Entrar</button>
+        <button class="btn-pin-forgot" onclick="recuperarPin()">Esqueci o PIN</button>
+      </div>
+    </div>
+
+    <!-- etapa 2: relatório -->
+    <div class="parents-dash" id="parentDash" style="display:none">
+      <div class="pd-child" id="parentChildCard"></div>
+
+      <section class="pd-section">
+        <h4><i class="fa-solid fa-chart-simple"></i> Domínio por unidade da BNCC</h4>
+        <p class="pd-help">Barra cheia = a criança já domina. Barra baixa = é por aqui que vale treinar mais.</p>
+        <div id="parentUnits" class="pd-units"></div>
+      </section>
+
+      <section class="pd-section">
+        <h4><i class="fa-solid fa-arrow-down-short-wide"></i> Onde precisa desenvolver</h4>
+        <div id="parentWeak" class="pd-list"></div>
+      </section>
+
+      <section class="pd-section">
+        <h4><i class="fa-solid fa-arrow-up-wide-short"></i> Já está seguro de</h4>
+        <div id="parentStrong" class="pd-list"></div>
+      </section>
+
+      <section class="pd-section">
+        <h4><i class="fa-solid fa-stopwatch"></i> Tempo de resposta</h4>
+        <div id="parentTiming" class="pd-timing"></div>
+      </section>
+
+      <section class="pd-section">
+        <h4><i class="fa-solid fa-calendar-days"></i> Histórico das últimas sessões</h4>
+        <div id="parentSessions" class="pd-sessions"></div>
+      </section>
+
+      <section class="pd-section pd-advice">
+        <h4><i class="fa-solid fa-lightbulb"></i> Plano sugerido para a semana</h4>
+        <div id="parentAdvice"></div>
+      </section>
+
+      <section class="pd-section">
+        <h4><i class="fa-solid fa-sliders"></i> Ajustes do perfil</h4>
+        <div class="pd-settings">
+          <label class="pd-field">
+            <span>Ano escolar</span>
+            <select id="parentGradeSelect" onchange="mudarAnoEscolar(this.value)"></select>
+          </label>
+          <label class="pd-field">
+            <span>Novo PIN (4 números)</span>
+            <input type="password" id="parentNewPin" inputmode="numeric" maxlength="4" placeholder="deixe vazio para manter">
+          </label>
+          <button class="pd-btn" onclick="salvarAjustesPais()"><i class="fa-solid fa-floppy-disk"></i> Salvar ajustes</button>
+        </div>
+        <div class="pd-actions">
+          <button class="pd-btn" onclick="exportarRelatorioPais()"><i class="fa-solid fa-file-arrow-down"></i> Baixar relatório</button>
+          <button class="pd-btn" onclick="imprimirRelatorio()"><i class="fa-solid fa-print"></i> Imprimir</button>
+          <button class="pd-btn pd-btn-danger" onclick="sairDaConta()"><i class="fa-solid fa-right-from-bracket"></i> Apagar perfil e sair</button>
+        </div>
+      </section>
+
+      <p class="pd-footnote" id="parentFootnote"></p>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: TRILHA ===== -->
+  <div id="modalTracks" class="modal" style="display:none">
+    <div class="modal-box tracks-box">
       <div class="modal-hdr">
-        <h2><i class="fa-solid fa-layer-group"></i> Escolha a Dificuldade</h2>
-        <button class="btn-close-modal" onclick="closeModal('modalDifficulty')"><i class="fa-solid fa-xmark"></i></button>
+        <h2><i class="fa-solid fa-route"></i> O que você quer treinar?</h2>
+        <button class="btn-close-modal" onclick="closeModal('modalTracks')"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      
-      <div class="diff-levels">
-        <button class="diff-btn diff-lvl1" id="diffBtn1" onclick="selectDifficulty(1)">
-          <div class="d-icon" id="diffIcon1"><i class="fa-solid fa-plus"></i></div>
-          <div class="d-info">
-            <strong>Nível 1</strong>
-            <span id="diffDesc1">Apenas Soma</span>
-          </div>
-        </button>
-        <button class="diff-btn diff-lvl2" id="diffBtn2" onclick="selectDifficulty(2)">
-          <div class="d-icon" id="diffIcon2"><i class="fa-solid fa-minus"></i></div>
-          <div class="d-info">
-            <strong>Nível 2</strong>
-            <span id="diffDesc2">Soma e Subtração</span>
-          </div>
-        </button>
-        <button class="diff-btn diff-lvl3" id="diffBtn3" onclick="selectDifficulty(3)">
-          <div class="d-icon" id="diffIcon3"><i class="fa-solid fa-xmark"></i></div>
-          <div class="d-info">
-            <strong>Nível 3</strong>
-            <span id="diffDesc3">Até Multiplicação</span>
-          </div>
-        </button>
-        <button class="diff-btn diff-lvl4" id="diffBtn4" onclick="selectDifficulty(4)">
-          <div class="d-icon" id="diffIcon4"><i class="fa-solid fa-divide"></i></div>
-          <div class="d-info">
-            <strong>Nível 4</strong>
-            <span id="diffDesc4">Todas as Operações!</span>
-          </div>
-        </button>
-      </div>
+      <p class="tracks-help">A dificuldade vem automaticamente do seu ano escolar — você só escolhe o assunto.</p>
+      <div class="track-list" id="trackList"></div>
     </div>
   </div>
 
@@ -340,7 +598,7 @@
   <div id="modalShop" class="modal" style="display:none">
     <div class="modal-box shop-box">
       <div class="modal-hdr">
-        <h2><i class="fa-solid fa-shirt"></i> Guarda-Roupa da  Lili Candy</h2>
+        <h2><i class="fa-solid fa-shirt"></i> Guarda-Roupa da Juju Candy</h2>
         <div class="modal-coins"><i class="fa-solid fa-star"></i> <span id="shopCoins">0</span></div>
         <button class="btn-close-modal" onclick="closeModal('modalShop')"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -397,6 +655,7 @@
           <div class="rc-val" id="recCorrect">0</div>
         </div>
       </div>
+      <div class="rec-trilhas" id="recTrilhas"></div>
       <button class="btn-reset-all" onclick="resetGame()"><i class="fa-solid fa-rotate-left"></i> Recomeçar Tudo</button>
     </div>
   </div>
@@ -409,9 +668,14 @@
       <h2 class="lu-title">Fase Completa!</h2>
       <p class="lu-phase" id="luPhaseText">Fase 1 → Fase 2</p>
       <p class="lu-stars" id="luStarsText">+50 <i class="fa-solid fa-star"></i></p>
-      <button class="btn-lu-continue" onclick="closeModal('modalLevelUp')">
-        Continuar! <i class="fa-solid fa-rocket"></i>
-      </button>
+      <div class="lu-acoes">
+        <button class="btn-lu-continue" onclick="closeModal('modalLevelUp'); goHub()">
+          Continuar! <i class="fa-solid fa-rocket"></i>
+        </button>
+        <button class="btn-lu-again" onclick="jogarDeNovo()">
+          <i class="fa-solid fa-rotate-right"></i> Jogar outra vez
+        </button>
+      </div>
     </div>
   </div>
 
@@ -433,10 +697,10 @@
   <div id="modalQuests" class="modal" style="display:none">
     <div class="modal-box quests-box">
       <div class="modal-hdr">
-        <h2><i class="fa-solid fa-list-check"></i> Missões Diárias</h2>
+        <h2><i class="fa-solid fa-list-check"></i> Missões de Hoje</h2>
         <button class="btn-close-modal" onclick="closeModal('modalQuests')"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <p class="quests-subtitle">Complete para ganhar moedas extras!</p>
+      <p class="quests-subtitle">Complete para ganhar estrelas extras!</p>
       <div class="quests-list" id="questsList">
         <!-- Rendered via JS -->
       </div>
@@ -450,19 +714,19 @@
         <h2><i class="fa-solid fa-gear"></i> Configurações</h2>
         <button class="btn-close-modal" onclick="closeModal('modalSettings')"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      
+
       <div class="settings-list">
         <div class="setting-item">
           <div class="setting-info">
-            <strong><i class="fa-solid fa-volume-high"></i> Sons e Música</strong>
+            <strong><i class="fa-solid fa-volume-high" id="soundIcon"></i> Sons e Música</strong>
           </div>
           <button class="btn-toggle" id="toggleSoundBtn" onclick="toggleSound()">Ativado</button>
         </div>
-        
+
         <div class="setting-item">
           <div class="setting-info">
-            <strong><i class="fa-solid fa-robot"></i> Leitura Automática (A.I.)</strong>
-            <span>Lê as perguntas em voz alta automaticamente</span>
+            <strong><i class="fa-solid fa-volume-high"></i> Ler as perguntas em voz alta</strong>
+            <span>A Juju lê cada pergunta para a criança</span>
           </div>
           <button class="btn-toggle" id="toggleTTSBtn" onclick="toggleAutoTTS()">Desativado</button>
         </div>
@@ -481,6 +745,22 @@
             <span>Usa uma fonte especial (Lexend)</span>
           </div>
           <button class="btn-toggle" id="toggleFontBtn" onclick="toggleDyslexiaFont()">Desativado</button>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <strong><i class="fa-solid fa-wind"></i> Animações</strong>
+            <span>Desligue se as animações atrapalharem</span>
+          </div>
+          <button class="btn-toggle" id="toggleMotionBtn" onclick="toggleMotion()">Ativado</button>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <strong><i class="fa-solid fa-school"></i> Ano escolar</strong>
+            <span>Vem do cadastro; ajuste aqui se precisar</span>
+          </div>
+          <select class="btn-select" id="settingGrade"></select>
         </div>
       </div>
     </div>

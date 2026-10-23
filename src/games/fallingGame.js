@@ -1,124 +1,145 @@
 import { G } from '../state/gameState.js';
-import { pickQuestion, pick } from '../engine/questionGenerator.js';
+import { registrarTentativa } from '../state/gameState.js';
+import { novaPergunta } from '../engine/questionGenerator.js';
+import { getFallingSpeed } from '../engine/mathDifficulty.js';
 import { $ } from '../utils/dom.js';
 import { MSGS } from '../data/messages.js';
+import { pick } from '../engine/questionUtils.js';
 import { playSound, speakText } from '../audio/soundManager.js';
 import { showConfetti } from '../effects/particles.js';
+import { showStudyOverlay } from '../ui/studyOverlay.js';
 import { saveState } from '../storage/persistence.js';
-import { finishRound } from './gameUtils.js';
-import { progressQuest } from './gameManager.js';
+import { finishRound, startTimer, elapsed, marcarProgresso, pontosPorAcerto } from './gameUtils.js';
+import { depoisDaRodada } from './roundCycle.js';
 
-let fallingIndex = 0;
-let candiesFallen = 0;
+const TOTAL = 5;
+let indice = 0;
+let caíram = 0;
+let timer = null;
 
 export function startFallingRound() {
-  fallingIndex = 0;
+  indice = 0;
   G.roundCorrect = 0;
   loadFallingQuestion();
 }
 
 export function loadFallingQuestion() {
-  G.currentQ = pickQuestion(G.selectedLevel || 1);
+  G.currentQ = novaPergunta({ trackId: G.selectedTrack, grade: G.grade });
   const q = G.currentQ;
 
-  $('fallingProg').textContent    = `${fallingIndex+1}/5`;
-  $('fallingStarsBar').textContent = G.stars;
-  $('fallingDiff').textContent    = q.diff;
-  $('fallingText').textContent    = q.text;
+  marcarProgresso('falling', indice + 1, TOTAL);
+  $('fallingDiff').textContent = q.trilhaNome;
+  $('fallingText').textContent = q.prompt;
   $('fallingFeedback').classList.remove('show');
-  
-  if (G.autoTTS) speakText(q.text);
-  
+
+  startTimer();
+  if (G.autoTTS) speakText(q.prompt);
+
   const stage = $('fallingStage');
   stage.innerHTML = '';
-  
-  let threeOpts = [q.opts[q.ans]];
-  const wrongs = q.opts.filter(o => o !== q.opts[q.ans]);
-  threeOpts.push(wrongs[0], wrongs[1]);
-  threeOpts = threeOpts.sort(() => Math.random() - 0.5);
-  const correctIdx = threeOpts.indexOf(q.opts[q.ans]);
 
-  candiesFallen = 0;
-  threeOpts.forEach((opt, i) => {
-    const c = document.createElement('div');
+  // até 4 doces caindo, um para cada alternativa
+  const ordem = q.options.map((_, i) => i).sort(() => Math.random() - 0.5);
+  caíram = 0;
+
+  ordem.forEach((optIdx, pos) => {
+    const c = document.createElement('button');
     c.className = 'falling-candy';
-    c.style.left = (20 + i * 25) + '%';
-    c.innerHTML = `<div class="fc-val">${opt}</div>`;
-    
-    let pos = -60;
-    const speed = 1.0 + Math.random() * 1.5; 
-    
-    c.dataset.isCorrect = (i === correctIdx);
-    c.onclick = () => handleCandyClick(c, c.dataset.isCorrect === 'true');
+    c.style.left = `${8 + pos * (84 / Math.max(1, ordem.length - 1))}%`;
+    c.innerHTML = `<span class="fc-val">${q.options[optIdx]}</span><i class="fa-solid fa-candy-cane fc-shadow"></i>`;
+    c.dataset.isCorrect = String(optIdx === q.answer);
+    c.dataset.speed = String(getFallingSpeed(G.grade));
+    c.dataset.pos = '-70';
+    c.addEventListener('click', () => handleCandyClick(c, c.dataset.isCorrect === 'true'));
     stage.appendChild(c);
-    
-    const fallInterval = setInterval(() => {
-      if (!c.isConnected || c.dataset.stopped) {
-        clearInterval(fallInterval);
-        return;
-      }
-      pos += speed;
-      c.style.top = pos + 'px';
-      
-      if (pos > stage.offsetHeight - 40) {
-        clearInterval(fallInterval);
-        c.remove();
-        candiesFallen++;
-        if (candiesFallen === 3 && !$('fallingFeedback').classList.contains('show')) {
-           handleCandyMiss();
-        }
-      }
-    }, 20);
   });
+
+  animarCandies(stage, ordem.length);
 }
 
-export function handleCandyClick(c, isCorrect) {
-  if (c.dataset.stopped) return;
-  
-  document.querySelectorAll('.falling-candy').forEach(cand => {
-    cand.dataset.stopped = true;
-  });
+function animarCandies(stage, total) {
+  clearInterval(timer);
+  let travado = false;
+  const doces = Array.from(stage.querySelectorAll('.falling-candy'));
+  const limite = stage.offsetHeight || 320;
 
-  // Track stats
-  const op = G.currentQ.op;
-  if (op && G.stats[op]) {
-    if (isCorrect) G.stats[op].c++;
-    else G.stats[op].w++;
-  }
+  timer = setInterval(() => {
+    if (travado) return;
+    // a criança saiu da Chuva de Doces: congela a queda. Sem isso, os doces
+    // continuariam "caindo" escondidos, virariam tentativa errada na Área dos
+    // Pais e a rodada antiga terminaria por cima do jogo novo.
+    const tela = $('screenFalling');
+    if (tela && !tela.classList.contains('active')) {
+      clearInterval(timer);
+      timer = null;
+      return;
+    }
+    doces.forEach(c => {
+      if (c.dataset.dead) return;
+      let pos = Number(c.dataset.pos);
+      pos += Number(c.dataset.speed);
+      c.dataset.pos = String(pos);
+      c.style.top = pos + 'px';
+      if (pos > limite - 40) {
+        c.dataset.dead = '1';
+        c.classList.add('caiu');
+        caíram++;
+        if (caíram >= total) {
+          travado = true;
+          handleCandyMiss();
+        }
+      }
+    });
+  }, 16);
+}
 
-  if (isCorrect) {
+function parar() {
+  clearInterval(timer);
+  timer = null;
+  document.querySelectorAll('.falling-candy').forEach(c => { c.dataset.dead = '1'; c.disabled = true; });
+}
+
+export function handleCandyClick(c, certa) {
+  parar();
+  const q = G.currentQ;
+  const ms = elapsed();
+  registrarTentativa(q, certa, ms, 'falling');
+
+  if (certa) {
     c.classList.add('correct');
-    G.stars += 15;
-    G.totalCorrect++;
+    G.stars += pontosPorAcerto('falling');
     G.streak++;
     G.roundCorrect++;
     if (G.streak > G.bestStreak) G.bestStreak = G.streak;
     playSound('correct');
     showConfetti();
     showFallingFeedback(pick(MSGS.correct));
-    progressQuest('correct_math', 1);
+    // missão de acertos sobe em registrarTentativa()
   } else {
     c.classList.add('wrong');
+    const certaEl = Array.from(document.querySelectorAll('.falling-candy')).find(el => el.dataset.isCorrect === 'true');
+    if (certaEl) certaEl.classList.add('correct-reveal');
     G.streak = 0;
     playSound('wrong');
-    showFallingFeedback(pick(MSGS.wrong));
+    showFallingFeedback(`Era ${q.answerText}!`);
+    showStudyOverlay(q);
   }
-  
+
   $('fallingStarsBar').textContent = G.stars;
   saveState();
-
-  setTimeout(nextFallingRound, 1500);
+  depoisDaRodada(certa ? 1400 : 4200, nextFallingRound);
 }
 
 export function handleCandyMiss() {
-  document.querySelectorAll('.falling-candy').forEach(cand => {
-    cand.dataset.stopped = true;
-  });
+  parar();
+  const q = G.currentQ;
+  registrarTentativa(q, false, elapsed(), 'falling');
   G.streak = 0;
   playSound('wrong');
-  showFallingFeedback('Você deixou cair!');
+  showFallingFeedback('Escapou! Ficou olhando a resposta certa:');
+  showStudyOverlay(q);
   saveState();
-  setTimeout(nextFallingRound, 1500);
+  depoisDaRodada(4200, nextFallingRound);
 }
 
 export function showFallingFeedback(msg) {
@@ -127,10 +148,7 @@ export function showFallingFeedback(msg) {
 }
 
 export function nextFallingRound() {
-  fallingIndex++;
-  if (fallingIndex >= 5) {
-    finishRound('falling');
-  } else {
-    loadFallingQuestion();
-  }
+  indice++;
+  if (indice >= TOTAL) finishRound('falling');
+  else loadFallingQuestion();
 }

@@ -1,13 +1,37 @@
-import { G } from '../state/gameState.js';
+import { G, registrarTentativa } from '../state/gameState.js';
 import { PUZZLES } from '../data/puzzles.js';
 import { $ } from '../utils/dom.js';
 import { playSound } from '../audio/soundManager.js';
 import { showConfetti } from '../effects/particles.js';
+import { registrarPartida } from './gameUtils.js';
 import { saveState } from '../storage/persistence.js';
 import { showToast } from '../ui/toastManager.js';
 
 let currentPuzzle = null;
 let hintsUsed = 0;
+// resultado já registrado de cada célula (evita contar a mesma célula a cada clique em conferir)
+const resultadosCelas = new Map();
+
+/**
+ * A cruzadinha não nasce do motor de perguntas (ela é uma grade pronta),
+ * mas ainda assim entra no relatório dos pais como treino de raciocínio:
+ * cada célula certa vale um acerto, cada errada um erro.
+ */
+function registrarCelas(certas, erradas) {
+  const questao = {
+    prompt: `Cruzadinha: ${currentPuzzle ? currentPuzzle.title : 'grade de somas'}`,
+    answerText: `${certas} célula(s) correta(s)`,
+    explain: 'Complete a grade pensando em duas direções: a soma da linha e a soma da coluna precisam bater ao mesmo tempo.',
+    skillId: 'grade-logica',
+    trilhaId: 'padroes',
+    trilhaNome: 'Detetive de Padrões',
+    unidadeTematica: 'algebra',
+    codes: ['EF02MA10', 'EF03MA11'],
+    grade: G.grade,
+  };
+  for (let i = 0; i < certas; i++) registrarTentativa(questao, true, 0, 'puzzle');
+  for (let i = 0; i < erradas; i++) registrarTentativa(questao, false, 0, 'puzzle');
+}
 
 export function startPuzzleMode() {
   hintsUsed = 0;
@@ -22,6 +46,7 @@ export function loadPuzzle(idx) {
   $('puzzleTitle').textContent    = currentPuzzle.title;
   $('puzzleDesc').textContent     = currentPuzzle.desc;
   hintsUsed = 0;
+  resultadosCelas.clear();
   renderPuzzleGrid();
 }
 
@@ -87,6 +112,8 @@ export function checkPuzzle() {
   const n = p.size;
   let allCorrect = true;
   let anyFilled = false;
+  let novasCertas = 0;
+  let novasErradas = 0;
 
   // Clear previous states
   document.querySelectorAll('.pcell.blank').forEach(c => {
@@ -99,11 +126,18 @@ export function checkPuzzle() {
     const cell = inp.parentElement;
     const val = parseInt(inp.value, 10);
     if (!isNaN(val)) anyFilled = true;
-    if (val === ans) {
+    const acertou = val === ans;
+    if (acertou) {
       cell.classList.add('correct-cell');
     } else {
       cell.classList.add('wrong-cell');
       allCorrect = false;
+    }
+    // cada célula só entra no relatório uma vez por resultado: conferir
+    // repetido não infla a estatística da habilidade
+    if (resultadosCelas.get(key) !== acertou) {
+      resultadosCelas.set(key, acertou);
+      if (acertou) novasCertas++; else novasErradas++;
     }
   });
 
@@ -112,10 +146,12 @@ export function checkPuzzle() {
     return;
   }
 
+  if (novasCertas || novasErradas) registrarCelas(novasCertas, novasErradas);
+
   if (allCorrect) {
     const earned = Math.max(p.stars - hintsUsed * 5, 10);
     G.stars += earned;
-    G.totalCorrect++;
+    registrarPartida('puzzle');
     G.puzzleIndex = (G.puzzleIndex + 1) % PUZZLES.length;
     saveState();
     playSound('correct');

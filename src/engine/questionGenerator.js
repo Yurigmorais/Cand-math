@@ -1,86 +1,81 @@
+/**
+ * Seleção de quem a criança vai enfrentar na próxima pergunta.
+ *
+ * Ideia pedagógica: dentro da trilha escolhida, o sorteio não é uniforme.
+ * Habilidades com mais erros (ou não treinadas há mais tempo) pesam mais,
+ * então o jogo "volta" no ponto fraco sem a criança perceber que está
+ * sendo corrigida — ela só sente que o jogo está variando.
+ */
 import { G } from '../state/gameState.js';
+import { TRACKS, TRACKS_BY_ID, MIX_TRACK, SKILLS_BY_ID, skillsOfTrack, tracksForGrade } from '../data/curriculum.js';
+import { buildQuestion, paraTrueFalse } from './generators/index.js';
+import { rnd, pick } from './questionUtils.js';
 
-export function pick(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
+export { pick, rnd, buildQuestion, paraTrueFalse };
+
+function skillStat(skillId) {
+  if (!G.skillStats) return null;
+  return G.skillStats[skillId] || null;
 }
 
-function getWeightedOp(availableOps) {
-  if (!G.stats || availableOps.length <= 1) return pick(availableOps);
-
-  let weights = [];
-  let totalWeight = 0;
-
-  availableOps.forEach(opKey => {
-    const stat = G.stats[opKey];
-    // Se a criança erra, o peso sobe. 
-    // Peso base = 10. Cada erro a mais que acerto = +2. Max peso = 40.
-    let weight = 10;
-    if (stat) {
-      const errorRate = stat.w - stat.c;
-      if (errorRate > 0) weight += errorRate * 2;
-    }
-    weight = Math.min(weight, 40);
-    weights.push({ op: opKey, weight });
-    totalWeight += weight;
-  });
-
-  let rand = Math.random() * totalWeight;
-  for (let w of weights) {
-    if (rand < w.weight) return w.op;
-    rand -= w.weight;
-  }
-  return pick(availableOps);
+/**
+ * Peso de treino de uma habilidade.
+ * base 10, +3 por erro líquido, teto 45, e um empurrãozinho para
+ * habilidades nunca vistas (curiosidade > repetição chata).
+ */
+function peso(sk) {
+  const st = skillStat(sk.id);
+  if (!st) return 22;
+  const liquido = st.w - st.c;
+  let p = 10 + Math.max(0, liquido) * 3;
+  // se está mandando muito bem, reduz um pouco mas nunca some da rotação
+  if (liquido < 0) p = 6;
+  return Math.min(45, p);
 }
 
-export function generateQuestion(level = 1) {
-  let op1, op2, res, symbol, text;
-  const icons = ['fa-candy-cane', 'fa-cookie-bite', 'fa-cookie', 'fa-ice-cream', 'fa-cake-candles', 'fa-circle-dot'];
-  const icon = pick(icons);
-
-  const opsMap = ['add'];
-  if (level >= 2) opsMap.push('sub');
-  if (level >= 3) opsMap.push('mul');
-  if (level >= 4) opsMap.push('div');
-  
-  const opKey = getWeightedOp(opsMap);
-
-  if (opKey === 'add') {
-    op1 = Math.floor(Math.random() * 10) + 1;
-    op2 = Math.floor(Math.random() * 10) + 1;
-    res = op1 + op2;
-    symbol = '+';
-  } else if (opKey === 'sub') {
-    op1 = Math.floor(Math.random() * 15) + 5;
-    op2 = Math.floor(Math.random() * op1) + 1;
-    res = op1 - op2;
-    symbol = '-';
-  } else if (opKey === 'mul') {
-    op1 = Math.floor(Math.random() * 10) + 1;
-    op2 = Math.floor(Math.random() * 10) + 1;
-    res = op1 * op2;
-    symbol = '×';
-  } else if (opKey === 'div') {
-    res = Math.floor(Math.random() * 9) + 2;
-    op2 = Math.floor(Math.random() * 9) + 2;
-    op1 = res * op2;
-    symbol = '÷';
+function sortear(habilidades) {
+  const pesos = habilidades.map(peso);
+  const total = pesos.reduce((a, b) => a + b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < habilidades.length; i++) {
+    if (r < pesos[i]) return habilidades[i];
+    r -= pesos[i];
   }
-  text = `Quanto é ${op1} ${symbol} ${op2}?`;
-
-  let optsSet = new Set([res]);
-  while (optsSet.size < 4) {
-    let wrong = res + (Math.floor(Math.random() * 7) - 3);
-    if (wrong < 0) wrong = res + Math.floor(Math.random() * 5) + 1;
-    if (wrong !== res) optsSet.add(wrong);
-  }
-  
-  let opts = Array.from(optsSet).sort(() => Math.random() - 0.5);
-  let ansIdx = opts.indexOf(res);
-  let diffText = level === 1 ? "Iniciante" : level === 2 ? "Aprendiz" : level === 3 ? "Experiente" : "Mestre";
-
-  return { diff: diffText, icon, text, opts: opts.map(String), ans: ansIdx, numericRes: res, op: opKey };
+  return pick(habilidades);
 }
 
-export function pickQuestion(selectedLevel) {
-  return generateQuestion(selectedLevel || 1);
+/**
+ * @param {object} opts { trackId, grade }
+ * @returns pergunta pronta para qualquer minigame
+ */
+export function novaPergunta(opts = {}) {
+  const grade = Number(opts.grade || (G.profile && G.profile.grade) || G.grade || 3);
+  const trackId = opts.trackId || G.selectedTrack || 'mix';
+
+  const trilha = trackId === 'mix' ? MIX_TRACK : (TRACKS_BY_ID[trackId] || MIX_TRACK);
+  let pool = trackId === 'mix'
+    ? tracksForGrade(grade).reduce((acc, t) => acc.concat(t.habilidades), [])
+    : skillsOfTrack(trilha.id, grade);
+
+  // trilha escolhida não cobre esse ano: usa a trilha mix completa do ano
+  if (!pool.length) pool = tracksForGrade(grade).reduce((acc, t) => acc.concat(t.habilidades), []);
+  if (!pool.length) pool = TRACKS.reduce((acc, t) => acc.concat(t.habilidades), []);
+
+  const sk = sortear(pool);
+  return buildQuestion(sk, grade);
+}
+
+/**
+ * Versão antiga, mantida como atalho para os minigames já escritos.
+ * level ainda funciona como "nível de operação" (1 soma, 4 divisão).
+ */
+export function pickQuestion(levelOrOpts) {
+  if (levelOrOpts && typeof levelOrOpts === 'object') return novaPergunta(levelOrOpts);
+  const level = levelOrOpts || 1;
+  const trilhaPorLevel = { 1: 'adição', 2: 'subtracao', 3: 'multiplicacao', 4: 'divisao' };
+  return novaPergunta({ trackId: trilhaPorLevel[level] || 'mix' });
+}
+
+export function skillDe(q) {
+  return q && q.skillId ? SKILLS_BY_ID[q.skillId] : null;
 }

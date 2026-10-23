@@ -1156,29 +1156,7 @@ html, body {
   50% { transform: scale(1.12); box-shadow: 0 0 30px rgba(107, 203, 119, 0.8); }
 }
 
-.study-overlay {
-  position: fixed; inset: 0; z-index: 9998;
-  background: rgba(0,0,0,0.5);
-  display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(4px);
-}
-.study-card {
-  background: #fff; border-radius: 24px; padding: 32px;
-  text-align: center; max-width: 320px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-}
-.study-answer {
-  font-size: 48px; font-weight: 900;
-  color: #6BCB77; margin: 16px 0;
-}
-.study-timer-bar {
-  height: 6px; background: #6BCB77; border-radius: 3px;
-  width: 100%; margin-top: 16px;
-}
-@keyframes studyCountdown {
-  from { width: 100%; }
-  to { width: 0%; }
-}
+/* estilos da tela de foco (study-overlay) ficam na seção "TELA DE FOCO" lá embaixo */
 
 /* ===== LOGIN SCREEN ===== */
 .login-bg {
@@ -1428,193 +1406,6 @@ html, body {
 .btn-reset-all:hover, .btn-lu-continue:hover, .btn-login-submit:active {
   transform:translateY(4px) !important;
   box-shadow: 0 4px 0 var(--border), 0 6px 10px rgba(0,0,0,0.2) !important;
-
-/* ===================================================
-   CANDY CRUSH / CARTUNIZADO 2D OVERRIDES
-   =================================================== */
-
-:root {
-  --pink:    #FF3385;
-  --pink2:   #E6005C;
-  --pink-dark: #C2004B;
-  --yellow:  #FFD500;
-  --yellow-dark: #CCAA00;
-  --mint:    #00E5FF;
-  --purple:  #A200FF;
-  --purple-dark: #6B00B2;
-  --orange:  #FF7B00;
-  --orange-dark: #C25000;
-  --red:     #FF2A2A;
-  --red-dark: #C20000;
-  --blue:    #00A2FF;
-  --blue-dark: #006BB2;
-  --green:   #33CC33;
-  --green-dark: #1E8C1E;
-
-  --bg:      #D4F0FF;
-  --card:    #FFFFFF;
-  --border:  #4A2B65;
-
-  --text:    #4A2B65;
-  --text2:   #7A6B8A;
-  --white:   #FFFFFF;
-
-  --shadow-pink: 0 8px 0 var(--border), 0 12px 15px rgba(0,0,0,0.2);
-  --shadow-card: 0 8px 0 var(--border), 0 12px 15px rgba(0,0,0,0.2);
-  --r:       24px;
-  --r-sm:    16px;
-}
-
-html, body {
-  background: repeating-linear-gradient(45deg, #7CD4FF, #7CD4FF 30px, #5CB8FF 30px, #5CB8FF 60px) !important;
-}
-.login-bg {
-  background: repeating-linear-gradient(45deg, #7CD4FF, #7CD4FF 30px, #5CB8FF 30px, #5CB8FF 60px) !important;
-}
-
-.splash-title {
-  text-shadow: 
-    -3px -3px 0 var(--border),  
-     3px -3px 0 var(--border),
-    -3px  3px 0 var(--border),
-     3px  3px 0 var(--border),
-     0 8px 0 var(--orange-dark),
-     0 12px 10px rgba(0,0,0,0.4) !important;
-}
-
-.btn-play {
-  background: var(--green) !important;
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 8px 0 var(--green-dark), 0 12px 20px rgba(0,0,0,0.3) !important;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.4) !important;
-  animation: none !important;
-}
-.btn-play:hover { transform:translateY(4px) !important; box-shadow: 0 4px 0 var(--green-dark), 0 6px 10px rgba(0,0,0,0.3) !important; }
-.btn-play:active { transform:translateY(8px) !important; box-shadow: 0 0 0 var(--green-dark), 0 2px 5px rgba(0,0,0,0.3) !important; }
-
-.btn-back {
-  border: 3px solid var(--border) !important;
-  box-shadow: 0 4px 0 var(--pink-dark), 0 6px 10px rgba(0,0,0,0.3) !important;
-  text-shadow: 1px 1px 0 rgba(0,0,0,0.3) !important;
-  background: var(--pink) !important;
-}
-.btn-back:hover { transform: translateY(2px) !important; box-shadow: 0 2px 0 var(--pink-dark), 0 4px 6px rgba(0,0,0,0.3) !important; }
-
-.hub-header {
-  border: 4px solid var(--border) !important;
-  border-top: none !important;
-  box-shadow: 0 8px 0 var(--border), 0 12px 15px rgba(0,0,0,0.2) !important;
-  background: var(--card) !important;
-}
-.hub-stat { border: 3px solid var(--border) !important; }
-
-.mode-card {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 8px 0 var(--border), 0 12px 15px rgba(0,0,0,0.2) !important;
-}
-.mode-card:hover { transform:translateY(4px) !important; box-shadow: 0 4px 0 var(--border), 0 6px 10px rgba(0,0,0,0.2) !important; }
-.mc-quiz { background: var(--pink) !important; }
-.mc-falling { background: var(--orange) !important; }
-.mc-puzzle { background: var(--purple) !important; }
-.mc-memory { background: var(--blue) !important; }
-.mc-tf { background: var(--green) !important; }
-
-.btn-hub-action {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 6px 0 var(--border), 0 8px 10px rgba(0,0,0,0.2) !important;
-}
-.btn-hub-action:hover { transform:translateY(3px) !important; box-shadow: 0 3px 0 var(--border), 0 4px 6px rgba(0,0,0,0.2) !important; }
-.bha-shop { background: var(--pink) !important; }
-.bha-records { background: var(--yellow) !important; }
-.bha-sound { background: var(--mint) !important; color: var(--text) !important; }
-
-.quiz-card, .falling-question-wrap, .puzzle-info-card, .puzzle-grid-wrap {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 8px 0 var(--border), 0 12px 15px rgba(0,0,0,0.2) !important;
-}
-
-.ans-btn {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 6px 0 var(--border), 0 8px 10px rgba(0,0,0,0.2) !important;
-}
-.ans-btn:hover:not(:disabled) { transform:translateY(3px) !important; box-shadow: 0 3px 0 var(--border), 0 4px 6px rgba(0,0,0,0.2) !important; }
-.ans-btn.correct, .ans-btn.correct-reveal { background: var(--green) !important; border-color: var(--border) !important; color: white !important;}
-.ans-btn.wrong { background: var(--red) !important; border-color: var(--border) !important; color: white !important; }
-
-.falling-stage {
-  border: 4px solid var(--border) !important;
-  background: var(--bg) !important;
-  box-shadow: inset 0 8px 0 rgba(0,0,0,0.1) !important;
-}
-.falling-candy {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 6px 0 var(--border), 0 8px 10px rgba(0,0,0,0.2) !important;
-}
-.falling-candy:active { transform: translateY(4px) !important; box-shadow: 0 2px 0 var(--border), 0 4px 6px rgba(0,0,0,0.2) !important; }
-
-.btn-hint, .btn-check-puzzle, .btn-next-puzzle {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 6px 0 var(--border), 0 8px 10px rgba(0,0,0,0.2) !important;
-}
-.btn-hint:hover, .btn-check-puzzle:hover, .btn-next-puzzle:hover { transform:translateY(3px) !important; box-shadow: 0 3px 0 var(--border), 0 4px 6px rgba(0,0,0,0.2) !important; }
-.btn-hint { background: var(--yellow) !important; }
-.btn-check-puzzle { background: var(--green) !important; }
-.btn-next-puzzle { background: var(--purple) !important; }
-
-.mcard-front {
-  border: 4px solid var(--border) !important;
-  box-shadow: inset 0 -4px 0 rgba(0,0,0,0.2) !important;
-  background: var(--blue) !important;
-}
-.mcard-back {
-  border: 4px solid var(--border) !important;
-}
-
-.modal-box {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 12px 0 var(--border), 0 16px 20px rgba(0,0,0,0.3) !important;
-}
-
-.diff-btn {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 6px 0 var(--border), 0 8px 10px rgba(0,0,0,0.2) !important;
-}
-.diff-btn:hover { transform:translateY(3px) !important; box-shadow: 0 3px 0 var(--border), 0 4px 6px rgba(0,0,0,0.2) !important; }
-.diff-lvl1 { background: var(--green) !important; }
-.diff-lvl2 { background: var(--yellow) !important; }
-.diff-lvl3 { background: var(--pink) !important; }
-.diff-lvl4 { background: var(--purple) !important; }
-
-.shop-item-card {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 6px 0 var(--border), 0 8px 10px rgba(0,0,0,0.2) !important;
-}
-.shop-item-card:hover { transform:translateY(3px) !important; box-shadow: 0 3px 0 var(--border), 0 4px 6px rgba(0,0,0,0.2) !important; }
-.sic-btn {
-  border: 3px solid var(--border) !important;
-  box-shadow: 0 4px 0 var(--border) !important;
-}
-.sic-btn:hover:not(.locked-btn) { transform:translateY(2px) !important; box-shadow: 0 2px 0 var(--border) !important; }
-.sic-btn.buy-btn { background: var(--purple) !important; }
-.sic-btn.equip-btn { background: var(--green) !important; }
-.sic-btn.unequip-btn { background: var(--orange) !important; }
-
-.rec-card {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 6px 0 var(--border), 0 8px 10px rgba(0,0,0,0.2) !important;
-}
-.rc-yellow { background: var(--yellow) !important; border-color: var(--border) !important; color: var(--border) !important; }
-.rc-pink { background: var(--pink) !important; border-color: var(--border) !important; color: white !important;}
-.rc-orange { background: var(--orange) !important; border-color: var(--border) !important; color: white !important;}
-.rc-mint { background: var(--mint) !important; border-color: var(--border) !important; color: var(--border) !important;}
-
-.btn-reset-all, .btn-lu-continue, .btn-login-submit {
-  border: 4px solid var(--border) !important;
-  box-shadow: 0 8px 0 var(--border), 0 12px 15px rgba(0,0,0,0.2) !important;
-}
-.btn-reset-all:hover, .btn-lu-continue:hover, .btn-login-submit:active {
-  transform:translateY(4px) !important;
-  box-shadow: 0 4px 0 var(--border), 0 6px 10px rgba(0,0,0,0.2) !important;
 }
 .btn-reset-all { background: var(--red) !important; color: white !important;}
 .btn-lu-continue { background: var(--pink) !important; color: white !important; }
@@ -1627,16 +1418,29 @@ html, body {
 
 /* ===== NOVO: XP BAR, QUESTS, SETTINGS, ACESSIBILIDADE ===== */
 
-/* Dyslexia Font Support */
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700;800&display=swap');
+/* fonte Lexend: carregada no <link> das paginas (um @import aqui no meio do
+   arquivo seria ignorado pelo navegador)
+
+   O botão "fonte para dislexia" precisa alcançar tudo que a criança lê.
+   Antes ele só trocava os parágrafos, e os títulos, enunciados e alternativas
+   continuavam em Luckiest Guy — fonte desenhada com letra juntinha e traço
+   grosso, justamente o que atrapalha quem tem dislexia. Agora a Lexend vale
+   para todo o app; a cara de doce continua vindo das cores, bordas e sombras,
+   não da fonte. Os ícones (fa-*) ficam de fora porque dependem da própria
+   fonte do FontAwesome, e o espaçamento de letras é deixado em cada elemento
+   (os pontinhos do PIN, por exemplo, precisam do recuo largo). */
 body.dyslexia-font,
-body.dyslexia-font input,
-body.dyslexia-font button,
-body.dyslexia-font .qcard-text,
-body.dyslexia-font .mc-name,
-body.dyslexia-font .mc-desc {
-  font-family: 'Lexend', sans-serif !important;
-  letter-spacing: 0.5px;
+body.dyslexia-font *:not([class*="fa-"]) {
+  font-family: 'Lexend', 'Comic Neue', sans-serif !important;
+}
+
+/* Lexend é mais larga que Luckiest Guy: nas etiquetas apertadas (o nome do
+   minigame no card do hub) ela não cabia e cortava "Cruzadinha",
+   "Mercadinho". Um tamanho um pouco menor resolve sem perder o destaque. */
+body.dyslexia-font .mc-name {
+  font-size: 15px;
+  letter-spacing: 0;
+  overflow-wrap: break-word;
 }
 
 /* XP Bar in Hub */
@@ -1760,4 +1564,955 @@ body.high-contrast .hub-title, body.high-contrast .splash-title {
   color: #000; text-shadow: none;
 }
 body.high-contrast .quest-item { background: #fff; border-color: #000; }
-body.high-contrast .mc-desc { color: #000; }}
+body.high-contrast .mc-desc { color: #000; }
+
+/* ===================================================
+   CAMADA NOVA — trilhas, desenhos das perguntas,
+   Corrida Doce, Fatia de Bolo, Balança, Mercadinho
+   e Área dos Pais. Mesma linguagem de desenho:
+   traço grosso, bloco de sombra embaixo, Luckiest Guy.
+   =================================================== */
+
+:root {
+  --bg-dark:  #2B1B45;
+  --bg-light: #FFF6FB;
+  --traço:    4px;
+}
+
+/* ---- hub com rolagem ---- */
+#screenHub { overflow: hidden; }
+.hub-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 26px;
+}
+.hub-scroll::-webkit-scrollbar { width: 8px; }
+.hub-scroll::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 8px; }
+
+/* faixa da trilha escolhida */
+.hub-trilha-strip {
+  display: flex; align-items: center; gap: 12px;
+  width: calc(100% - 32px); max-width: 568px;
+  margin: 14px auto 2px; padding: 10px 14px;
+  background: var(--card);
+  border: var(--traço) solid var(--border);
+  box-shadow: 0 5px 0 var(--border);
+  border-radius: 20px;
+  cursor: pointer; font-family: inherit; text-align: left;
+  transition: transform .12s, box-shadow .12s;
+}
+.hub-trilha-strip:hover { transform: translateY(2px); box-shadow: 0 3px 0 var(--border); }
+.hub-trilha-strip .hts-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--yellow); border: 3px solid var(--border);
+  border-radius: 50%; font-size: 18px; color: var(--text);
+}
+.hub-trilha-strip .hts-txt { flex: 1; display: flex; flex-direction: column; }
+.hub-trilha-strip .hts-txt strong { font-family:'Luckiest Guy',cursive; font-size: 17px; color: var(--text); letter-spacing: .4px; }
+.hub-trilha-strip .hts-txt small { font-size: 12px; color: var(--text2); font-weight: 700; }
+.hub-trilha-strip .hts-change {
+  font-size: 11px; font-weight: 800; color: #fff; background: var(--purple);
+  border: 3px solid var(--border); border-radius: 14px; padding: 4px 9px;
+  white-space: nowrap;
+}
+
+/* ---- cartas dos modos novos ---- */
+.mc-race    { background: var(--orange) !important; }
+.mc-fraction{ background: #FF8FB1 !important; }
+.mc-balance { background: var(--blue) !important; }
+.mc-market  { background: var(--green) !important; }
+.mode-grid { grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 16px; padding-bottom: 18px; }
+
+.bha-quests  { background: var(--mint) !important; color: var(--text) !important; }
+.bha-settings{ background: #B9A7FF !important; color: var(--text) !important; }
+.bha-parents { background: var(--purple) !important; }
+
+/* ---- splash: selo das unidades ---- */
+.splash-trilhas {
+  display: flex; flex-wrap: wrap; gap: 7px; justify-content: center;
+  margin: 4px 0 18px; max-width: 420px;
+}
+.splash-trilhas span {
+  background: rgba(255,255,255,.85); color: var(--text);
+  border: 3px solid var(--border); border-radius: 14px;
+  font-size: 11px; font-weight: 800; padding: 4px 9px;
+  display: inline-flex; align-items: center; gap: 5px;
+  box-shadow: 0 3px 0 var(--border);
+}
+.splash-trilhas i { color: var(--pink2); }
+
+/* ---- desenhos das perguntas ---- */
+.quiz-visual { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 4px 0 12px; }
+.quiz-visual:empty { display: none; }
+.dv { font-size: 20px; line-height: 1; }
+.dv-legenda { font-size: 12px; font-weight: 800; color: var(--text2); text-align: center; }
+
+.dv-bandejas { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.dv-tray {
+  display: flex; gap: 4px; flex-wrap: wrap; justify-content: center;
+  background: var(--bg-light); border: 3px solid var(--border);
+  border-radius: 12px; padding: 7px 9px; min-width: 62px; max-width: 130px;
+  box-shadow: 0 4px 0 var(--border);
+}
+.dv-tray .dv { font-size: 16px; }
+
+.dv-array {
+  display: grid; gap: 5px; padding: 10px 12px;
+  background: var(--bg-light); border: 3px solid var(--border);
+  border-radius: 14px; box-shadow: 0 4px 0 var(--border);
+}
+.dv-array span { font-size: 17px; text-align: center; }
+
+.dv-grupos { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.dv-grupo {
+  background: #fff; border: 3px dashed var(--purple); border-radius: 14px;
+  padding: 6px 8px; min-width: 66px; text-align: center;
+}
+.dv-grupo-topo {
+  font-family:'Luckiest Guy',cursive; font-size: 13px; color: var(--purple);
+  margin-bottom: 4px;
+}
+
+.dv-pares { display: flex; align-items: center; gap: 14px; }
+.dv-numo {
+  background: var(--bg-light); border: 3px solid var(--border); border-radius: 14px;
+  padding: 8px 16px; text-align: center; box-shadow: 0 4px 0 var(--border);
+}
+.dv-numo strong { display: block; font-family:'Luckiest Guy',cursive; font-size: 22px; color: var(--text); }
+.dv-numo span { font-size: 11px; font-weight: 800; color: var(--text2); }
+.dv-vs, .dv-vezes {
+  font-family:'Luckiest Guy',cursive; font-size: 20px; color: var(--pink2);
+  background: #fff; border: 3px solid var(--border); border-radius: 50%;
+  width: 38px; height: 38px; display: flex; align-items: center; justify-content: center;
+}
+
+.dv-reta {
+  list-style: none; display: flex; align-items: flex-end; gap: 6px;
+  padding: 20px 12px 8px; position: relative; max-width: 100%;
+  overflow-x: auto;
+}
+.dv-reta::before {
+  content: ''; position: absolute; left: 10px; right: 10px; bottom: 26px;
+  border-bottom: 4px solid var(--border);
+}
+.dv-reta li { position: relative; text-align: center; min-width: 30px; }
+.dv-reta li .dv-rponto {
+  display: block; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--blue); border: 3px solid var(--border); margin: 0 auto 6px;
+}
+.dv-reta li b { font-size: 11px; color: var(--text2); }
+.dv-reta li.marcada .dv-rponto { background: var(--pink); transform: scale(1.5); }
+.dv-reta li.marcada b { color: var(--pink2); font-size: 13px; }
+
+.dv-pote {
+  position: relative; width: 190px; height: 120px;
+  background: linear-gradient(180deg, #fff, var(--bg-light));
+  border: 4px solid var(--border); border-radius: 18px 18px 26px 26px;
+  box-shadow: 0 5px 0 var(--border);
+}
+.dv-pote i { position: absolute; font-size: 15px; }
+
+.dv-combo { display: flex; align-items: center; gap: 10px; }
+.dv-combo > div {
+  background: #fff; border: 3px solid var(--border); border-radius: 14px;
+  padding: 8px 10px; text-align: center; box-shadow: 0 4px 0 var(--border);
+}
+.dv-itens { display: flex; gap: 5px; font-size: 17px; color: var(--purple); }
+.dv-combo small { display: block; font-size: 10px; font-weight: 800; color: var(--text2); margin-top: 4px; }
+
+.dv-bolo {
+  position: relative; width: 118px; height: 118px; border-radius: 50%;
+  border: 4px solid var(--border); background: #FFF3D6; overflow: hidden;
+  box-shadow: 0 5px 0 var(--border);
+}
+.dv-bolo .fatia {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from var(--a), var(--pink) 0 var(--b), transparent var(--b) 360deg);
+  opacity: 0;
+}
+.dv-bolo .fatia.on { opacity: 1; }
+.dv-bolo::after {
+  content: ''; position: absolute; inset: 0;
+  background: repeating-conic-gradient(from 0deg, rgba(0,0,0,0) 0, rgba(0,0,0,0) 0);
+}
+
+.dv-fracoes-par { display: flex; align-items: center; gap: 12px; }
+.dv-fracoes-par b { font-family:'Luckiest Guy',cursive; color: var(--purple); font-size: 20px; }
+.dv-fracao { text-align: center; background:#fff; border:3px solid var(--border); border-radius: 12px; padding: 6px 12px; box-shadow: 0 4px 0 var(--border); }
+.dv-fracao span { display:block; font-family:'Luckiest Guy',cursive; font-size: 19px; color: var(--text); }
+.dv-fracao hr { border: none; border-top: 3px solid var(--border); margin: 3px 0; }
+.dv-fracao .dv-vazio { color: var(--pink2); }
+
+.dv-comparar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.dv-barra { display: flex; gap: 3px; }
+.dv-barra i {
+  width: 24px; height: 26px; background: #fff;
+  border: 3px solid var(--border); border-radius: 6px;
+}
+.dv-barra i.on { background: var(--mint); }
+.dv-comparar small { font-weight: 800; font-size: 12px; color: var(--text2); }
+
+.dv-decimal { display: flex; gap: 6px; align-items: flex-end; }
+.dv-inteiro { width: 40px; height: 40px; border: 3px solid var(--border); border-radius: 8px; background: #fff; }
+.dv-inteiro.cheio { background: var(--blue); }
+.dv-pedacos { display: flex; flex-direction: column-reverse; width: 40px; height: 40px; padding: 0; overflow: hidden; background: #fff; }
+.dv-pedacos i { flex: 1; border: none; border-radius: 0; background: #fff; width: 100%; height: auto; }
+.dv-pedacos i.on { background: var(--orange); }
+
+.dv-notas { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.dv-nota {
+  min-width: 52px; padding: 8px 6px; text-align: center; color: #fff;
+  border: 3px solid var(--border); border-radius: 8px;
+  font-family:'Luckiest Guy',cursive; font-size: 15px;
+  box-shadow: 0 4px 0 var(--border);
+}
+
+.dv-recibo { background: #fff; border: 3px dashed var(--border); border-radius: 12px; padding: 8px 14px; min-width: 190px; }
+.dv-recibo-item { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; padding: 3px 0; border-bottom: 2px dotted #ddd; }
+.dv-recibo-item.troco { border-bottom: none; color: var(--pink2); font-size: 15px; }
+
+.dv-etiqueta {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--yellow); border: 3px solid var(--border);
+  border-radius: 12px; padding: 8px 14px; box-shadow: 0 4px 0 var(--border);
+}
+.dv-etiqueta s { color: var(--text2); font-size: 15px; }
+.dv-etiqueta strong { font-family:'Luckiest Guy',cursive; font-size: 19px; }
+.dv-etiqueta.sobe strong { color: var(--green-dark); }
+.dv-etiqueta.desce strong { color: var(--red); }
+
+.dv-percent { display: flex; gap: 4px; }
+.dv-percent span { width: 20px; height: 26px; background: #fff; border: 3px solid var(--border); border-radius: 5px; }
+.dv-percent span.cheio { background: var(--pink); }
+
+.dv-sequencia { display: flex; gap: 7px; flex-wrap: wrap; justify-content: center; }
+.dv-termo {
+  min-width: 42px; padding: 8px; text-align: center;
+  font-family:'Luckiest Guy',cursive; font-size: 18px; color: var(--text);
+  background: #fff; border: 3px solid var(--border); border-radius: 12px;
+  box-shadow: 0 4px 0 var(--border);
+}
+.dv-termo.vazio { background: var(--yellow); color: var(--pink2); animation: pulsa 1.2s ease infinite; }
+@keyframes pulsa { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+.dv-balancinha { position: relative; width: 240px; height: 130px; }
+.dv-base { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 70px; height: 12px; background: var(--purple); border: 3px solid var(--border); border-radius: 6px; }
+.dv-braco { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); width: 6px; height: 60px; background: var(--purple-dark); border: 2px solid var(--border); }
+.dv-prato {
+  position: absolute; bottom: 74px; width: 96px; min-height: 40px;
+  background: #fff; border: 3px solid var(--border); border-radius: 8px 8px 20px 20px;
+  padding: 6px; display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; align-items: center;
+  box-shadow: 0 4px 0 var(--border);
+}
+.dv-prato.prato-esq { left: 0; }
+.dv-prato.prato-dir { right: 0; }
+.dv-prato .dv { font-size: 14px; }
+.dv-saco {
+  font-family:'Luckiest Guy',cursive; font-size: 17px; color: #fff;
+  background: var(--orange); border: 3px solid var(--border); border-radius: 10px;
+  padding: 3px 8px;
+}
+.dv-saco.menos { background: var(--red); }
+
+.dv-fila { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.dv-fila-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: #fff; border: 3px solid var(--border); border-radius: 12px; padding: 5px 8px;
+  font-size: 11px; font-weight: 800; color: var(--text2);
+}
+.dv-fila-item i { font-size: 16px; color: var(--blue); }
+.dv-fila-item.destaque { background: var(--yellow); color: var(--text); transform: translateY(-4px); }
+.dv-fila-item.destaque i { color: var(--pink2); }
+.dv-fila-seta { color: var(--purple); font-size: 18px; }
+
+.dv-plano {
+  position: relative; width: 190px; height: 190px; background: #fff;
+  border: 4px solid var(--border); border-radius: 12px; box-shadow: 0 5px 0 var(--border);
+}
+.dv-plano::before { content:''; position:absolute; left:0; right:0; bottom:0; height:2px; background: var(--text2); }
+.dv-plano::after  { content:''; position:absolute; top:0; bottom:0; left:0; width:2px; background: var(--text2); }
+.dv-plano .dv-ponto {
+  position: absolute; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--pink); border: 3px solid var(--border);
+  left: calc(var(--x) / var(--max) * 100% - 8px);
+  bottom: calc(var(--y) / var(--max) * 100% - 8px);
+}
+.dv-plano .gx, .dv-plano .gy { position: absolute; font-size: 9px; font-weight: 800; color: var(--text2); }
+.dv-plano .gx { bottom: -14px; transform: translateX(-50%); }
+.dv-plano .gy { left: -14px; transform: translateY(50%); }
+
+.dv-malha {
+  display: grid; width: 210px; gap: 0; background: #fff;
+  border: 3px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.dv-malha i { aspect-ratio: 1; border: 1px solid rgba(74,43,101,.18); }
+.dv-malha i.borda { background: var(--mint); }
+.dv-malha i.dentro { background: rgba(61,187,255,.35); }
+
+.dv-cubo { display: grid; grid-template-columns: repeat(5, 22px); gap: 4px; }
+.dv-cubo span { width: 22px; height: 22px; background: var(--blue); border: 3px solid var(--border); border-radius: 5px; }
+
+.dv-relogio {
+  position: relative; width: 130px; height: 130px; border-radius: 50%;
+  background: #fff; border: 5px solid var(--border); box-shadow: 0 5px 0 var(--border);
+}
+.dv-agulha { position:absolute; left:50%; bottom:50%; transform-origin: bottom center; background: var(--text); border-radius: 4px; }
+.dv-agulha.hora { width: 5px; height: 32px; margin-left: -2.5px; }
+.dv-agulha.minuto { width: 3px; height: 46px; margin-left: -1.5px; background: var(--pink2); }
+.dv-pino { position:absolute; left:50%; top:50%; width:12px; height:12px; margin:-6px 0 0 -6px; background: var(--purple); border:2px solid var(--border); border-radius:50%; }
+.dv-relogio b { position:absolute; font-size: 12px; color: var(--text2); }
+.dv-relogio b.n12 { top: 5px; left: 50%; transform: translateX(-50%); }
+.dv-relogio b.n6  { bottom: 5px; left: 50%; transform: translateX(-50%); }
+.dv-relogio b.n3  { right: 7px; top: 50%; transform: translateY(-50%); }
+.dv-relogio b.n9  { left: 7px; top: 50%; transform: translateY(-50%); }
+
+.dv-termometro {
+  position: relative; width: 34px; height: 140px; border-radius: 20px 20px 24px 24px;
+  background: #fff; border: 4px solid var(--border); overflow: hidden;
+}
+.dv-mercurio { position:absolute; bottom:0; left:0; right:0; background: linear-gradient(180deg, var(--red), var(--orange)); transition: height .5s ease; }
+.dv-termometro b { position:absolute; bottom: -22px; left: 50%; transform: translateX(-50%); font-family:'Luckiest Guy',cursive; font-size: 15px; color: var(--text); }
+.dv-termometro { margin-bottom: 22px; }
+
+.dv-grafico { width: 220px; height: 140px; background: #fff; border: 3px solid var(--border); border-radius: 12px; padding: 10px 8px 4px; box-shadow: 0 5px 0 var(--border); }
+.dv-colunas { display: flex; align-items: flex-end; gap: 8px; height: 100%; }
+.dv-col {
+  flex: 1; background: var(--purple); border: 3px solid var(--border); border-radius: 8px 8px 0 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  min-height: 22px; transition: height .4s ease;
+}
+.dv-col b { font-family:'Luckiest Guy',cursive; font-size: 13px; color: #fff; }
+.dv-col span { position:absolute; }
+.dv-colunas { position: relative; }
+.dv-col > span { position: absolute; bottom: -18px; font-size: 10px; font-weight: 800; color: var(--text2); }
+.dv-grafico { margin-bottom: 20px; }
+
+.dv-tabela { border-collapse: collapse; background: #fff; font-size: 13px; }
+.dv-tabela th, .dv-tabela td { border: 2px solid var(--border); padding: 5px 10px; text-align: center; }
+.dv-tabela thead th { background: var(--mint); color: var(--text); }
+.dv-tabela tbody th { background: var(--bg-light); font-weight: 800; }
+
+.dv-bolinhas { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.dv-fileira { display: flex; gap: 4px; }
+.dv-fileira i { font-size: 16px; }
+.dv-fileira .vermelho { color: var(--red); }
+.dv-fileira .azul { color: var(--blue); }
+.dv-rotulo { font-size: 11px; font-weight: 800; color: var(--text2); }
+
+.dv-lista { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.dv-lista span {
+  background: #fff; border: 3px solid var(--border); border-radius: 10px;
+  padding: 4px 10px; font-weight: 800; font-size: 15px; color: var(--text);
+}
+
+/* ângulo desenhado com dois lados e a abertura em leque */
+.dv-angulo { position: relative; width: 190px; height: 132px; margin: 0 auto; }
+.dv-angulo .dv-lado {
+  position: absolute; left: 34px; bottom: 26px; width: 132px; height: 6px;
+  border-radius: 6px; background: var(--pink); transform-origin: 3px 50%;
+  box-shadow: 0 2px 0 rgba(0,0,0,.15);
+}
+.dv-angulo .dv-lado-b { background: var(--blue); }
+.dv-angulo .dv-abertura {
+  position: absolute; left: 0; bottom: -8px; width: 68px; height: 68px; border-radius: 50%;
+  background: conic-gradient(from calc(90deg - var(--abre)), rgba(155,93,229,.30) var(--abre), transparent 0);
+}
+.dv-angulo .dv-vertice {
+  position: absolute; left: 29px; bottom: 21px; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--border); border: 3px solid #fff;
+}
+.dv-angulo .dv-graus {
+  position: absolute; right: 2px; bottom: 40px;
+  background: #fff; border: 3px solid var(--border); border-radius: 10px;
+  padding: 2px 8px; font-size: 15px; color: var(--purple);
+}
+
+.dv-forma { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.dv-forma small { font-family:'Luckiest Guy',cursive; font-size: 15px; color: var(--text); }
+.fg { display: block; width: 92px; height: 92px; background: var(--pink); border: 4px solid var(--border); box-shadow: 0 5px 0 var(--border); }
+.fg-quadrado { border-radius: 10px; }
+.fg-retangulo { width: 122px; height: 72px; border-radius: 10px; background: var(--blue); }
+.fg-triangulo { width: 0; height: 0; background: transparent; border: none; border-left: 52px solid transparent; border-right: 52px solid transparent; border-bottom: 88px solid var(--yellow); filter: drop-shadow(0 4px 0 rgba(0,0,0,.2)); }
+.fg-circulo { border-radius: 50%; background: var(--mint); }
+.fg-pentagono { clip-path: polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%); border: none; background: var(--purple); }
+.fg-hexagono { clip-path: polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%); border: none; background: var(--orange); }
+.fg-octogono { clip-path: polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%); border: none; background: var(--blue); }
+.fg-cubo { background: var(--purple); border-radius: 8px; box-shadow: inset -14px -14px 0 rgba(0,0,0,.18), 0 5px 0 var(--border); }
+.fg-esfera { border-radius: 50%; background: radial-gradient(circle at 32% 30%, #fff, var(--pink) 60%); }
+.fg-cilindro { height: 104px; border-radius: 46% / 16%; background: linear-gradient(90deg, #bfeaff, var(--blue) 45%, #7fc8ff); }
+.fg-cone { width: 0; height: 0; border: none; background: transparent; border-left: 48px solid transparent; border-right: 48px solid transparent; border-bottom: 92px solid var(--green); filter: drop-shadow(0 4px 0 rgba(0,0,0,.2)); }
+.fg-piramide { clip-path: polygon(50% 0,100% 100%,0 100%); border: none; background: var(--orange); }
+.fg-prisma { clip-path: polygon(0 22%,50% 0,100% 22%,100% 100%,0 100%); border: none; background: var(--mint); }
+.fg-eixo { display: block; width: 3px; height: 96px; background: repeating-linear-gradient(180deg, var(--text) 0 6px, transparent 6px 12px); margin-top: -98px; }
+
+/* ---- V ou F ---- */
+.tf-text { font-size: 24px; margin-bottom: 12px; }
+.tf-afirmacao { display: block; }
+.tf-answers { display: flex; gap: 16px; padding: 16px; justify-content: center; }
+.tf-verdadeiro { background: var(--green) !important; color: #fff !important; }
+.tf-falso { background: var(--red) !important; color: #fff !important; }
+.ans-btn.correct-reveal { background: var(--green) !important; color: #fff !important; }
+
+/* ---- botão de conferir das oficinas ---- */
+.frac-acoes { display: flex; justify-content: center; padding: 8px 16px 12px; flex-shrink: 0; }
+.btn-conferir {
+  font-family:'Luckiest Guy',cursive; font-size: 19px; letter-spacing: .5px;
+  background: var(--green); color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,.25);
+  border: var(--traço) solid var(--border); border-radius: 20px;
+  padding: 12px 30px; cursor: pointer; box-shadow: 0 6px 0 var(--green-dark);
+  transition: transform .12s, box-shadow .12s;
+  display: inline-flex; align-items: center; gap: 10px;
+}
+.btn-conferir:hover { transform: translateY(3px); box-shadow: 0 3px 0 var(--green-dark); }
+.btn-conferir:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ---- CORRIDA DOCE ---- */
+#screenRace { overflow: hidden; }
+.race-question-wrap {
+  margin: 12px 16px; padding: 12px 16px; background: var(--card);
+  border-radius: var(--r); border: var(--traço) solid var(--border);
+  box-shadow: 0 5px 0 var(--border); flex-shrink: 0;
+}
+.race-diff-tag {
+  display: inline-block; background: var(--orange); color: #fff;
+  border: 3px solid var(--border); padding: 2px 12px; border-radius: 14px;
+  font-size: 12px; font-weight: 800; margin-bottom: 6px;
+}
+.race-q-text { font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.4; }
+.race-stage { flex: 1; position: relative; overflow: hidden; margin: 0 10px; }
+.race-road {
+  position: absolute; inset: 0; background: linear-gradient(180deg, #6b6b6b 0%, #4a4a4a 100%);
+  border-radius: 14px; overflow: hidden; border: 4px solid var(--border);
+}
+.road-dash {
+  position: absolute; left: 50%; top: 0; bottom: 0; width: 8px; transform: translateX(-50%);
+  background: repeating-linear-gradient(180deg, #FFD500 0 26px, transparent 26px 52px);
+  animation: roadScroll .6s linear infinite;
+}
+@keyframes roadScroll { from { background-position: 0 0; } to { background-position: 0 52px; } }
+.road-side-l, .road-side-r {
+  position: absolute; top: 0; bottom: 0; width: 34px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-around;
+  padding: 10px 0; background: linear-gradient(180deg, #57c05a, #2f8f3a);
+}
+.road-side-l { left: 0; } .road-side-r { right: 0; }
+.road-side-l i, .road-side-r i { font-size: 16px; color: rgba(255,255,255,.9); }
+.road-side-l .fa-candy-cane { color: #FF6B9D; }
+.road-side-l .fa-cookie { color: #c98b4b; }
+.road-side-r .fa-star { color: #FFD500; }
+.road-side-r .fa-heart { color: #FF3385; }
+.race-gates { position: absolute; top: 22px; left: 40px; right: 40px; display: flex; gap: 8px; }
+.race-gate {
+  flex: 1; background: rgba(255,255,255,.16); border: 3px solid rgba(255,255,255,.5);
+  border-radius: 12px; padding: 10px 4px; text-align: center;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.race-gate.correct-gate { background: rgba(51,204,51,.75); border-color: #b6ffbe; }
+.race-gate.wrong-gate { background: rgba(255,42,42,.7); border-color: #ffb3b3; }
+.gate-icon { font-size: 17px; display: block; margin-bottom: 4px; color: rgba(255,255,255,.85); }
+.gate-text { font-family:'Luckiest Guy',cursive; font-size: 20px; color: #fff; display: block; }
+.race-car {
+  position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+  font-size: 42px; color: var(--yellow); z-index: 5;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,.55));
+  transition: left .45s cubic-bezier(0.34,1.56,0.64,1);
+}
+.race-car.crash { animation: carCrash .4s ease; }
+.race-car.win { animation: carWin .6s ease forwards; }
+@keyframes carCrash { 0%,100%{transform:translateX(-50%)} 25%{transform:translateX(-50%) rotate(-16deg)} 75%{transform:translateX(-50%) rotate(16deg)} }
+@keyframes carWin { 0%{opacity:1;transform:translateX(-50%)} 100%{opacity:0;transform:translateX(-50%) translateY(-190px) scale(.5)} }
+.finish-line {
+  position: absolute; top: -40px; left: 40px; right: 40px; opacity: 0;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: repeating-linear-gradient(90deg, #000 0 14px, #fff 14px 28px);
+  height: 22px; border-top: 3px solid var(--border); transition: all .3s;
+}
+.finish-line i { font-size: 18px; color: var(--yellow); text-shadow: 0 0 6px #000; }
+.finish-line.show { opacity: 1; top: 0; }
+.race-lane-btns { display: flex; gap: 10px; padding: 12px 16px 14px; flex-shrink: 0; }
+.lane-btn {
+  flex: 1; padding: 12px 6px; background: var(--orange); color: #fff;
+  border: var(--traço) solid var(--border); border-radius: 16px;
+  font-family:'Luckiest Guy',cursive; font-size: 20px; cursor: pointer;
+  box-shadow: 0 5px 0 var(--orange-dark); transition: transform .12s, box-shadow .12s;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.lane-btn i { font-size: 13px; opacity: .85; }
+.lane-btn:hover:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 var(--orange-dark); }
+.lane-btn:disabled { opacity: .5; cursor: not-allowed; }
+.race-feedback { display: flex; align-items: center; gap: 12px; padding: 0 16px 8px; opacity: 0; flex-shrink: 0; transition: opacity .3s; }
+.race-feedback > span {
+  width: 42px; height: 42px; background: #fff; border-radius: 50%;
+  border: 3px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.race-feedback.show { opacity: 1; }
+.race-feedback-msg {
+  background: var(--card); border: 3px solid var(--border); border-radius: 14px;
+  padding: 8px 14px; font-weight: 800; font-size: 14px; color: var(--text);
+  box-shadow: 0 4px 0 var(--border);
+}
+
+/* ===== FATIA DE BOLO ===== */
+#screenFraction { overflow-y: auto; }
+.frac-mesa { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 14px 16px 4px; flex: 1; }
+.frac-ordem {
+  background: var(--card); border: var(--traço) solid var(--border); border-radius: var(--r);
+  box-shadow: 0 6px 0 var(--border); padding: 12px 20px; text-align: center; width: 100%; max-width: 420px;
+}
+.frac-pergunta { font-size: 14px; font-weight: 800; color: var(--text2); margin-bottom: 6px; }
+.frac-alvo { font-family:'Luckiest Guy',cursive; font-size: 16px; color: var(--text); display: flex; align-items: center; justify-content: center; gap: 10px; }
+.ff {
+  display: inline-flex; flex-direction: column; align-items: center;
+  background: var(--yellow); border: 3px solid var(--border); border-radius: 12px;
+  padding: 4px 14px; line-height: 1;
+}
+.ff em { font-style: normal; font-size: 22px; }
+.ff hr { border: none; border-top: 3px solid var(--border); width: 100%; margin: 3px 0; }
+.ff b { font-size: 22px; }
+.frac-placar { font-size: 13px; font-weight: 800; color: var(--purple-dark); margin-top: 8px; }
+
+.bolo-prato {
+  background: #fff8ec; border: var(--traço) solid var(--border); border-radius: 26px;
+  box-shadow: 0 6px 0 var(--border); padding: 18px;
+}
+.bolo-tabua {
+  position: relative; width: min(60vw, 250px); aspect-ratio: 1;
+  border-radius: 50%; background: #FFE9B8;
+  border: 5px solid var(--border); box-shadow: inset 0 -10px 0 rgba(0,0,0,.08);
+}
+.bolo-tabua::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: repeating-conic-gradient(from 0deg, var(--border) 0 .8deg, transparent .8deg calc(360deg / var(--partes)));
+  opacity: .55;
+}
+.bolo-fatia {
+  --passo: calc(360deg / var(--partes));
+  position: absolute; inset: 0; padding: 0; border: none; background: transparent;
+  border-radius: 50%; cursor: pointer; transition: transform .15s;
+}
+.bolo-fatia::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from calc(var(--i, 0) * var(--passo)), rgba(255,255,255,.45) 0 var(--passo), transparent var(--passo));
+}
+.bolo-fatia:hover:not(:disabled) { transform: scale(1.03); }
+.bolo-fatia.on::before {
+  background: conic-gradient(from calc(var(--i, 0) * var(--passo)), var(--pink) 0 var(--passo), transparent var(--passo));
+}
+.bolo-fatia.mostra-certo::before {
+  background: conic-gradient(from calc(var(--i, 0) * var(--passo)), var(--green) 0 var(--passo), transparent var(--passo));
+}
+.bolo-fatia:disabled { cursor: default; }
+.bolo-cobertura { position: absolute; inset: 0; border-radius: 50%; }
+.bolo-num {
+  position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -13px;
+  display: flex; align-items: center; justify-content: center;
+  font-family:'Luckiest Guy',cursive; font-size: 13px; color: var(--text);
+  background: #fff; border: 2px solid var(--border); border-radius: 50%;
+  transform: rotate(calc((var(--i, 0) + .5) * var(--passo))) translateY(calc(-1 * min(60vw, 250px) * .33)) rotate(calc(-1 * (var(--i, 0) + .5) * var(--passo)));
+}
+.bolo-fatia:nth-child(1){--i:0}  .bolo-fatia:nth-child(2){--i:1}
+.bolo-fatia:nth-child(3){--i:2}  .bolo-fatia:nth-child(4){--i:3}
+.bolo-fatia:nth-child(5){--i:4}  .bolo-fatia:nth-child(6){--i:5}
+.bolo-fatia:nth-child(7){--i:6}  .bolo-fatia:nth-child(8){--i:7}
+.bolo-fatia:nth-child(9){--i:8}  .bolo-fatia:nth-child(10){--i:9}
+.bolo-fatia:nth-child(11){--i:10} .bolo-fatia:nth-child(12){--i:11}
+
+/* ===== BALANÇA DA JUJU ===== */
+#screenBalance { overflow-y: auto; }
+.bal-enunciado {
+  margin: 12px 16px; padding: 10px 14px; background: var(--card);
+  border: var(--traço) solid var(--border); border-radius: 16px; box-shadow: 0 5px 0 var(--border);
+  font-size: 14px; font-weight: 800; color: var(--text); text-align: center;
+}
+.bal-corpo { position: relative; height: 210px; margin: 8px 12px 0; flex-shrink: 0; }
+.bal-pilar {
+  position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
+  width: 14px; height: 132px; background: var(--purple); border: 3px solid var(--border);
+}
+.bal-base {
+  position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%);
+  width: 130px; height: 16px; background: var(--purple-dark);
+  border: 3px solid var(--border); border-radius: 8px;
+}
+.bal-trave {
+  position: absolute; left: 50%; top: 46px; transform: translateX(-50%);
+  width: 84%; height: 12px; background: var(--blue);
+  border: 3px solid var(--border); border-radius: 8px;
+  transition: transform .5s cubic-bezier(0.34,1.2,0.64,1);
+  transform-origin: center;
+}
+.bal-pino {
+  position: absolute; left: 50%; top: -8px; transform: translateX(-50%);
+  width: 20px; height: 20px; background: var(--yellow);
+  border: 3px solid var(--border); border-radius: 50%;
+}
+.bal-bandeja { position: absolute; top: 66px; width: 40%; transition: transform .5s ease; }
+.bal-esquerda-wrap { left: 2%; }
+.bal-direita-wrap { right: 2%; }
+.bal-corrente {
+  width: 3px; height: 20px; margin: 0 auto; background: var(--border);
+}
+.bal-prato {
+  min-height: 86px; background: #fff; border: var(--traço) solid var(--border);
+  border-radius: 10px 10px 22px 22px; padding: 8px; box-shadow: 0 5px 0 var(--border);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px;
+}
+.bal-doces { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; font-size: 15px; }
+.bal-contagem { width: 100%; text-align: center; font-family:'Luckiest Guy',cursive; font-size: 15px; color: var(--text2); }
+.bal-saco {
+  width: 54px; height: 54px; display: flex; align-items: center; justify-content: center;
+  font-family:'Luckiest Guy',cursive; font-size: 22px; color: #fff;
+  background: var(--orange); border: 4px solid var(--border); border-radius: 12px 12px 16px 16px;
+  box-shadow: 0 4px 0 var(--border); transition: background .2s, transform .2s;
+}
+.bal-saco.cheio { transform: translateY(-3px); }
+.bal-saco.ok { background: var(--green); }
+.bal-saco.erro { background: var(--red); animation: shakeAnim .4s ease; }
+.bal-corpo.equilibrou .bal-trave { transform: translateX(-50%) rotate(0deg); }
+.bal-corpo.pendendo .bal-trave { transform: translateX(-50%) rotate(-7deg); }
+.bal-corpo.pendendo .bal-esquerda-wrap { transform: translateY(16px); }
+.bal-corpo.pendendo .bal-direita-wrap { transform: translateY(-10px); }
+.bal-pega { text-align: center; font-weight: 800; font-size: 13px; color: var(--text2); margin: 6px 0; }
+.bal-opcoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; padding: 0 16px 10px; }
+.bal-chip {
+  min-width: 64px; padding: 12px 10px; background: #fff; color: var(--text);
+  border: var(--traço) solid var(--border); border-radius: 16px;
+  font-family:'Luckiest Guy',cursive; font-size: 21px; cursor: pointer;
+  box-shadow: 0 5px 0 var(--border); transition: transform .12s, background .15s, box-shadow .12s;
+}
+.bal-chip:hover:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 var(--border); }
+.bal-chip.sel { background: var(--yellow); }
+.bal-chip:disabled { opacity: .5; cursor: not-allowed; }
+
+/* ===== MERCADINHO ===== */
+#screenMarket { overflow-y: auto; }
+.mer-caixa { display: flex; gap: 12px; padding: 12px 14px 0; flex-wrap: wrap; }
+.mer-vitrine, .mer-bandeja-wrap {
+  flex: 1; min-width: 240px; background: var(--card);
+  border: var(--traço) solid var(--border); border-radius: var(--r); box-shadow: 0 6px 0 var(--border);
+  padding: 12px 14px;
+}
+.mer-vitrine h4, .mer-bandeja-wrap h4, .mer-gaveta-wrap h4 {
+  font-family:'Luckiest Guy',cursive; font-size: 15px; color: var(--purple-dark);
+  letter-spacing: .4px; margin-bottom: 8px;
+}
+.mer-lista { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.mer-lista li {
+  display: flex; justify-content: space-between; gap: 10px;
+  background: var(--bg-light); border: 2px dashed var(--border); border-radius: 10px;
+  padding: 5px 10px; font-weight: 800; font-size: 14px; color: var(--text);
+}
+.mer-lista li b { color: var(--green-dark); }
+.mer-enunciado { margin-top: 10px; font-size: 14px; font-weight: 800; color: var(--text); text-align: center; }
+.mer-bandeja { min-height: 66px; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+.mer-ficha {
+  background: var(--yellow); border: 3px solid var(--border); border-radius: 10px;
+  padding: 5px 10px; font-family:'Luckiest Guy',cursive; font-size: 15px; color: var(--text);
+  box-shadow: 0 3px 0 var(--border);
+}
+.mer-vazio { font-size: 12px; color: var(--text2); font-weight: 800; }
+.mer-gaveta-wrap { padding: 12px 14px 0; }
+.mer-gaveta {
+  display: flex; flex-wrap: wrap; gap: 8px; padding: 12px;
+  background: #6b4b2a; border: var(--traço) solid var(--border); border-radius: 18px;
+  box-shadow: inset 0 6px 0 rgba(0,0,0,.2), 0 6px 0 var(--border);
+}
+.mer-dinheiro {
+  min-width: 66px; padding: 8px 6px; border-radius: 10px; cursor: pointer;
+  border: 3px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font-family:'Luckiest Guy',cursive; transition: transform .12s, box-shadow .12s;
+  box-shadow: 0 4px 0 var(--border);
+}
+.mer-dinheiro small { font-family: 'Comic Neue',sans-serif; font-size: 9px; font-weight: 800; opacity: .8; text-transform: uppercase; }
+.mer-dinheiro strong { font-size: 16px; }
+.mer-dinheiro.nota { color: #fff; }
+.mer-dinheiro.nota:nth-of-type(1) { background: #8e5a3a; }
+.mer-dinheiro.nota:nth-of-type(2) { background: #a4713f; }
+.mer-dinheiro.nota:nth-of-type(3) { background: #5f9e5f; }
+.mer-dinheiro.nota:nth-of-type(4) { background: #7a5fa8; }
+.mer-dinheiro.nota:nth-of-type(5) { background: #6d9ec4; }
+.mer-dinheiro.nota:nth-of-type(6) { background: #c9a227; }
+.mer-dinheiro.nota:nth-of-type(7) { background: #b0663f; }
+.mer-dinheiro.moeda { background: #e8d48a; color: var(--text); border-radius: 50%; min-width: 58px; height: 58px; justify-content: center; }
+.mer-dinheiro:hover:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--border); }
+.mer-dinheiro:disabled, .mer-limpar:disabled { opacity: .5; cursor: not-allowed; }
+.mer-limpar {
+  background: var(--red); color: #fff; border: 3px solid var(--border); border-radius: 12px;
+  padding: 8px 12px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 0 var(--border);
+  font-family: 'Comic Neue',sans-serif; font-size: 13px;
+}
+
+/* ===== MODAL DE TRILHAS ===== */
+.tracks-box { border-top: 6px solid var(--mint) !important; max-width: 620px; }
+.tracks-help { font-size: 13px; font-weight: 700; color: var(--text2); margin-bottom: 10px; }
+.track-list { display: flex; flex-direction: column; gap: 8px; max-height: 56vh; overflow-y: auto; padding-right: 4px; }
+.track-group-label {
+  font-family:'Luckiest Guy',cursive; font-size: 14px; color: var(--purple-dark);
+  letter-spacing: .4px; margin: 12px 0 4px;
+}
+.track-group-label i { color: var(--pink2); margin-right: 6px; }
+.track-card {
+  display: flex; align-items: center; gap: 12px; width: 100%; text-align: left;
+  background: #fff; border: var(--traço) solid var(--border); border-radius: 18px;
+  padding: 10px 12px; cursor: pointer; font-family: inherit; color: var(--text);
+  box-shadow: 0 5px 0 var(--border); transition: transform .12s, box-shadow .12s;
+  border-left: 12px solid var(--cor, var(--pink));
+}
+.track-card:hover:not([disabled]) { transform: translateY(3px); box-shadow: 0 2px 0 var(--border); }
+.track-card.sel { background: var(--bg-light); outline: 3px dashed var(--purple); }
+.track-card .tc-icon {
+  width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 17px;
+  background: var(--cor, var(--pink)); color: #fff; border: 3px solid var(--border);
+}
+.track-card .tc-txt { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+.track-card .tc-txt strong { font-family:'Luckiest Guy',cursive; font-size: 15px; letter-spacing: .3px; }
+.track-card .tc-txt small { font-size: 12px; color: var(--text2); font-weight: 700; }
+.track-card .tc-txt em { font-size: 10px; font-style: normal; font-weight: 800; color: var(--purple-dark); }
+.track-card .tc-tag {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px;
+  background: var(--yellow); border: 2px solid var(--border); border-radius: 10px; padding: 3px 7px;
+  white-space: nowrap;
+}
+.track-card.revisao .tc-tag { background: var(--mint); }
+.track-card.futura { opacity: .55; cursor: not-allowed; }
+.track-card.futura .tc-tag { background: #d9d9d9; }
+
+/* ===== TELA DE FOCO (depois do erro) ===== */
+.study-overlay {
+  position: fixed; inset: 0; z-index: 1400;
+  background: rgba(43, 27, 69, .72);
+  display: flex; align-items: center; justify-content: center; padding: 18px;
+  opacity: 0; transition: opacity .22s ease;
+  cursor: pointer;
+}
+.study-overlay.in { opacity: 1; }
+.study-overlay.out { opacity: 0; }
+.study-card {
+  background: #fffdf5; border: 5px solid var(--border); border-radius: var(--r);
+  box-shadow: 0 12px 0 var(--border), 0 20px 40px rgba(0,0,0,.4);
+  width: min(94vw, 420px); padding: 16px 18px 14px; text-align: center;
+  transform: translateY(16px) scale(.96); transition: transform .22s ease;
+  max-height: 86vh; overflow-y: auto;
+}
+.study-overlay.in .study-card { transform: translateY(0) scale(1); }
+.study-mascote {
+  width: 74px; height: 74px; margin: 0 auto 6px; border-radius: 50%;
+  background: #FFE9B8; border: 4px solid var(--border); overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.study-mascote img { width: 100%; height: 100%; object-fit: contain; }
+.study-label {
+  font-family:'Luckiest Guy',cursive; font-size: 15px; color: var(--orange-dark);
+  letter-spacing: .5px; margin-bottom: 6px;
+}
+.study-label i { color: var(--yellow); margin-right: 5px; }
+.study-question { font-size: 16px; font-weight: 800; color: var(--text); line-height: 1.45; margin-bottom: 10px; }
+.study-answer {
+  font-family:'Luckiest Guy',cursive; font-size: 22px; color: var(--green-dark);
+  background: #eafbea; border: 3px dashed var(--green); border-radius: 14px;
+  padding: 6px; margin: 10px 0;
+}
+.study-why { font-size: 14px; font-weight: 700; color: var(--text2); line-height: 1.5; margin-bottom: 12px; }
+.study-timer-bar {
+  height: 8px; background: rgba(74,43,101,.15); border-radius: 8px; overflow: hidden; width: 0; margin: 0 auto 10px;
+}
+.study-timer-bar { transition: width .1s linear; }
+.study-hint { font-size: 11px; font-weight: 800; color: var(--text2); margin-bottom: 10px; }
+.btn-study-close {
+  font-family:'Luckiest Guy',cursive; font-size: 17px; letter-spacing: .5px;
+  background: var(--green); color: #fff; border: 4px solid var(--border); border-radius: 16px;
+  padding: 10px 26px; cursor: pointer; box-shadow: 0 6px 0 var(--green-dark);
+  text-shadow: 1px 1px 0 rgba(0,0,0,.25);
+}
+.btn-study-close:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--green-dark); }
+.study-card .quiz-visual { margin: 8px 0 12px; }
+
+/* ===== ÁREA DOS PAIS ===== */
+#screenParents { background: var(--bg-light); overflow: hidden; }
+.parents-bar { border-bottom: 4px solid var(--border) !important; background: #fff; }
+#screenParents .gtb-title { color: var(--text); font-size: 18px; }
+#screenParents .btn-back { background: var(--purple) !important; }
+
+.pin-gate { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.pin-card {
+  background: #fff; border: 5px solid var(--border); border-radius: var(--r);
+  box-shadow: 0 10px 0 var(--border); padding: 22px; width: min(92vw, 360px); text-align: center;
+}
+.pin-mascote { width: 70px; height: 70px; margin: 0 auto 10px; border-radius: 50%; border: 4px solid var(--border); background: #FFE9B8; overflow: hidden; display:flex; align-items:center; justify-content:center; }
+.pin-mascote img { width: 100%; height: 100%; object-fit: contain; }
+.pin-card h3 { font-family:'Luckiest Guy',cursive; font-size: 22px; color: var(--purple-dark); margin-bottom: 8px; }
+.pin-card p { font-size: 13px; font-weight: 700; color: var(--text2); line-height: 1.5; margin-bottom: 12px; }
+.pin-card input {
+  font-family:'Luckiest Guy',cursive; font-size: 26px; letter-spacing: 10px; text-align: center;
+  width: 100%; padding: 10px; border: 4px solid var(--border); border-radius: 14px;
+  background: var(--bg-light); color: var(--text); margin-bottom: 8px;
+}
+.pin-erro { color: var(--red) !important; font-weight: 800; min-height: 18px; }
+.btn-pin-ok {
+  width: 100%; font-family:'Luckiest Guy',cursive; font-size: 18px; letter-spacing: .5px;
+  background: var(--green); color: #fff; border: 4px solid var(--border); border-radius: 16px;
+  padding: 11px; cursor: pointer; box-shadow: 0 6px 0 var(--green-dark);
+}
+.btn-pin-ok:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--green-dark); }
+.btn-pin-forgot {
+  background: none; border: none; color: var(--purple); font-weight: 800;
+  margin-top: 12px; cursor: pointer; font-size: 13px; text-decoration: underline;
+}
+
+.parents-dash { flex: 1; overflow-y: auto; padding: 14px 14px 40px; -webkit-overflow-scrolling: touch; }
+.pd-child {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: #fff; border: 4px solid var(--border); border-radius: var(--r);
+  box-shadow: 0 6px 0 var(--border); padding: 14px; margin-bottom: 16px;
+}
+.pdc-avatar { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--border); background: #FFE9B8; overflow: hidden; flex-shrink: 0; display:flex;align-items:center;justify-content:center; }
+.pdc-avatar img { width: 100%; height: 100%; object-fit: contain; }
+.pdc-txt { flex: 1; min-width: 140px; }
+.pdc-txt h3 { font-family:'Luckiest Guy',cursive; font-size: 20px; color: var(--text); }
+.pdc-txt p { font-size: 12px; font-weight: 800; color: var(--text2); }
+.pdc-num { display: flex; gap: 14px; flex-wrap: wrap; }
+.pdc-num div { text-align: center; background: var(--bg-light); border: 3px solid var(--border); border-radius: 12px; padding: 6px 10px; min-width: 62px; }
+.pdc-num strong { display: block; font-family:'Luckiest Guy',cursive; font-size: 18px; color: var(--purple-dark); }
+.pdc-num span { font-size: 10px; font-weight: 800; color: var(--text2); text-transform: uppercase; }
+
+.pd-section {
+  background: #fff; border: 4px solid var(--border); border-radius: var(--r);
+  box-shadow: 0 6px 0 var(--border); padding: 14px 16px; margin-bottom: 16px;
+}
+.pd-section h4 { font-family:'Luckiest Guy',cursive; font-size: 16px; color: var(--purple-dark); margin-bottom: 6px; letter-spacing: .3px; }
+.pd-section h4 i { color: var(--pink2); margin-right: 6px; }
+.pd-help { font-size: 12px; font-weight: 700; color: var(--text2); margin-bottom: 10px; }
+
+.pd-units { display: flex; flex-direction: column; gap: 12px; }
+.pu-row { background: var(--bg-light); border: 3px solid var(--border); border-radius: 14px; padding: 8px 10px; }
+.pu-head { display: flex; align-items: center; gap: 8px; }
+.pu-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--cor); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 13px; border: 2px solid var(--border); }
+.pu-head strong { font-family:'Luckiest Guy',cursive; font-size: 14px; color: var(--text); flex: 1; }
+.pu-head em { font-style: normal; font-family:'Luckiest Guy',cursive; font-size: 14px; color: var(--cor); }
+.pu-bar { height: 14px; background: rgba(74,43,101,.12); border: 2px solid var(--border); border-radius: 10px; overflow: hidden; margin: 6px 0 4px; }
+.pu-bar i { display: block; height: 100%; background: var(--cor); border-radius: 8px; transition: width .6s ease; }
+.pu-foot { font-size: 11px; font-weight: 700; color: var(--text2); }
+.pu-row.sem { opacity: .7; }
+
+.pd-list { display: flex; flex-direction: column; gap: 8px; }
+.pl-row { display: flex; align-items: center; gap: 10px; background: var(--bg-light); border: 3px solid var(--border); border-left: 10px solid var(--cor); border-radius: 12px; padding: 7px 10px; }
+.pl-main { flex: 1; min-width: 0; }
+.pl-main strong { display: block; font-size: 13px; color: var(--text); }
+.pl-main span { font-size: 10px; font-weight: 700; color: var(--text2); }
+.pl-meter { width: 74px; height: 12px; background: rgba(74,43,101,.12); border: 2px solid var(--border); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+.pl-meter i { display: block; height: 100%; background: var(--cor); }
+.pl-pct { font-family:'Luckiest Guy',cursive; font-size: 14px; color: var(--text); width: 42px; text-align: right; }
+.pl-vazio { font-size: 12px; font-weight: 700; color: var(--text2); font-style: italic; }
+
+.pt-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 8px; }
+.pt-card { background: var(--bg-light); border: 3px solid var(--border); border-radius: 14px; padding: 10px; }
+.pt-label { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text2); }
+.pt-card strong { display: block; font-family:'Luckiest Guy',cursive; font-size: 16px; color: var(--text); margin: 3px 0; }
+.pt-card p { font-size: 11px; font-weight: 700; color: var(--text2); line-height: 1.4; }
+.pt-lento { border-color: var(--orange); }
+.pt-rapido { border-color: var(--green); }
+.pt-note { font-size: 11px; font-weight: 700; color: var(--text2); line-height: 1.5; background: #fff8ec; border: 2px dashed var(--border); border-radius: 12px; padding: 8px 10px; }
+
+.ps-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ps-table th, .ps-table td { border-bottom: 2px dashed rgba(74,43,101,.25); padding: 6px 4px; text-align: left; }
+.ps-table thead th { font-size: 10px; text-transform: uppercase; color: var(--text2); }
+.ps-chip { font-weight: 800; padding: 2px 8px; border-radius: 10px; border: 2px solid var(--border); }
+.ps-chip.bom { background: var(--green); color: #fff; }
+.ps-chip.meio { background: var(--yellow); }
+.ps-chip.baixo { background: var(--red); color: #fff; }
+
+.pa-item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 2px dashed rgba(74,43,101,.2); }
+.pa-item:last-child { border-bottom: none; }
+.pa-num {
+  width: 30px; height: 30px; flex-shrink: 0; border-radius: 50%;
+  background: var(--pink); color: #fff; border: 3px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family:'Luckiest Guy',cursive; font-size: 15px;
+}
+.pa-item strong { display: block; font-size: 14px; color: var(--text); }
+.pa-item p { font-size: 12px; font-weight: 700; color: var(--text2); line-height: 1.5; margin-top: 2px; }
+.pa-faca { color: var(--purple-dark) !important; }
+.pa-novo .pa-num { background: var(--mint); color: var(--text); }
+
+.pd-settings { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.pd-field { display: flex; flex-direction: column; gap: 4px; font-size: 11px; font-weight: 800; color: var(--text2); text-transform: uppercase; flex: 1; min-width: 160px; }
+.pd-field select, .pd-field input {
+  font-family: 'Comic Neue', sans-serif; font-size: 15px; font-weight: 700; color: var(--text);
+  border: 3px solid var(--border); border-radius: 12px; padding: 8px 10px; background: var(--bg-light);
+}
+.btn-select {
+  font-family: 'Comic Neue', sans-serif; font-weight: 800; color: var(--text);
+  background: #fff; border: 3px solid var(--border); border-radius: 14px;
+  padding: 6px 10px; font-size: 14px; cursor: pointer;
+}
+.pd-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.pd-btn {
+  font-family:'Luckiest Guy',cursive; font-size: 14px; letter-spacing: .4px;
+  background: var(--blue); color: #fff; border: 3px solid var(--border); border-radius: 14px;
+  padding: 9px 16px; cursor: pointer; box-shadow: 0 5px 0 var(--border);
+}
+.pd-btn:hover { transform: translateY(2px); box-shadow: 0 3px 0 var(--border); }
+.pd-btn-danger { background: var(--red); }
+.pd-footnote { font-size: 11px; font-weight: 700; color: var(--text2); line-height: 1.5; text-align: center; }
+
+/* registros por modo no modal de recordes */
+.rec-trilhas { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0; }
+.rt-chip {
+  background: var(--bg-light); border: 3px solid var(--border); border-radius: 14px;
+  padding: 6px 10px; font-size: 11px; font-weight: 800; color: var(--text);
+  display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 90px;
+}
+.rt-chip b { font-family:'Luckiest Guy',cursive; font-size: 14px; color: var(--purple-dark); }
+
+/* actions da rodada concluída */
+.lu-acoes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 6px; }
+.btn-lu-again {
+  font-family:'Luckiest Guy',cursive; font-size: 17px; letter-spacing: .5px;
+  background: var(--blue); color: #fff; border: 4px solid var(--border); border-radius: 20px;
+  padding: 12px 22px; cursor: pointer; box-shadow: 0 6px 0 var(--border);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-lu-again:hover { transform: translateY(3px); box-shadow: 0 3px 0 var(--border); }
+
+/* ---- sem animações (config) ---- */
+body.reduce-motion .candy-float,
+body.reduce-motion .road-dash,
+body.reduce-motion .dv-termo.vazio { animation: none !important; }
+body.reduce-motion * { transition-duration: .01ms !important; }
+
+/* ---- impressão do relatório ---- */
+@media print {
+  html, body { background: #fff !important; overflow: visible !important; }
+  #screenSplash, #screenHub, #screenQuiz, #screenFalling, #screenRace,
+  #screenPuzzle, #screenMemory, #screenTrueFalse, #screenFraction,
+  #screenBalance, #screenMarket, .modal, .modal-overlay, #particleCanvas,
+  .study-overlay, .btn-conferir, .pd-actions, .pin-gate { display: none !important; }
+  #screenParents { position: static; opacity: 1 !important; transform: none !important; overflow: visible !important; }
+  .parents-bar { border: none !important; box-shadow: none !important; }
+  .parents-dash { overflow: visible !important; padding: 0 !important; }
+  .pd-section, .pd-child { box-shadow: none !important; border-color: #999 !important; break-inside: avoid; }
+}
+
+/* ---- ajustes de tela pequena ---- */
+@media (max-width:480px) {
+  .hub-trilha-strip .hts-txt small { display: none; }
+  .race-gates { left: 36px; right: 36px; }
+  .gate-text { font-size: 16px; }
+  .lane-btn { font-size: 16px; padding: 10px 4px; }
+  .bal-opcoes { gap: 6px; }
+  .bal-chip { min-width: 54px; font-size: 18px; }
+  .mer-caixa { flex-direction: column; }
+  .pdc-num { width: 100%; justify-content: space-between; }
+  .pl-meter { width: 48px; }
+  .track-card .tc-txt em { display: none; }
+}
+
+/* ---- dica pequena embaixo dos campos ---- */
+.form-tip {
+  display: block; margin-top: 5px;
+  font-size: 11px; font-weight: 700; color: var(--text2); line-height: 1.45;
+}
+.pd-timing, .pd-sessions { margin-bottom: 4px; }

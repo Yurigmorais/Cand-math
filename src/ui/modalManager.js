@@ -1,5 +1,6 @@
 import { G } from '../state/gameState.js';
 import { $ } from '../utils/dom.js';
+import { renderQuests, renderRecordsExtras } from './hubUI.js';
 
 export function openModal(id) {
   if (id === 'modalRecords') {
@@ -7,7 +8,9 @@ export function openModal(id) {
     $('recPhase').textContent = G.phase;
     $('recStreak').textContent = G.bestStreak;
     $('recCorrect').textContent = G.totalCorrect;
+    renderRecordsExtras();
   }
+  if (id === 'modalQuests') renderQuests();
   $(id).style.display = 'block';
   $('modalOverlay').classList.add('open');
 }

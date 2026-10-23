@@ -1,32 +1,30 @@
 /**
- * Calcula a velocidade de queda baseada na dificuldade do nível.
- * 
- * Princípio pedagógico: operações mais complexas = mais tempo para pensar.
- * 
- * Nível 1 (Soma):          velocidade rápida   → baseSpeed = 1.8, variance = 0.8
- * Nível 2 (Subtração):     velocidade moderada  → baseSpeed = 1.4, variance = 0.6
- * Nível 3 (Multiplicação): velocidade lenta     → baseSpeed = 1.0, variance = 0.4
- * Nível 4 (Divisão):       velocidade muito lenta → baseSpeed = 0.7, variance = 0.3
- * 
- * Fórmula: speed = baseSpeed + (Math.random() * variance)
+ * Ritmo do jogo de acordo com a idade.
+ *
+ * Princípio pedagógico: criança menor precisa de mais tempo de leitura e de
+ * menos pressão na tela. O ano escolar (vindo do perfil) define a velocidade
+ * base da Chuva de Doces, o tamanho da janela do Corrida e o tempo que a
+ * tela de "memorize" fica aberta.
  */
-export function getFallingSpeed(level) {
-  const config = {
-    1: { base: 1.8, variance: 0.8 },  // Soma: rápido
-    2: { base: 1.4, variance: 0.6 },  // Subtração: moderado
-    3: { base: 1.0, variance: 0.4 },  // Multiplicação: lento
-    4: { base: 0.7, variance: 0.3 },  // Divisão: muito lento
-  };
-  
-  const { base, variance } = config[level] || config[1];
-  return base + Math.random() * variance;
+
+export function perfilPorAno(grade) {
+  const g = Math.max(1, Math.min(9, Number(grade) || 3));
+  if (g <= 2) return { queda: 0.55, janela: 5200, estudo: 5000, letras: 'grande', perguntas: 4 };
+  if (g <= 4) return { queda: 0.8, janela: 4600, estudo: 4200, letras: 'grande', perguntas: 5 };
+  if (g <= 6) return { queda: 1.1, janela: 3800, estudo: 3500, letras: 'media', perguntas: 5 };
+  if (g <= 8) return { queda: 1.4, janela: 3200, estudo: 3200, letras: 'media', perguntas: 6 };
+  return { queda: 1.7, janela: 2800, estudo: 3000, letras: 'normal', perguntas: 6 };
 }
 
-/**
- * Retorna a duração do intervalo do game loop (em ms).
- * Níveis mais difíceis usam interval menor para compensar a velocidade baixa,
- * mantendo a animação suave.
- */
-export function getFallingInterval(level) {
-  return 20; // mantido constante; a suavidade vem do speed
+export function getFallingSpeed(grade) {
+  const base = perfilPorAno(grade).queda;
+  return base + Math.random() * base * 0.5;
+}
+
+export function getStudyMs(grade) {
+  return perfilPorAno(grade).estudo;
+}
+
+export function getRoundSize(grade) {
+  return perfilPorAno(grade).perguntas;
 }
