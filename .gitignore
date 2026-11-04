@@ -24,3 +24,8 @@ Thumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# (as duas linhas que a CLI da Vercel acrescentou aqui — `.vercel` e `.env*` —
+# foram removidas: `.vercel/` já estava na linha 12, e `.env*`, por ser a última
+# regra, desfazia o `!.env.example` da linha 9 e deixava o exemplo fora do
+# repositório. O `.env.local` que a CLI cria continua ignorado pelo `.env.*`.)

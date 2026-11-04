@@ -1,0 +1,29 @@
+# =====================================================
+# CANDY MATH — .vercelignore
+# O que NUNCA sobe para a hospedagem. Existe por um motivo específico: o
+# vercel.json publica a raiz inteira (outputDirectory "."), então qualquer
+# arquivo que chegue ao servidor vira endereço público. O `.env` desta pasta
+# tem a chave da Fish Audio e, um dia, pode ter a service_role do Supabase.
+#
+# O `.gitignore` já barrava esse arquivo no repositório, mas a CLI da Vercel
+# não lê o `.gitignore` quando o projeto não tem este arquivo aqui. Sem ele,
+# um `vercel --prod` feito da máquina mandaria o `.env` junto.
+# =====================================================
+
+# segredos locais
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+
+# git e ferramentas
+.git/
+.vercel/
+node_modules/
+.npm/
+
+# temporários de teste
+testes/capturas/
+*.log

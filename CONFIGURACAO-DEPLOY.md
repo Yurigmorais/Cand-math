@@ -225,6 +225,62 @@ curl -s -X POST https://SEU-PROJETO.vercel.app/api/voz -H 'content-type: applica
   vai junto, o que é aceitável **só** porque o RLS é quem guarda os dados. Se um dia
   houver segredo no front, isso muda de figura.
 
+### O estado publicado em 04/11/2026
+
+Produção: **https://candy-math-eight.vercel.app** — projeto `equaldiagra/candy-math`,
+framework *Other*, raiz e saída `.`, região `iad1`. O repositório
+`Yurigmorais/Cand-math` está **conectado** ao projeto, então `git push` no `main`
+gera deploy sozinho; o primeiro estado veio de `npx vercel deploy --prod` feito da
+máquina, depois de um `vercel login` por código de dispositivo (a identidade é sua;
+a CLI só recebeu o token no fim).
+
+| variável | ambiente | tipo | estado |
+|---|---|---|---|
+| `FISH_AUDIO_API_KEY` | Production + Preview | Secret | **no ar** — lida do `.env` por `vercel env add`, sem nunca passar pela tela |
+| `CM_ORIGENS` | Production | Config | **no ar** — `https://candy-math-eight.vercel.app` |
+| `SUPABASE_URL` | — | — | **pendente**: o endereço do projeto que está em `config.js` e no `.env` não existe (veja o bloco abaixo) |
+| `SUPABASE_SERVICE_ROLE_KEY` | — | Secret | **pendente**: só você tem; digite-a na Vercel, nunca aqui |
+| `FISH_AUDIO_MODELO`, `FISH_AUDIO_MAX`, `FISH_AUDIO_POR_HORA` | — | — | não postas de propósito: os padrões do código valem (`s2.1-pro-free`, 320, 240/h) |
+
+**O Project URL precisa ser copiado do painel.** `jomezruaohlgvqizcsdf.supabase.co`
+e a variante `.supabase.in` foram consultados por DNS-over-HTTPS no Cloudflare e
+pelo navegador: os dois devolvem *NXDOMAIN* — o mesmo que uma referência inventada
+devolve. O endereço foi montado por mim a partir do ref visto na barra do painel, e
+montar não é copiar. Enquanto ele não for o verdadeiro, `Settings → Configuration →
+API Keys` (ou o diálogo *Connect*) devolve a string exata:
+
+- o **cache de áudio** fica desligado (a função fala direto com a Fish Audio — que é
+  exatamente o comportamento de antes do cache, e é o que está acontecendo agora);
+- **login, prova na nuvem e duelo em rede** não funcionam; o jogo segue inteiro
+  offline, com progresso no aparelho;
+- nada disso quebra a voz: ela não depende do Supabase.
+
+**`.vercelignore` foi criado neste deploy, e ele é obrigatório.** Com
+`outputDirectory: "."` tudo que sobe vira endereço público, e a CLI da Vercel **não
+lê o `.gitignore`** quando o projeto não tem esse arquivo — um `vercel --prod` feito
+da máquina mandaria o `.env` (chave da Fish inclusa) para o servidor. Conferido no
+ar: `/​.env` 404, `/.env.local` 404, `/vercel.json` 404. `supabase/schema.sql` e
+`testes/testar-rls.sql` seguem 200 — é o comércio descrito em `SEGURANCA.md`, item 11.
+
+O que foi executado contra a hospedagem real:
+
+| teste | resposta |
+|---|---|
+| `GET /` | 200, 50 KB de HTML, CSP sem `unsafe-inline` de script, HSTS, `X-Frame-Options: DENY` |
+| `POST /api/voz` com as quatro vozes, `Origin:` do próprio site | 200 `audio/mpeg` em `sara`, `bruna`, `miguel`, `evelyn` (25–36 KB cada) |
+| `POST /api/voz` de origem estranha | 403 `{"erro":"origem não permitida"}` |
+| `POST /api/voz` sem cabeçalho de origem | 200 (é o caminho do `curl` e do jogo local) |
+| voz fora da lista | 400 `{"erro":"voz não faz parte da lista deste jogo"}` |
+| texto vazio | 400 |
+| `GET /api/voz` | 405 |
+| jogo de verdade, no navegador | menu → *Quiz Doce* → responder → *Ouvir a pergunta em voz alta* → `POST /api/voz` 200 e um `blob:` servido como mídia (206): a fala tocou |
+
+Uma nota sobre o teto: `limparTexto` **corta** em `FISH_AUDIO_MAX` (`slice(0, maximo)`)
+em vez de recusar. Um texto de 400 caracteres virou 320 e ainda virou uma chamada de
+síntese — que estourou os 15 s e devolveu 502. O desenho está certo (a criança nunca
+ouve metade de uma frase longa, e a cota não estoura), mas ele significa que frase
+demais custa: o navegador já corta em `narracao.maximoCaracteres` antes de perguntar.
+
 ---
 
 ## 4. Ligar o duelo em rede (só depois disto)
@@ -337,6 +393,14 @@ ligado.
    conta no egress do Supabase (2 GB/mês no plano gratuito ≈ 15 mil frases servidas
    por mês). **Estimativa, não medição** — o tamanho real só se confirma ouvindo a
    primeira frase com a chave publicada; confira o painel antes de subir o teto.
+
+   **Já é medição, desde 04/11/2026**, com a chave publicada na Vercel: uma frase
+   curta de feedback ("Muito bem, você acertou essa.") sai em **25–36 KB** e uma
+   pergunta inteira de 213 caracteres em **186 KB** — mp3 MPEG-1 Layer III, 128 kbps,
+   44,1 kHz, ou seja ~16 KB por segundo de fala. O teto de 6.000 frases vale na faixa
+   de **100 MB a 1,1 GB** dependendo de quanto o texto é longo: o "feedback" é barato,
+   o "enunciado completo" é o que come o Storage. Antes de subir `CM_CACHE_TETO`,
+   olhe o painel.
 8. **Conferir que o cache pegou.** SQL Editor:
    `select voz, count(*) as frases, sum(usos) as audições, max(visto_em) from
    public.narracoes group by voz;` — linha aparecendo é frase guardada. Se a
@@ -345,6 +409,34 @@ ligado.
    contrário, `select purgar_narracoes(1, 10);` derruba as dez menos usadas.
    O navegador nunca lê esta tabela: RLS ligado sem política nenhuma é "nega
    tudo", e o `revoke all ... from anon, authenticated` é a segunda fechadura.
+9. **Duas contas, duas chaves — e uma só chega.** O jogo tem quatro vozes
+   (`sara`, `bruna`, `miguel`, `evelyn`), e elas vieram de dois lugares: Bruna e
+   Sara de uma conta, Miguel e Evelyn de outra. A pergunta natural é se a função
+   precisa das duas chaves. **Não precisa, e isto foi medido** em 04/11/2026 com a
+   chave de uma única conta, chamando `POST https://api.fish.audio/v1/tts` com os
+   quatro `reference_id` pinados em `api/_voz-nucleo.js:31-34`:
+
+   | voz | HTTP | mp3 | duração |
+   |---|---|---|---|
+   | sara | 200 | 44.302 B | ~2,8 s |
+   | bruna | 200 | 42.630 B | ~2,7 s |
+   | miguel | 200 | 40.959 B | ~2,6 s |
+   | evelyn | 200 | 52.243 B | ~3,3 s |
+
+   O motivo é o desenho da plataforma: a chave autoriza **uma conta** (o faturamento
+   e os modelos dela), e a voz é escolhida por `reference_id` **no catálogo global**.
+   Voz de comunidade não é propriedade de quem a clonou — qualquer chave válida pode
+   chamá-la, e as cobranças caem na conta da chave usada. Por isso:
+
+   - `FISH_AUDIO_API_KEY` é **uma** string, a da sua conta. Não há segunda variável,
+     e adicionar a chave do amigo seria pior: o gasto da voz dele sairia no
+     faturamento dele, e um `429` na conta dele calaria o seu jogo.
+   - Se alguma das quatro virar **voz privada** (clonada e marcada como não pública),
+     aí sim a chave precisa ser da conta dona daquela voz — e a troca é uma linha em
+     `api/_voz-nucleo.js`, não uma arquitetura de duas chaves.
+   - A chave que foi colada em conversa **não é mais utilizável**: trate como vazada e
+     revogue no painel (`Fish Audio → API Keys → Delete`). Ela é a da outra conta, o
+     que não muda nada: vazou, revoga.
 
 ---
 
@@ -376,16 +468,31 @@ como funcionando.
 
 ## 7. Checklist de publicação
 
-- [ ] `npm test` verde na máquina de quem publica (os cinco itens pendentes da tabela
+Estado em 04/11/2026, depois do primeiro deploy real: `[x]` é o que foi conferido;
+`[ ]` continua devendo gente — inclusive ouvir, que máquina nenhuma faz.
+
+- [x] `npm test` verde na máquina de quem publica (os cinco itens pendentes da tabela
       final de `RELATORIO-TESTES.md` continuam pendentes até serem rodados por gente).
 - [ ] `npm start` + `node testes/auditar-layout.js` e `--prova` antes do push.
-- [ ] Schema aplicado no Supabase (e migração 00001, se o banco era da 3.0).
-- [ ] Site URL e Redirect URLs apontando para o endereço publicado.
+- [x] Schema aplicado no Supabase — `8 · 8 · 17 · 0 · 1` na consulta de conferência.
+      A migração 00001 só interessa se o banco veio da 3.0.
+- [ ] **Copiar o Project URL verdadeiro do painel** e substituir em `config.js`,
+      `.env` e na variável `SUPABASE_URL` da Vercel. O endereço que está hoje no
+      repositório não resolve (NXDOMAIN) — foi montado a partir do ref da tela, e
+      isso não é o mesmo que copiá-lo. Sem ele certo, cache de áudio, login e duelo
+      ficam no escuro; o jogo e a voz seguem funcionando.
+- [ ] Site URL e Redirect URLs apontando para `https://candy-math-eight.vercel.app`.
 - [ ] SMTP configurado (senão a verificação de e-mail não chega em produção).
-- [ ] `config.js` com URL e anon key; `dueloRedeHabilitado: false`.
-- [ ] Variáveis secretas na Vercel, *Sensitive*, sem "Exposed to the Browser".
-- [ ] `curl -I` confirmando CSP, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`.
-- [ ] Ouvir as quatro vozes no preview (item 5.3).
+- [x] Variáveis secretas na Vercel, *Sensitive*, sem "Exposed to the Browser" —
+      `FISH_AUDIO_API_KEY` e `CM_ORIGENS` no ar; as duas do Supabase dependem do item
+      acima.
+- [x] `curl -I` confirmando CSP, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`
+      no endereço publicado.
+- [x] As quatro vozes respondendo `audio/mpeg` na função publicada — e o `blob:` de
+      mídia no navegador provando que a fala tocou. **Falta ouvir uma por uma e dizer
+      qual serve**: a leitura de números em pt-BR é a que mais muda de voz para voz.
+- [x] `dueloRedeHabilitado: false` — continua false, e só muda depois dos itens 2 e 3
+      da seção 4 rodados contra o projeto certo.
 - [ ] Preencher os campos de controlador em `privacidade.html` (hoje marcados "a
       preencher") **com revisão de quem responde pela base legal** — isto não é
       conformidade automática.
