@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Candy Math</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== SPLASH SCREEN ===== -->
+  <div id="screenSplash" class="screen active">
+    <div class="splash-bg">
+      <div class="candy-float" style="--d:0s;--x:8%;--s:1.1"><i class="fa-solid fa-candy-cane"></i></div>
+      <div class="candy-float" style="--d:0.7s;--x:82%;--s:0.9"><i class="fa-solid fa-mug-hot"></i></div>
+      <div class="candy-float" style="--d:1.2s;--x:45%;--s:1.25"><i class="fa-solid fa-cookie"></i></div>
+      <div class="candy-float" style="--d:0.3s;--x:22%;--s:0.85"><i class="fa-solid fa-cake-candles"></i></div>
+      <div class="candy-float" style="--d:1.8s;--x:65%;--s:1"><i class="fa-solid fa-ice-cream"></i></div>
+      <div class="candy-float" style="--d:0.9s;--x:90%;--s:0.8"><i class="fa-solid fa-star"></i></div>
+      <div class="candy-float" style="--d:2.1s;--x:35%;--s:1.15"><i class="fa-solid fa-heart"></i></div>
+      <div class="candy-float" style="--d:1.5s;--x:55%;--s:0.95"><i class="fa-solid fa-lollipop"></i></div>
+      <div class="candy-float" style="--d:2.6s;--x:12%;--s:0.9"><i class="fa-solid fa-lemon"></i></div>
+      <div class="candy-float" style="--d:3.2s;--x:74%;--s:1.05"><i class="fa-solid fa-candy-cane"></i></div>
+      <div class="splash-stripe"></div>
+    </div>
+    <div class="splash-content">
+      <div class="splash-onca-wrap">
+        <div class="splash-onca-icon">
+          <i class="fa-solid fa-paw"></i>
+        </div>
+        <div class="splash-onca-bubble">Olá! Sou Juba Candy!</div>
+      </div>
+      <h1 class="splash-title">Candy<br>Math</h1>
+      <p class="splash-sub">Aprenda matemática com doces!</p>
+      <div class="splash-features">
+        <div class="splash-feat feat-pink"><i class="fa-solid fa-calculator"></i> Cálculos</div>
+        <div class="splash-feat feat-yellow"><i class="fa-solid fa-star"></i> Estrelas</div>
+        <div class="splash-feat feat-mint"><i class="fa-solid fa-shirt"></i> Guarda-Roupa</div>
+      </div>
+      <button class="btn-play" id="btnPlay">
+        <i class="fa-solid fa-gamepad"></i> Jogar!
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== HUB SCREEN ===== -->
+  <div id="screenHub" class="screen">
+    <div class="hub-header">
+      <div class="hh-inner">
+        <div class="hub-mascote">
+          <div class="onca-display" id="oncaDisplay">
+            <div class="onca-base-icon"><i class="fa-solid fa-paw"></i></div>
+            <span class="o-layer o-wig"    id="oWig"></span>
+            <span class="o-layer o-hat"    id="oHat"></span>
+            <span class="o-layer o-glass"  id="oGlass"></span>
+            <span class="o-layer o-outfit" id="oOutfit"></span>
+            <span class="o-layer o-shoes"  id="oShoes"></span>
+            <span class="o-layer o-acc"    id="oAcc"></span>
+          </div>
+          <div class="onca-speech" id="oncaSpeech">Vamos aprender! <i class="fa-solid fa-candy-cane"></i></div>
+        </div>
+        <div class="hub-stats">
+          <div class="hub-stat hs-estrelas">
+            <span class="hub-stat-icon"><i class="fa-solid fa-star"></i></span>
+            <span class="sr-only">Estrelas:</span>
+            <span class="hub-stat-val" id="hubStars">0</span>
+          </div>
+          <div class="hub-stat">
+            <span class="hub-stat-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+            <span class="sr-only">Ano:</span>
+            <span class="hub-stat-val" id="hubAno">5º</span>
+          </div>
+          <div class="hub-stat">
+            <span class="hub-stat-icon"><i class="fa-solid fa-signal"></i></span>
+            <span class="sr-only">Nível:</span>
+            <span class="hub-stat-val" id="hubNivel">Base</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hub-seletor">
+      <div class="hsl-row">
+        <span class="hsl-rotulo" id="rotuloAno"><i class="fa-solid fa-graduation-cap"></i> Ano</span>
+        <div class="hsl-chips" id="chipsAno" role="group" aria-labelledby="rotuloAno"></div>
+      </div>
+      <div class="hsl-row">
+        <span class="hsl-rotulo" id="rotuloNivel"><i class="fa-solid fa-signal"></i> Nível</span>
+        <div class="hsl-chips" id="chipsNivel" role="group" aria-labelledby="rotuloNivel"></div>
+      </div>
+      <p class="hsl-explica" id="nivelDescricao"></p>
+      <p class="hsl-regra">O ano é sua escolha. O nível sobe quando você fecha a rodada inteira e desce um passo quando trava — o conteúdo continua sendo o do ano escolhido.</p>
+    </div>
+
+    <div class="hub-actions">
+      <button class="btn-hub-action bha-shop" data-acao="openShop">
+        <i class="fa-solid fa-shirt"></i><span>Guarda-Roupa</span>
+      </button>
+      <button class="btn-hub-action bha-records" data-acao="openModal" data-args='["modalRecords"]'>
+        <i class="fa-solid fa-trophy"></i><span>Recordes</span>
+      </button>
+      <button class="btn-hub-action bha-pais" data-acao="openModal" data-args='["modalPais"]'>
+        <i class="fa-solid fa-users"></i><span>Responsáveis</span>
+      </button>
+      <button class="btn-hub-action bha-sound" id="btnSound" data-acao="toggleSound">
+        <i class="fa-solid fa-volume-high" id="soundIcon"></i><span>Som</span>
+      </button>
+      <button class="btn-hub-action bha-voz" id="btnVoz" data-acao="openModal" data-args='["modalNarracao"]'>
+        <i class="fa-solid fa-comment-dots" id="vozIcon"></i><span>Voz</span>
+      </button>
+    </div>
+
+    <div class="hub-body">
+      <h2 class="hub-title">Escolha o jogo!</h2>
+
+      <!-- Contas Rápidas -->
+      <section class="hub-cat hc-calc">
+        <div class="hub-cat-hdr">
+          <span class="hub-cat-icon"><i class="fa-solid fa-calculator"></i></span>
+          <div class="hub-cat-text">
+            <h3 class="hub-cat-name">Contas Rápidas</h3>
+            <p class="hub-cat-desc">Responda a pergunta e ganhe estrelas!</p>
+          </div>
+          <span class="hub-cat-count">5 jogos</span>
+        </div>
+
+        <div class="mode-grid">
+          <div class="mode-card mc-quiz" data-acao="startMode" data-args='["quiz"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-candy-cane"></i></div>
+            <div class="mc-name">Quiz Doce</div>
+            <div class="mc-desc">Contas e problemas do seu ano!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 por acerto</div>
+          </div>
+          <div class="mode-card mc-truefalse" data-acao="startMode" data-args='["truefalse"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+            <div class="mc-name">Verdadeiro ou Falso</div>
+            <div class="mc-desc">Diga se cada frase está certa!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 por acerto</div>
+          </div>
+          <div class="mode-card mc-operator" data-acao="startMode" data-args='["operator"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-plus-minus"></i></div>
+            <div class="mc-name">Qual o Sinal?</div>
+            <div class="mc-desc">Descubra qual sinal falta!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 por acerto</div>
+          </div>
+          <div class="mode-card mc-balance" data-acao="startMode" data-args='["balance"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-weight-hanging"></i></div>
+            <div class="mc-name">Balança da Igualdade</div>
+            <div class="mc-desc">Ache o número que equilibra!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por acerto</div>
+          </div>
+          <div class="mode-card mc-roulette" data-acao="startMode" data-args='["roulette"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-dharmachakra"></i></div>
+            <div class="mc-name">Roleta da Sorte</div>
+            <div class="mc-desc">Gire, responda e leve o prêmio!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +10 a 40 por giro</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Raciocínio Doce -->
+      <section class="hub-cat hc-logic">
+        <div class="hub-cat-hdr">
+          <span class="hub-cat-icon"><i class="fa-solid fa-puzzle-piece"></i></span>
+          <div class="hub-cat-text">
+            <h3 class="hub-cat-name">Raciocínio Doce</h3>
+            <p class="hub-cat-desc">Monte, ordene e descubra o padrão!</p>
+          </div>
+          <span class="hub-cat-count">4 jogos</span>
+        </div>
+
+        <div class="mode-grid">
+          <div class="mode-card mc-puzzle" data-acao="startMode" data-args='["puzzle"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-puzzle-piece"></i></div>
+            <div class="mc-name">Cruzadinha Numérica</div>
+            <div class="mc-desc">Complete a grade pelas somas!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +30 por grade</div>
+          </div>
+          <div class="mode-card mc-sequence" data-acao="startMode" data-args='["sequence"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-arrow-right-long"></i></div>
+            <div class="mc-name">Sequência Lógica</div>
+            <div class="mc-desc">Descubra o número que falta!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +15 por acerto</div>
+          </div>
+          <div class="mode-card mc-sort" data-acao="startMode" data-args='["sort"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-arrow-down-1-9"></i></div>
+            <div class="mc-name">Ordene os Números</div>
+            <div class="mc-desc">Do menor para o maior, ou ao contrário!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por acerto</div>
+          </div>
+          <div class="mode-card mc-memory" data-acao="startMode" data-args='["memory"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-clone"></i></div>
+            <div class="mc-name">Memória Doce</div>
+            <div class="mc-desc">Ligue cada conta ao resultado!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por mesa</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Doces em Ação -->
+      <section class="hub-cat hc-action">
+        <div class="hub-cat-hdr">
+          <span class="hub-cat-icon"><i class="fa-solid fa-bolt"></i></span>
+          <div class="hub-cat-text">
+            <h3 class="hub-cat-name">Doces em Ação</h3>
+            <p class="hub-cat-desc">Pegue, estoure e acerte no tempo!</p>
+          </div>
+          <span class="hub-cat-count">4 jogos</span>
+        </div>
+
+        <div class="mode-grid">
+          <div class="mode-card mc-catch" data-acao="startMode" data-args='["catch"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-cloud-showers-heavy"></i></div>
+            <div class="mc-name">Chuva Numérica</div>
+            <div class="mc-desc">Mova a cesta e pegue a resposta!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por acerto</div>
+          </div>
+          <div class="mode-card mc-balloon" data-acao="startMode" data-args='["balloon"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-meteor"></i></div>
+            <div class="mc-name">Balões Doces</div>
+            <div class="mc-desc">Estoure o balão com a resposta!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +15 por acerto</div>
+          </div>
+          <div class="mode-card mc-fishing" data-acao="startMode" data-args='["fishing"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-fish"></i></div>
+            <div class="mc-name">Pescaria</div>
+            <div class="mc-desc">Pesque a resposta certa!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +15 por acerto</div>
+          </div>
+          <div class="mode-card mc-whack" data-acao="startMode" data-args='["whack"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-hammer"></i></div>
+            <div class="mc-name">Caça-Toupeira</div>
+            <div class="mc-desc">Martele a resposta certa!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +20 por acerto</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Para Dois e Para Provar -->
+      <section class="hub-cat hc-duelo">
+        <div class="hub-cat-hdr">
+          <span class="hub-cat-icon"><i class="fa-solid fa-crosshairs"></i></span>
+          <div class="hub-cat-text">
+            <h3 class="hub-cat-name">Para Dois e Para Provar</h3>
+            <p class="hub-cat-desc">Encare um adversário e confira se o conteúdo ficou!</p>
+          </div>
+          <span class="hub-cat-count">2 atividades</span>
+        </div>
+
+        <div class="mode-grid">
+          <div class="mode-card mc-duelo" data-acao="startMode" data-args='["duelo"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-crosshairs"></i></div>
+            <div class="mc-name">Caça ao Número</div>
+            <div class="mc-desc">1 x 1 por turnos: ache a resposta no meio de 20, 40, 60 ou 80 números!</div>
+            <div class="mc-stars"><i class="fa-solid fa-star"></i> +1 por número achado</div>
+          </div>
+          <div class="mode-card mc-prova" data-acao="startMode" data-args='["prova"]'>
+            <div class="mc-glow"></div>
+            <div class="mc-icon"><i class="fa-solid fa-file-pen"></i></div>
+            <div class="mc-name">Prova de Aprendizagem</div>
+            <div class="mc-desc">12 perguntas sem dica: mostra o que ficou de verdade!</div>
+            <div class="mc-stars"><i class="fa-solid fa-clipboard-check"></i> vira boletim</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ SCREEN ===== -->
+  <div id="screenQuiz" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-candy-cane"></i> Quiz Doce</div>
+      <div class="gtb-info">
+        <span id="quizProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="quizStarsBar">0</span>
+      </div>
+    </div>
+
+    <div class="q-progress-dots" id="qDots">
+      <div class="qdot" data-i="0"></div>
+      <div class="qdot" data-i="1"></div>
+      <div class="qdot" data-i="2"></div>
+      <div class="qdot" data-i="3"></div>
+      <div class="qdot" data-i="4"></div>
+    </div>
+
+    <div class="quiz-card" id="quizCard">
+      <div class="qcard-top">
+        <span class="diff-tag" id="quizDiff">Fácil</span>
+        <button class="btn-speak" id="btnFalar" data-acao="speakText" aria-label="Ouvir a pergunta em voz alta" title="Ouvir a pergunta">
+          <i class="fa-solid fa-volume-high" id="btnFalarIcone"></i>
+        </button>
+        <span class="voz-estado" id="vozEstado" role="status" aria-live="polite"></span>
+      </div>
+      <div class="qcard-emoji" id="quizEmoji">
+        <i class="fa-solid fa-candy-cane"></i>
+      </div>
+      <p class="qcard-text" id="quizText">Carregando...</p>
+      <span class="qcard-tag" id="quizTag"></span>
+    </div>
+
+    <div class="quiz-answers" id="quizAnswers"></div>
+
+    <div class="quiz-visual" id="quizVisual" hidden></div>
+
+    <div class="quiz-feedback" id="quizFeedback">
+      <span class="qf-onca"><i class="fa-solid fa-paw"></i></span>
+      <div class="qf-bubble" id="quizFeedbackMsg">Boa!</div>
+    </div>
+  </div>
+
+  <!-- ===== CATCH SCREEN ===== -->
+  <div id="screenCatch" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-cloud-showers-heavy"></i> Chuva Numérica</div>
+      <div class="gtb-info">
+        <span id="catchProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="catchStarsBar">0</span>
+      </div>
+    </div>
+
+    <div class="catch-question-wrap">
+      <p class="catch-q-text" id="catchText">Carregando...</p>
+    </div>
+
+    <div class="catch-stage" id="catchStage">
+      <!-- Items will fall here -->
+      <div class="catch-player" id="catchPlayer">
+        <div class="catch-juba">
+          <i class="fa-solid fa-paw"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-feedback" id="catchFeedback">
+      <span class="qf-onca"><i class="fa-solid fa-paw"></i></span>
+      <div class="qf-bubble" id="catchFeedbackMsg">Pegue a resposta!</div>
+    </div>
+  </div>
+
+  <!-- ===== PUZZLE SCREEN ===== -->
+  <div id="screenPuzzle" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-puzzle-piece"></i> Cruzadinha Numérica</div>
+      <div class="gtb-info">
+        <span id="puzzleLvlLabel">Nível 1</span> · <i class="fa-solid fa-star"></i><span id="puzzleStarsBar">0</span>
+      </div>
+    </div>
+
+    <div class="puzzle-info-card">
+      <span class="puzzle-onca"><i class="fa-solid fa-paw"></i></span>
+      <div>
+        <strong id="puzzleTitle">Adição de Doces</strong>
+        <p id="puzzleDesc">Preencha os <strong>?</strong> para que as somas batam!</p>
+      </div>
+    </div>
+
+    <div class="puzzle-outer">
+      <div class="puzzle-grid-wrap" id="puzzleGridWrap"></div>
+    </div>
+
+    <div class="puzzle-btns">
+      <button class="btn-hint" data-acao="giveHint"><i class="fa-solid fa-lightbulb"></i> Dica</button>
+      <button class="btn-check-puzzle" data-acao="checkPuzzle"><i class="fa-solid fa-check"></i> Verificar</button>
+      <button class="btn-next-puzzle" id="btnNextPuzzle" data-acao="nextPuzzle" style="display:none"><i class="fa-solid fa-arrow-right"></i> Próximo</button>
+    </div>
+  </div>
+
+  <!-- ===== 10 NEW GAMES SCREENS ===== -->
+  <!-- 1. True/False -->
+  <div id="screenTrueFalse" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-scale-balanced"></i> Verdadeiro ou Falso</div>
+      <div class="gtb-info"><span id="tfProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="tfStarsBar">0</span></div>
+    </div>
+    <div class="game-tag" id="tfTag"></div>
+    <div class="tf-card-area">
+      <div class="tf-equation" id="tfEquation">Carregando...</div>
+    </div>
+    <div class="tf-actions">
+      <button class="btn-tf btn-tf-false" data-acao="checkTF" data-args='[false]'><i class="fa-solid fa-xmark"></i> Falso</button>
+      <button class="btn-tf btn-tf-true" data-acao="checkTF" data-args='[true]'><i class="fa-solid fa-check"></i> Verdadeiro</button>
+    </div>
+    <div class="game-feedback" id="tfFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="tfFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 2. Memory -->
+  <div id="screenMemory" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-clone"></i> Memória Doce</div>
+      <div class="gtb-info"><i class="fa-solid fa-star"></i><span id="memStarsBar">0</span></div>
+    </div>
+    <div class="mem-grid" id="memGrid"></div>
+    <div class="game-feedback" id="memFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="memFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 3. Operator -->
+  <div id="screenOperator" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-plus-minus"></i> Qual o Sinal?</div>
+      <div class="gtb-info"><span id="opProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="opStarsBar">0</span></div>
+    </div>
+    <div class="game-tag" id="opTag"></div>
+    <div class="op-eq-box" id="opEquation">5 <span class="op-hole">?</span> 3 = 8</div>
+    <div class="op-options" id="opOptions">
+      <button class="btn-op" data-acao="checkOp" data-args='["+"]'>+</button>
+      <button class="btn-op" data-acao="checkOp" data-args='["-"]'>-</button>
+      <button class="btn-op" data-acao="checkOp" data-args='["×"]'>×</button>
+      <button class="btn-op" data-acao="checkOp" data-args='["÷"]'>÷</button>
+    </div>
+    <div class="game-feedback" id="opFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="opFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 4. Balloon -->
+  <div id="screenBalloon" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-meteor"></i> Balões Doces</div>
+      <div class="gtb-info"><span id="balProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="balStarsBar">0</span></div>
+    </div>
+    <div class="bal-question" id="balQuestion">5 + 5 = ?</div>
+    <div class="bal-area" id="balArea"></div>
+    <div class="game-feedback" id="balFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="balFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 5. Fishing -->
+  <div id="screenFishing" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-fish"></i> Pescaria</div>
+      <div class="gtb-info"><span id="fishProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="fishStarsBar">0</span></div>
+    </div>
+    <div class="fish-question" id="fishQuestion">3 × 4 = ?</div>
+    <div class="fish-area">
+      <div class="fish-hook" id="fishHook"><i class="fa-solid fa-anchor"></i></div>
+      <div class="fish-pool" id="fishPool"></div>
+    </div>
+    <button class="btn-fish-action" data-acao="dropHook">Pescar!</button>
+    <div class="game-feedback" id="fishFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="fishFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 6. Sort -->
+  <div id="screenSort" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-arrow-down-1-9"></i> Ordene os Números</div>
+      <div class="gtb-info"><span id="sortProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="sortStarsBar">0</span></div>
+    </div>
+    <div class="game-tag" id="sortTag"></div>
+    <div class="sort-inst">Toque em duas peças para trocá-las!</div>
+    <div class="sort-area" id="sortArea"></div>
+    <button class="btn-check-sort" data-acao="checkSort"><i class="fa-solid fa-check"></i> Verificar</button>
+    <div class="game-feedback" id="sortFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="sortFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 7. Whack-a-Mole -->
+  <div id="screenWhack" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-hammer"></i> Caça-Toupeira</div>
+      <div class="gtb-info"><span id="whackProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="whackStarsBar">0</span></div>
+    </div>
+    <div class="whack-question" id="whackQuestion">12 ÷ 4 = ?</div>
+    <div class="whack-grid" id="whackGrid">
+      <div class="mole-hole" data-acao="whackMole" data-args='[0]'><div class="mole" id="mole0"></div></div>
+      <div class="mole-hole" data-acao="whackMole" data-args='[1]'><div class="mole" id="mole1"></div></div>
+      <div class="mole-hole" data-acao="whackMole" data-args='[2]'><div class="mole" id="mole2"></div></div>
+      <div class="mole-hole" data-acao="whackMole" data-args='[3]'><div class="mole" id="mole3"></div></div>
+      <div class="mole-hole" data-acao="whackMole" data-args='[4]'><div class="mole" id="mole4"></div></div>
+      <div class="mole-hole" data-acao="whackMole" data-args='[5]'><div class="mole" id="mole5"></div></div>
+    </div>
+    <div class="game-feedback" id="whackFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="whackFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 8. Sequence -->
+  <div id="screenSequence" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-arrow-right-long"></i> Sequência Lógica</div>
+      <div class="gtb-info"><span id="seqProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="seqStarsBar">0</span></div>
+    </div>
+    <div class="game-tag" id="seqTag"></div>
+    <div class="seq-box" id="seqBox">2, 4, 6, <span class="seq-hole">?</span></div>
+    <div class="seq-options" id="seqOptions"></div>
+    <div class="game-feedback" id="seqFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="seqFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 9. Balance -->
+  <div id="screenBalance" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-weight-hanging"></i> Balança da Igualdade</div>
+      <div class="gtb-info"><span id="balnProg">1/5</span> · <i class="fa-solid fa-star"></i><span id="balnStarsBar">0</span></div>
+    </div>
+    <div class="game-tag" id="balnTag"></div>
+    <div class="baln-scale">
+      <div class="baln-side" id="balnLeft"></div>
+      <div class="baln-center"></div>
+      <div class="baln-side" id="balnRight"></div>
+    </div>
+    <div class="baln-options" id="balnOptions"></div>
+    <div class="game-feedback" id="balnFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="balnFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- 10. Roulette -->
+  <div id="screenRoulette" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-dharmachakra"></i> Roleta da Sorte</div>
+      <div class="gtb-info"><i class="fa-solid fa-star"></i><span id="roulStarsBar">0</span></div>
+    </div>
+    <div class="roul-area">
+      <div class="roul-wheel" id="roulWheel"></div>
+      <div class="roul-pointer"></div>
+    </div>
+    <button class="btn-spin" id="btnSpin" data-acao="spinRoulette">Girar!</button>
+    <div class="roul-question" id="roulQuestionBox" style="display:none">
+      <p id="roulQuestionText"></p>
+      <div id="roulOptions" class="roul-opts"></div>
+    </div>
+    <div class="game-feedback" id="roulFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span><div class="qf-bubble" id="roulFeedbackMsg">Boa!</div></div>
+  </div>
+
+  <!-- ===== CAÇA AO NÚMERO (duelo 1 x 1) ===== -->
+  <div id="screenDuelo" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-crosshairs"></i> Caça ao Número</div>
+      <div class="gtb-info"><span id="dueloProg">— na tela</span> · <i class="fa-solid fa-star"></i><span id="dueloStarsBar">0</span></div>
+    </div>
+
+    <!-- 1) montagem da partida -->
+    <div class="duelo-setup" id="dueloSetup">
+      <p class="duelo-rotulo" id="rotuloDens"><i class="fa-solid fa-hashtag"></i> Quantos números na tela?</p>
+      <div class="duelo-chips" id="dueloDens" role="radiogroup" aria-labelledby="rotuloDens">
+        <button type="button" class="chip-opcao" role="radio" aria-checked="false" data-d="20">20</button>
+        <button type="button" class="chip-opcao ativa" role="radio" aria-checked="true" data-d="40">40</button>
+        <button type="button" class="chip-opcao" role="radio" aria-checked="false" data-d="60">60</button>
+        <button type="button" class="chip-opcao" role="radio" aria-checked="false" data-d="80">80</button>
+      </div>
+      <p class="duelo-nota" id="dueloNotaDens"></p>
+      <p class="duelo-nota" id="dueloRecorde" hidden></p>
+
+      <p class="duelo-rotulo" id="rotuloModo"><i class="fa-solid fa-users"></i> Quem joga?</p>
+      <div class="duelo-chips" id="dueloModoChips" role="radiogroup" aria-labelledby="rotuloModo">
+        <button type="button" class="chip-opcao ativa" role="radio" aria-checked="true" data-modo="local">
+          <i class="fa-solid fa-table-cells-large"></i> Dois no aparelho</button>
+        <button type="button" class="chip-opcao" role="radio" aria-checked="false" data-modo="rede">
+          <i class="fa-solid fa-wifi"></i> Sala por código</button>
+      </div>
+
+      <div class="duelo-nomes" id="dueloNomes">
+        <label class="duelo-campo"><span>Jogador 1</span>
+          <input type="text" id="dueloNome1" maxlength="14" autocomplete="off"></label>
+        <label class="duelo-campo"><span>Jogador 2</span>
+          <input type="text" id="dueloNome2" maxlength="14" autocomplete="off"></label>
+      </div>
+
+      <div class="duelo-rede" id="dueloRede" hidden>
+        <div class="duelo-rede-linha">
+          <button type="button" class="btn-duelo" id="dueloCriar"><i class="fa-solid fa-plus"></i> Criar sala</button>
+          <label class="duelo-campo duelo-campo-codigo"><span>Código</span>
+            <input type="text" id="dueloCodigo" maxlength="24" placeholder="ABCDEFGH"
+                   autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+          <button type="button" class="btn-duelo" id="dueloEntrar"><i class="fa-solid fa-right-to-bracket"></i> Entrar</button>
+        </div>
+        <p class="duelo-nota" id="dueloFaltaNuvem" hidden>
+          <i class="fa-solid fa-plug"></i> A sala por código usa o login e o banco que você ligar em
+          <b>Responsáveis › Conexão</b>. Sem isso, jogue os dois no mesmo aparelho — a partida é igual.</p>
+        <p class="duelo-nota duelo-nota-bloqueio" id="dueloBloqueio" hidden>
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> <span id="dueloBloqueioTexto"></span></p>
+      </div>
+
+      <label class="duelo-alt">
+        <input type="checkbox" id="dueloTempoExtra"> Dobrar o tempo de cada vez
+      </label>
+      <p class="duelo-nota" id="dueloNotaTempo"></p>
+      <p class="duelo-aviso" id="dueloAviso" hidden></p>
+      <button type="button" class="btn-duelo btn-duelo-primario" id="dueloComecar">
+        <i class="fa-solid fa-play"></i> Começar a caçada</button>
+    </div>
+
+    <!-- 2) partida -->
+    <div class="duelo-jogo" id="dueloJogo" hidden>
+      <div class="duelo-placar">
+        <div class="duelo-lado" id="dueloLado0">
+          <span class="duelo-lado-nome" id="dueloLadoNome0">Você</span>
+          <span class="duelo-lado-num"><i class="fa-solid fa-magnifying-glass"></i><b id="dueloAch0">0</b></span>
+          <span class="duelo-lado-num duelo-lado-erro"><i class="fa-solid fa-xmark"></i><b id="dueloErros0">0</b></span>
+          <span class="duelo-lado-rel" id="dueloRel0">0:00</span>
+        </div>
+        <div class="duelo-versus" aria-hidden="true">×</div>
+        <div class="duelo-lado" id="dueloLado1">
+          <span class="duelo-lado-nome" id="dueloLadoNome1">Desafiante</span>
+          <span class="duelo-lado-num"><i class="fa-solid fa-magnifying-glass"></i><b id="dueloAch1">0</b></span>
+          <span class="duelo-lado-num duelo-lado-erro"><i class="fa-solid fa-xmark"></i><b id="dueloErros1">0</b></span>
+          <span class="duelo-lado-rel" id="dueloRel1">0:00</span>
+        </div>
+      </div>
+
+      <p class="duelo-vez" id="dueloVez" aria-live="polite">Preparando o tabuleiro…</p>
+
+      <div class="duelo-conta-area">
+        <p class="duelo-conta" id="dueloConta">—</p>
+        <span class="duelo-tag" id="dueloTag"></span>
+      </div>
+
+      <div class="duelo-tempo" aria-hidden="true"><div class="duelo-tempo-barra" id="dueloTempoBarra"></div></div>
+
+      <div class="duelo-tabuleiro" id="dueloTabuleiro"></div>
+
+      <div class="duelo-roda">
+        <span class="duelo-tempo-texto" id="dueloTempoTexto">—</span>
+        <button type="button" class="btn-duelo btn-duelo-passar" id="dueloPassarVez">
+          <i class="fa-solid fa-arrows-rotate"></i> Passar a vez</button>
+      </div>
+
+      <div class="game-feedback" id="dueloFala"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span>
+        <div class="qf-bubble" id="dueloFalaMsg">Ache o número!</div></div>
+    </div>
+
+    <!-- 3) portão de passagem: o relógio só anda quando o jogador diz que está pronto -->
+    <div class="duelo-passagem" id="dueloPassagem" hidden>
+      <div class="duelo-passagem-caixa">
+        <div class="duelo-passagem-onca"><i class="fa-solid fa-paw"></i></div>
+        <p class="duelo-passagem-nome" id="dueloPassaNome">Você</p>
+        <p class="duelo-passagem-texto" id="dueloPassaTexto"></p>
+        <button type="button" class="btn-duelo btn-duelo-primario" id="dueloPronto">
+          <i class="fa-solid fa-play"></i> Estou pronto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PROVA DE APRENDIZAGEM ===== -->
+  <div id="screenProva" class="screen">
+    <div class="game-top-bar">
+      <button class="btn-back" data-acao="goHub"><i class="fa-solid fa-arrow-left"></i> Voltar</button>
+      <div class="gtb-title"><i class="fa-solid fa-file-pen"></i> Prova de Aprendizagem</div>
+      <div class="gtb-info"><span id="provaProg">1/12</span></div>
+    </div>
+
+    <div class="prova-painel" id="provaPainel">
+      <p class="prova-regua"><i class="fa-solid fa-user-check"></i> Sem pista, sem desenho e sem correção agora:
+        é assim que descobrimos o que ficou quando ninguém ajuda.</p>
+      <div class="game-tag" id="provaTag"></div>
+      <div class="prova-card">
+        <p class="prova-texto" id="provaText" aria-live="polite">Carregando…</p>
+      </div>
+      <div class="prova-respostas" id="provaRespostas"></div>
+      <p class="prova-nota" id="provaNota"></p>
+      <div class="game-feedback" id="provaFeedback"><span class="qf-onca"><i class="fa-solid fa-paw"></i></span>
+        <div class="qf-bubble" id="provaFeedbackMsg"></div></div>
+    </div>
+
+    <div class="prova-fim" id="provaFim" hidden></div>
+  </div>
+
+  <!-- ===== MODAL: RESULTADO DO DUELO ===== -->
+  <div id="modalDuelo" class="modal" role="dialog" aria-modal="true" aria-labelledby="dueloFimTitulo" style="display:none">
+    <div class="modal-box duelo-box">
+      <div class="modal-hdr">
+        <h2 id="dueloFimTitulo"><i class="fa-solid fa-crosshairs"></i> Fim da caçada</h2>
+        <button class="btn-close-modal" aria-label="Fechar resultado" data-acao="closeModal" data-args='["modalDuelo"]'>
+          <i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="duelo-fim" id="dueloFim"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: SHOP / WARDROBE ===== -->
+  <div id="modalShop" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloShop" style="display:none">
+    <div class="modal-box shop-box">
+      <div class="modal-hdr">
+        <h2 id="tituloShop"><i class="fa-solid fa-shirt"></i> Guarda-Roupa da Juba Candy</h2>
+        <div class="modal-coins"><span class="sr-only">Estrelas:</span><i class="fa-solid fa-star"></i> <span id="shopCoins">0</span></div>
+        <button class="btn-close-modal" aria-label="Fechar loja" data-acao="closeModal" data-args='["modalShop"]'><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="wardrobe-preview">
+        <div class="wd-onca-wrap">
+          <div class="wd-onca-base"><i class="fa-solid fa-paw"></i></div>
+          <span class="wd-layer wd-wig"    id="wdWig"></span>
+          <span class="wd-layer wd-hat"    id="wdHat"></span>
+          <span class="wd-layer wd-glass"  id="wdGlass"></span>
+          <span class="wd-layer wd-outfit" id="wdOutfit"></span>
+          <span class="wd-layer wd-shoes"  id="wdShoes"></span>
+          <span class="wd-layer wd-acc"    id="wdAcc"></span>
+        </div>
+        <div class="wd-equipped-list" id="wdEquippedList">Nenhum item equipado</div>
+      </div>
+
+      <!-- As abas são montadas por JS a partir do catálogo
+           (guarda-roupa.js), para a loja e os itens ficarem em um lugar só. -->
+      <div class="shop-tabs" id="shopTabs" role="group" aria-label="Categorias do guarda-roupa"></div>
+
+      <div class="shop-items-grid" id="shopGrid"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: RECORDS ===== -->
+  <div id="modalRecords" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloRec" style="display:none">
+    <div class="modal-box records-box">
+      <div class="modal-hdr">
+        <h2 id="tituloRec"><i class="fa-solid fa-trophy"></i> Seus Recordes</h2>
+        <button class="btn-close-modal" aria-label="Fechar recordes" data-acao="closeModal" data-args='["modalRecords"]'><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="records-grid">
+        <div class="rec-card rc-yellow">
+          <div class="rc-icon"><i class="fa-solid fa-star"></i></div>
+          <div class="rc-label">Estrelas</div>
+          <div class="rc-val" id="recStars">0</div>
+        </div>
+        <div class="rec-card rc-pink">
+          <div class="rc-icon"><i class="fa-solid fa-book-open"></i></div>
+          <div class="rc-label">Conteúdos praticados</div>
+          <div class="rc-val" id="recConteudo">0</div>
+        </div>
+        <div class="rec-card rc-orange">
+          <div class="rc-icon"><i class="fa-solid fa-fire"></i></div>
+          <div class="rc-label">Sequência</div>
+          <div class="rc-val" id="recStreak">0</div>
+        </div>
+        <div class="rec-card rc-mint">
+          <div class="rc-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="rc-label">Acertos</div>
+          <div class="rc-val" id="recCorrect">0</div>
+        </div>
+      </div>
+      <div class="rec-roteiro" id="recRoteiro" hidden>
+        <h3 class="rec-roteiro-titulo"><i class="fa-solid fa-compass"></i> Por onde continuar</h3>
+        <ul class="rec-lista" id="recLista"></ul>
+        <p class="rec-nota">Soma apenas o que você já jogou aqui. É um palpite sobre o caminho, não uma nota da escola.</p>
+      </div>
+      <p class="rec-nota">Para recomeçar ou apagar dados, abra o boletim dos responsáveis: a tecla fica lá,
+        protegida por uma confirmação a mais.</p>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: BOLETIM DOS RESPONSÁVEIS ===== -->
+  <div id="modalPais" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloPais" style="display:none">
+    <div class="modal-box pais-box">
+      <div class="modal-hdr">
+        <h2 id="tituloPais"><i class="fa-solid fa-file-lines"></i> Boletim de desempenho</h2>
+        <button class="btn-close-modal" aria-label="Fechar boletim" data-acao="closeModal" data-args='["modalPais"]'><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="pais-cabecalho">Documento gerado a partir das respostas registradas neste aparelho.
+        Linguagem formal, leitura parcial: ele descreve o que o jogo viu, não o que a criança é.</p>
+
+      <h3 class="pais-titulo">1. Situação observada</h3>
+      <div class="bol-situacao" id="bolSituacao"></div>
+
+      <h3 class="pais-titulo">2. O que o jogo está medindo</h3>
+      <div class="bol-sentido" id="bolSentido"></div>
+
+      <h3 class="pais-titulo">3. Resultado por unidade temática</h3>
+      <div class="pai-unidades" id="paiUnidades"></div>
+      <div class="bol-limites" id="bolLimites"></div>
+      <p class="pai-vazio" id="paiVazio" hidden>Depois de algumas respostas, as barras mostram onde a criança acerta mais e onde ainda erra.</p>
+
+      <h3 class="pais-titulo">4. Onde deve focar e onde já se adapta melhor</h3>
+      <ul class="rec-lista" id="paiLista"></ul>
+      <p class="pai-pendentes" id="paiPendentes"></p>
+
+      <h3 class="pais-titulo">5. Provas de aprendizagem aplicadas</h3>
+      <div class="bol-provas" id="bolProvas"></div>
+
+      <h3 class="pais-titulo">6. Leitura combinada: jogo e prova</h3>
+      <div class="bol-combinada" id="bolCombinada"></div>
+
+      <h3 class="pais-titulo">7. Recomendações para quem acompanha</h3>
+      <ul class="rec-lista bol-recomendacoes" id="bolRecomendacoes"></ul>
+
+      <h3 class="pais-titulo">8. Como o jogo regula a dificuldade</h3>
+      <ul class="pais-como">
+        <li>O <b>ano</b> é escolha de quem joga e não muda sozinho.</li>
+        <li>O <b>nível</b> é a intensidade dentro do mesmo conteúdo: números menores e uma etapa (Base) até conta mais longa e assuntos misturados (Domínio).</li>
+        <li>Rodada completa sobe um degrau; um acerto ou nenhum desce um.</li>
+        <li>Errar não tira a estrela na primeira tentativa: primeiro vem uma pista, depois o desenho da situação, e só então a resposta — junto de uma questão parecida para firmar a ideia.</li>
+        <li>O duelo Caça ao Número e a prova de aprendizagem <b>não</b> mudam o nível: um treina velocidade com ajuda, a outra mede sem ajuda.</li>
+      </ul>
+
+      <h3 class="pais-titulo">9. Habilidades da BNCC que apareceram</h3>
+      <p class="pai-nota">Serve para conversar com a professora: é o código da habilidade, não uma medida de desempenho.</p>
+      <div class="pai-codigos" id="paiCodigos"></div>
+
+      <h3 class="pais-titulo">10. Conta e onde ficam os dados</h3>
+      <div class="bol-conta" id="bolConta"></div>
+
+      <div class="pais-acoes">
+        <button class="btn-pais" data-acao="imprimir"><i class="fa-solid fa-print"></i> Imprimir boletim</button>
+        <button class="btn-pais" data-acao="openModal" data-args='["modalNuvem"]'><i class="fa-solid fa-cloud"></i> Conta e conexão</button>
+        <a class="btn-pais" href="privacidade.html"><i class="fa-solid fa-shield-heart"></i> Como os dados são tratados</a>
+        <button class="btn-pais btn-pais-apagar" data-acao="openModal" data-args='["modalApagar"]'><i class="fa-solid fa-trash-can"></i> Apagar dados</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: APAGAR DADOS (tela do responsável) ===== -->
+  <div id="modalApagar" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloApagar" style="display:none">
+    <div class="modal-box apagar-box">
+      <div class="modal-hdr">
+        <h2 id="tituloApagar"><i class="fa-solid fa-trash-can"></i> Apagar dados</h2>
+        <button class="btn-close-modal" aria-label="Fechar apagar dados" data-acao="closeModal" data-args='["modalApagar"]'><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="apagar-aviso">São duas operações diferentes. Nenhuma delas pode ser desfeita depois do
+        segundo clique.</p>
+
+      <div class="apagar-opcao">
+        <h3 class="apagar-titulo"><i class="fa-solid fa-mobile-screen"></i> Deste aparelho</h3>
+        <p class="apagar-texto">Limpa o que está guardado neste navegador: estrelas, ano e nível, histórico
+          por assunto, provas aplicadas, itens comprados e o apelido da criança. O que existe na conta
+          <b>não</b> muda — e nada é reenviado por cima.</p>
+        <button class="btn-reset-all" id="btnApagarLocal" data-acao="apagarDoAparelho">Apagar deste aparelho</button>
+      </div>
+
+      <div class="apagar-opcao" id="apagarContaBloco">
+        <h3 class="apagar-titulo"><i class="fa-solid fa-database"></i> Da conta, no banco</h3>
+        <p class="apagar-texto">Remove o perfil deste adulto, as crianças registradas por ele, os vínculos
+          compartilhados por código e as cópias de progresso guardadas no projeto publicado. Depois disso o
+          jogo volta a ser só deste aparelho.</p>
+        <p class="apagar-conta" id="apagarContaEstado">…</p>
+        <button class="btn-reset-all" id="btnApagarConta" data-acao="apagarNaConta" disabled>Apagar da conta</button>
+      </div>
+
+      <p class="apagar-rodape">A página <a href="privacidade.html">Como os dados são tratados</a> explica onde
+        cada um desses dados mora. Para pedidos sobre dados de criança, use o canal de contato informado por
+        quem publica o jogo.</p>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: CONTA, LOGIN E CONEXÃO ===== -->
+  <div id="modalNuvem" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloNuvem" style="display:none">
+    <div class="modal-box nuvem-box">
+      <div class="modal-hdr">
+        <h2 id="tituloNuvem"><i class="fa-solid fa-cloud"></i> Conta, verificação e conexão</h2>
+        <button class="btn-close-modal" aria-label="Fechar conexão" data-acao="closeModal" data-args='["modalNuvem"]'><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="nuvem-corpo" id="nuvemCorpo">
+        <p class="nuvem-estado" id="nuvemEstado">Verificando a conexão…</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: VOZ DO JUBA (narração) ===== -->
+  <div id="modalNarracao" class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloNarracao" style="display:none">
+    <div class="modal-box narracao-box">
+      <div class="modal-hdr">
+        <h2 id="tituloNarracao"><i class="fa-solid fa-comment-dots"></i> A voz que lê as perguntas</h2>
+        <button class="btn-close-modal" aria-label="Fechar a tela de voz" data-acao="closeModal" data-args='["modalNarracao"]'><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="narracao-intro">O Juba Candy pode ler cada pergunta em voz alta. Escolha a voz,
+        escolha de onde ela vem, e pare quando quiser.</p>
+
+      <fieldset class="voz-campo">
+        <legend class="voz-legenda">De onde vem a voz</legend>
+        <div class="chips-voz" id="vozPreferencias" role="radiogroup" aria-labelledby="rotuloPreferenciaVoz">
+          <span class="voz-pending" id="vozPreferenciasPending" hidden>Carregando as opções…</span>
+        </div>
+        <p class="voz-nota" id="vozNotaPreferencia"></p>
+      </fieldset>
+
+      <fieldset class="voz-campo">
+        <legend class="voz-legenda">Qual voz</legend>
+        <div class="chips-voz" id="vozLista" role="radiogroup" aria-labelledby="rotuloQualVoz"></div>
+        <p class="voz-nota" id="vozNotaVoz"></p>
+      </fieldset>
+
+      <div class="voz-acoes">
+        <button type="button" class="btn-pais" id="vozTestar"><i class="fa-solid fa-play"></i> Ouvir uma amostra</button>
+        <button type="button" class="btn-pais btn-voz-parar" id="vozParar"><i class="fa-solid fa-stop"></i> Parar a fala</button>
+      </div>
+
+      <p class="voz-estado-linha" id="vozEstadoModal" role="status" aria-live="polite"></p>
+
+      <p class="voz-privacidade">A leitura por IA manda <b>somente o texto da pergunta</b> para o
+        serviço de voz: nome, e-mail, código de vínculo, estrelas e histórico ficam neste aparelho
+        (ou no seu boletim, quando você liga a conexão). A escolha de voz fica salva neste navegador
+        — quem mais mexer aqui vê e muda essa preferência.</p>
+
+      <p class="voz-pendentes" id="vozPendentes" hidden></p>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: COMO JOGAR (explica antes da primeira partida) ===== -->
+  <div id="modalTuto" class="modal" role="dialog" aria-modal="true" aria-labelledby="tutoTitulo" style="display:none">
+    <div class="modal-box tuto-box">
+      <div class="modal-hdr">
+        <h2 id="tutoTitulo"><i class="fa-solid fa-circle-question"></i> <span id="tutoTituloText">Como se joga</span></h2>
+        <button class="btn-close-modal" aria-label="Fechar explicação" data-acao="closeModal" data-args='["modalTuto"]'><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tuto-corpo" id="tutoCorpo"></div>
+      <div class="tuto-acoes" id="tutoAcoes"></div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: LEVEL UP ===== -->
+  <div id="modalLevelUp" class="modal" role="dialog" aria-modal="true" aria-labelledby="luTitulo" style="display:none">
+    <div class="modal-box levelup-box">
+      <div class="lu-confetti" id="luConfetti"></div>
+      <div class="lu-onca"><i class="fa-solid fa-paw"></i></div>
+      <h2 class="lu-title" id="luTitulo">Rodada concluída!</h2>
+      <p class="lu-phase" id="luPhaseText">5º ano · Base</p>
+      <p class="lu-stars" id="luStarsText">+50 <i class="fa-solid fa-star"></i></p>
+      <p class="lu-conteudo" id="luConteudo"></p>
+      <button class="btn-lu-continue" data-acao="closeModal" data-args='["modalLevelUp"]'>
+        Continuar! <i class="fa-solid fa-rocket"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL OVERLAY ===== -->
+  <div id="modalOverlay" class="modal-overlay" data-acao="closeAllModals"></div>
+
+  <canvas id="particleCanvas" style="position:fixed;top:0;left:0;pointer-events:none;z-index:9999"></canvas>
+
+  <!-- A ordem importa: conteúdo primeiro, depois o que consome conteúdo,
+       por último o script.js, que liga tudo na tela. -->
+  <script src="conteudo.js"></script>
+  <script src="banco-itens.js"></script>
+  <script src="guarda-roupa.js"></script>
+  <script src="como-jogar.js"></script>
+  <script src="avaliacao.js"></script>
+  <script src="duelo.js"></script>
+  <script src="config.js"></script>
+  <script src="narracao.js"></script>
+  <script src="nuvem.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

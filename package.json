@@ -1,0 +1,19 @@
+{
+  "name": "candy-math",
+  "version": "3.1.0",
+  "private": true,
+  "description": "Candy Math — jogo de matemática (BNCC, 1º ao 9º ano) em HTML, CSS e JavaScript puros.",
+  "scripts": {
+    "start": "node testes/servidor-estatico.js",
+    "test": "node testes/testar-estrutura.js && node testes/testar-segredos.js && node testes/testar-politicas-sql.js && node testes/testar-autorizacao.js && node testes/testar-narracao.js && node testes/validar-banco.js && node testes/validar-conteudo.js && node testes/relatorio-bncc.js && node testes/validar-css.js",
+    "banco": "node testes/validar-banco.js",
+    "conteudo": "node testes/validar-conteudo.js",
+    "css": "node testes/validar-css.js",
+    "servidor": "node testes/servidor-estatico.js",
+    "layout": "node testes/auditar-layout.js",
+    "bncc": "node testes/relatorio-bncc.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

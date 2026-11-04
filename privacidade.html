@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Candy Math — como os dados são tratados</title>
+<meta name="description" content="O que o Candy Math guarda, onde guarda e o que nunca sai do aparelho.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  /* Esta página é texto. Ela veste as mesmas cores do jogo e nada mais:
+     nenhum script roda aqui, então nada pode ser coletado por engano. */
+  /* style.css prende o jogo dentro da janela (html e body com height:100% e
+     overflow:hidden). Aqui isso cortava o texto abaixo da dobra sem barra de
+     rolagem: o documento é para ler todo, então o corte vai embora e a
+     seleção de texto volta. As duas manchas de cor do fundo ficam de fora. */
+  html, body { height:auto; overflow:visible; user-select:text;
+    -webkit-user-select:text; }
+  body::before, body::after { display:none; }
+  .pv-corpo { max-width: 860px; margin: 0 auto; padding: clamp(16px, 3vw, 34px); }
+  .pv-cartao { background: var(--card); border: 3px solid var(--border); border-radius: var(--r);
+    box-shadow: var(--shadow-card); padding: clamp(16px, 3vw, 30px); }
+  .pv-titulo { font-family: 'Fredoka One', cursive; color: var(--purple);
+    font-size: clamp(22px, 4.2vw, 34px); line-height: 1.15; margin: 0 0 6px; }
+  .pv-sub { font-size: var(--fs-apoio); color: var(--text2); margin: 0 0 clamp(14px, 2.4vw, 22px); }
+  .pv-secao { font-family: 'Fredoka One', cursive; color: var(--text);
+    font-size: clamp(17px, 2.6vw, 22px); margin: clamp(20px, 3.4vw, 30px) 0 8px; }
+  .pv-texto { font-size: var(--fs-corpo); line-height: 1.6; color: var(--text); margin: 0 0 10px; }
+  .pv-lista { margin: 0 0 10px; padding-left: 20px; }
+  .pv-lista li { font-size: var(--fs-corpo); line-height: 1.55; color: var(--text); margin-bottom: 6px; }
+  .pv-tabela { width: 100%; border-collapse: collapse; font-size: var(--fs-apoio); }
+  .pv-tabela th, .pv-tabela td { text-align: left; padding: 8px 10px;
+    border-bottom: 2px solid var(--border); vertical-align: top; }
+  .pv-tabela th { font-family: 'Fredoka One', cursive; color: var(--purple); }
+  .pv-tabela code { background: #F3ECFF; padding: 1px 6px; border-radius: 6px;
+    font-size: clamp(10.5px, 1.1vw, 12.5px); overflow-wrap: anywhere; }
+  .pv-caixa { border: 2px dashed rgba(255, 154, 60, 0.6); background: #FFF1DC; color: #8A3B12;
+    border-radius: var(--r-sm); padding: clamp(10px, 1.6vw, 15px); margin: 12px 0; }
+  .pv-caixa p { margin: 0; }
+  .pv-ok { border-color: rgba(107, 203, 119, 0.6); background: #ECFBF0; color: #1F5B2C; }
+  .pv-voltar { display: inline-flex; align-items: center; gap: 8px; min-height: var(--alvo);
+    padding: 0 clamp(14px, 2.2vw, 20px); border-radius: var(--r-pill); text-decoration: none;
+    font-family: 'Fredoka One', cursive; color: #fff; background: linear-gradient(135deg, var(--blue), #2A65CC);
+    box-shadow: 0 3px 0 var(--linha-boneco); margin-bottom: clamp(12px, 2vw, 18px); }
+</style>
+</head>
+<body>
+<main class="pv-corpo">
+  <a class="pv-voltar" href="index.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao jogo</a>
+
+  <div class="pv-cartao">
+    <h1 class="pv-titulo">Como os seus dados são tratados</h1>
+    <p class="pv-sub">Este texto descreve o que o código do jogo faz hoje. Última conferência do texto:
+      30/10/2026. Ele não é um parecer jurídico e não declara conformidade integral com a LGPD.</p>
+
+    <p class="pv-texto"><b>A regra geral do Candy Math é o aparelho fechado.</b> Instalado e publicado do jeito
+      que está no repositório — com <code>config.js</code> sem preenchimento — o jogo funciona inteiramente
+      sem rede: nada é enviado, nada é pedido emprestado e não existe conta. A conexão só existe se
+      <i>quem publica</i> colocar a chave do próprio banco <code>Supabase</code>.</p>
+
+    <h2 class="pv-secao">1. O que fica guardado, e onde</h2>
+    <table class="pv-tabela">
+      <thead>
+        <tr><th>o que é</th><th>onde fica</th><th>quando sai do aparelho</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Progresso do jogo: estrelas, ano, nível, histórico por conteúdo, provas aplicadas,
+            itens comprados e equipados</td>
+          <td><code>localStorage</code> deste navegador, na chave <code>candymath_v3</code></td>
+          <td>Só se houver conta de responsável criada e e-mail confirmado. Sem isso, não sai.</td>
+        </tr>
+        <tr>
+          <td>Apelido da criança e código de vínculo</td>
+          <td>as mesmas chaves locais; o apelido é o único nome que pode subir</td>
+          <td>Com conta ativa e criança registrada. É um apelido escolhido pelo adulto, não o nome real.</td>
+        </tr>
+        <tr>
+          <td>Identificador deste aparelho</td>
+          <td><code>localStorage</code>, chave <code>candymath_id_aparelho</code></td>
+          <td>Vai junto no registro da criança, para o adulto reconhecer o aparelho. Não é lido por
+            terceiros nem usado para rastrear.</td>
+        </tr>
+        <tr>
+          <td>Preferências de voz e narração</td>
+          <td><code>localStorage</code>, chave <code>candymath_voz_v1</code></td>
+          <td>Nunca. A escolha da voz é local.</td>
+        </tr>
+        <tr>
+          <td>Frase narrada e o áudio dela (cache da narração)</td>
+          <td>no banco do projeto publicado: tabela <code>narracoes</code> e bucket privado
+            <code>narracoes</code></td>
+          <td>Só com a narração por IA publicada. É o texto do problema de Matemática e o mp3: nenhuma
+            identidade, conta, criança ou aparelho vai junto, e nenhuma frase é ligada a ninguém. Frases
+            menos usadas saem com a poda automática.</td>
+        </tr>
+        <tr>
+          <td>Conta do adulto</td>
+          <td>no banco do projeto publicado: tabela <code>perfis</code> (apelido e papel) e o e-mail
+            no serviço de autenticação</td>
+          <td>O e-mail serve apenas para confirmar a conta. Ele não aparece no jogo nem em relatório.</td>
+        </tr>
+        <tr>
+          <td>Crianças e vínculos</td>
+          <td>tabelas <code>criancas</code> e <code>vinculos</code></td>
+          <td>Visíveis só para a conta que registrou a criança e para quem recebeu o código de vínculo —
+            decidido pelas políticas de linha (RLS) do banco.</td>
+        </tr>
+        <tr>
+          <td>Cópias do progresso</td>
+          <td>tabela <code>progressos</code></td>
+          <td>Leitura e escrita restritas ao adulto dono do vínculo.</td>
+        </tr>
+        <tr>
+          <td>Salas e lances do duelo</td>
+          <td>tabelas <code>salas</code> e <code>jogadas</code></td>
+          <td><b>Recurso desligado por padrão.</b> Enquanto a autorização não for aplicada e conferida no
+            projeto de quem publica, o duelo funciona apenas com as duas pessoas no mesmo aparelho.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 class="pv-secao">2. O que o jogo não faz</h2>
+    <ul class="pv-lista">
+      <li><b>Sem publicidade e sem rastreamento.</b> Não há script de anúncio, pixel, contador de visitas,
+        analítica de terceiros ou rede social embutida.</li>
+      <li><b>Sem cookies.</b> O armazenamento local é o único depósito, e é do próprio jogo.</li>
+      <li><b>Sem perfil comportamental.</b> O histórico guarda acertos e erros por assunto de matemática —
+        é o que gera o boletim de desempenho. Não há inferência sobre humor, hábitos ou vida fora do jogo.</li>
+      <li><b>Sem câmera, microfone, localização ou contatos.</b> A página de permissões bloqueia todos esses
+        recursos; a narração usa voz sintetizada, não grava a sua voz.</li>
+      <li><b>Criança não tem conta.</b> Não existe login, senha ou e-mail de criança. Quem se cadastra é o
+        adulto responsável.</li>
+    </ul>
+
+    <h2 class="pv-secao">3. Narração por voz: o que viaja</h2>
+    <p class="pv-texto">Quando a narração por inteligência artificial está ativada por quem publica, o navegador
+      manda uma requisição para a função <code>/api/voz</code> deste projeto, e o corpo é apenas
+      <b>{ texto, voz }</b>: a frase da pergunta e o nome da voz escolhida.</p>
+    <ul class="pv-lista">
+      <li>Nomes reais, e-mails, códigos de acesso e progresso individual <b>não</b> são enviados ao serviço de voz.</li>
+      <li>A chave do serviço de voz mora em variável secreta do servidor. Ela nunca chega ao navegador.</li>
+      <li>A frase ouvida pode ficar <b>guardada no banco deste projeto</b>, com o áudio correspondente, para que a
+        mesma pergunta não seja sintetizada duas vezes. O que se guarda é o texto do problema de Matemática, o nome
+        da voz e o arquivo de áudio: <b>nenhuma</b> identidade, conta, criança, aparelho ou histórico acompanha a
+        frase, e ela não é ligada a ninguém. As menos usadas saem com o tempo, dentro de um teto configurável.</li>
+      <li>O áudio é mantido na memória da aba para reprodução imediata, com limite de tamanho, e desaparece ao fechar;
+        a cópia guardada no banco não é acessível pelo navegador — quem a serve é a função, pelo mesmo endereço de
+        sempre.</li>
+      <li>Falha de rede, frase grande demais ou excesso de pedidos: o jogo volta para a voz do próprio aparelho,
+        sem travar e sem expor o erro interno.</li>
+      <li>Sem a chave configurada, a opção aparece como pendente e só a voz do aparelho é usada.</li>
+    </ul>
+
+    <h2 class="pv-secao">4. Seus direitos (LGPD, art. 18) e como exercê-los</h2>
+    <table class="pv-tabela">
+      <thead><tr><th>direito</th><th>como fazer agora</th></tr></thead>
+      <tbody>
+        <tr><td>Saber o que existe sobre você</td>
+          <td>Boletim de desempenho (tela inicial → Responsáveis) e a tela Conta e conexão mostram o que há
+            neste aparelho e na conta.</td></tr>
+        <tr><td>Corrigir</td>
+          <td>Apelido e ano são editáveis dentro do jogo. O e-mail da conta se corrige no próprio login.</td></tr>
+        <tr><td>Apagar</td>
+          <td>Na tela Responsáveis: <b>apagar deste aparelho</b> limpa o armazenamento local, e
+            <b>apagar meus registros na conta</b> chama a função do banco que remove perfis, crianças,
+            vínculos e progresso desta conta. As duas pedem confirmação antes de executar.</td></tr>
+        <tr><td>Levar os dados</td>
+          <td>Imprimir o boletim gera o documento em papel/PDF. Uma exportação em arquivo estruturado é
+            pendente — ver a caixa abaixo.</td></tr>
+        <tr><td>Revogar o consentimento</td>
+          <td>Desligar a sincronização na tela Conta e conexão devolve o jogo ao modo aparelho fechado.</td></tr>
+      </tbody>
+    </table>
+
+    <div class="pv-caixa">
+      <p><b>Atenção: a exclusão na nuvem só funciona no projeto publicado.</b> Neste repositório, as políticas de
+        acesso do banco ainda precisam ser aplicadas e conferidas por quem publica
+        (<code>node testes/testar-autorizacao.js</code> com contas de teste). Sem essa conferência, o jogo
+        mantém o duelo desligado e avisa que a exclusão remota depende do banco configurado.</p>
+    </div>
+
+    <h2 class="pv-secao">5. Responsável pelo tratamento de dados</h2>
+    <div class="pv-caixa">
+      <p><b>Pendente de preenchimento por quem publica.</b> Estes campos não podem ser inventados pelo
+        repositório; ficam vazios e marcados de propósito:</p>
+      <ul class="pv-lista">
+        <li>Responsável (pessoa física ou jurídica): <i>a preencher</i></li>
+        <li>Canal de contato para pedidos sobre dados: <i>a preencher</i></li>
+        <li>Encarregado (DPO), se houver: <i>a preencher</i></li>
+        <li>Base legal declarada para o tratamento: <i>a preencher</i></li>
+        <li>Prazo de retenção e revisão periódica: <i>a preencher</i></li>
+      </ul>
+      <p>Um quadro de avisos sobre <i>consentimento</i>: a conta é do adulto, mas isto não prova que o adulto é
+      o responsável legal pela criança. Quem publica um jogo voltado ao público infantil precisa definir esse
+      fluxo — inclusive autorização de ambos os responsáveis, se for o caso da escola ou da família.</p>
+    </div>
+
+    <h2 class="pv-secao">6. Segurança descrita sem exagero</h2>
+    <ul class="pv-lista">
+      <li>Todas as tabelas têm políticas por linha, por operação. O código da sala, sozinho, não abre os
+        dados da sala.</li>
+      <li>As funções que escrevem em sala e lance rodam no banco e conferem quem chamou; o navegador não
+        escolhe a própria identidade nem o próprio assento.</li>
+      <li>As páginas pedem cabeçalhos que bloqueiam incorporação em quadro alheio, eliminam cheiro de
+        referidor e exigem HTTPS.</li>
+      <li><b>Isso não é um teste de invasão.</b> Nenhum ataque simulado foi executado contra o projeto
+        publicado, e o limite de requisições da narração é contador em memória de cada instância: segura
+        varredura acidental, não é muralha contra tráfego distribuído.</li>
+    </ul>
+
+    <div class="pv-caixa pv-ok">
+      <p><b>Modo aparelho fechado.</b> Se você jogar do jeito que o repositório entrega — arquivo copiado,
+        <code>config.js</code> em branco — nenhum dado de criança sai do seu computador em nenhuma hipótese.
+        É a configuração recomendada para testar em casa ou na escola antes de ativar a conexão.</p>
+    </div>
+
+    <p class="pv-sub">Este arquivo é a página prometida por <code>vercel.json</code> e o resumo que aparece na tela
+      dos responsáveis. Dúvidas sobre o código: veja <code>SEGURANCA.md</code> e <code>AUDITORIA.md</code> na
+      raiz do projeto.</p>
+  </div>
+</main>
+</body>
+</html>

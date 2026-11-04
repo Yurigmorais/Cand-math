@@ -1,0 +1,26 @@
+# Dependências e ferramentas locais
+node_modules/
+.npm/
+package-lock.json
+
+# Segredos e configuração local — NUNCA vão para o repositório
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+.vercel/
+supabase/.temp/
+supabase/config.toml.local
+
+# Saídas de teste e de auditoria
+testes/capturas/
+*.log
+npm-debug.log*
+
+# Sistema operacional e editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

@@ -1,0 +1,2950 @@
+/* ===================================================
+   CANDY MATH — style.css  (v2 — icon edition)
+   =================================================== */
+
+/* ---- RESET & ROOT ---- */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+/* O atributo hidden manda em tudo: sem esta linha, qualquer regra que defina
+   display:flex numa classe (o setup da caçada, o placar, a linha da rede)
+   ganharia do estilo padrão do navegador e a tela antiga continuaria aparecendo
+   por baixo da nova. */
+[hidden] { display:none !important; }
+
+:root {
+  --pink:    #FF6B9D;
+  --pink2:   #ff4d8f;
+  --yellow:  #FFD93D;
+  --mint:    #4ECDC4;
+  --purple:  #9B5DE5;
+  --orange:  #FF9A3C;
+  --red:     #FF4757;
+  --blue:    #3DBBFF;
+  --green:   #6BCB77;
+
+  --bg:      #FFF0F7;
+  --card:    #FFFFFF;
+  --border:  rgba(255,107,157,0.25);
+
+  --text:    #3A2A4D;
+  --text2:   #7A6B8A;
+  --white:   #FFFFFF;
+
+  --shadow-pink: 0 8px 24px rgba(255,107,157,0.28);
+  --shadow-card: 0 4px 20px rgba(100,60,120,0.12);
+  /* Malha de açúcar do hub, em variável: cada tela de jogo veste o mesmo papel
+     por cima do seu próprio degradê, sem repetir a receita treze vezes. */
+  --malha-acucar:
+    radial-gradient(rgba(255,255,255,0.55) 1.2px, transparent 1.9px) 0 0 / 26px 26px,
+    radial-gradient(rgba(255,255,255,0.30) 1.2px, transparent 1.9px) 13px 13px / 26px 26px;
+
+  /* Escala fluida: os componentes se ajustam à janela em vez de estourar.
+     clamp(min, preferido em vw, max) — o mínimo vale em 320 px, o máximo em
+     telas grandes, e nada disso depende de quebrar o layout num meio do caminho. */
+  --pad:    clamp(12px, 3.2vw, 22px);
+  --gap:    clamp(8px, 1.6vw, 14px);
+  --bloco:  clamp(14px, 3.4vh, 30px);
+  --r:       clamp(16px, 2.4vw, 22px);
+  --r-sm:    clamp(11px, 1.7vw, 14px);
+  --r-pill:  999px;            /* pílulas e fichas: o raio vira token, não medida solta */
+  --gap-sm:  clamp(5px, 0.9vw, 8px);
+  /* Contorno e base de botão de brinquedo (seção 19): uma linha escura de
+     adesivo em volta e uma base dura embaixo, que afunda quando aperta. */
+  --linha-boneco:       rgba(58,42,77,0.78);
+  --linha-boneco-suave: rgba(58,42,77,0.30);
+  --base-boneco:        0 5px 0 var(--linha-boneco);
+  --base-boneco-hover:  0 8px 0 var(--linha-boneco);
+  --alvo: 44px;              /* menor alvo de toque aceito */
+  --fs-titulo: clamp(17px, 2.3vw, 24px);
+  --fs-corpo:  clamp(14px, 1.35vw, 17px);
+  --fs-apoio:  clamp(11.5px, 1.15vw, 13px);
+  --largura-leitura: 640px;  /* coluna máxima de texto e tabuleiro */
+  --max-linha: 1040px;       /* largura máxima das faixas do hub */
+}
+
+html, body {
+  width: 100%; height: 100%;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  user-select: none;
+  /* Sem o flash cinza do toque: o retorno visual é o afundamento do botão
+     (seção 14), não um retângulo do navegador sobre o tema de doce. */
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+/* Duas manchas de cor que respiram. Ficam inteiramente dentro da janela,
+   para nenhum tamanho de tela ganhar rolagem horizontal por causa delas. */
+body::before, body::after {
+  content: ""; position: absolute; border-radius: 50%;
+  width: min(60vmin, 340px); height: min(60vmin, 340px);
+  filter: blur(80px); z-index: -1; pointer-events: none;
+}
+body::before {
+  background: var(--pink); top: 0; left: 0; opacity: 0.5;
+  animation: derivaA 12s infinite alternate ease-in-out;
+}
+body::after {
+  background: var(--mint); right: 0; bottom: 0; opacity: 0.45;
+  animation: derivaB 14s infinite alternate ease-in-out;
+}
+@keyframes derivaA {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(40px, 34px) scale(1.15); }
+}
+@keyframes derivaB {
+  from { transform: translate(0, 0) scale(1.1); }
+  to   { transform: translate(-44px, -30px) scale(1); }
+}
+
+/* ===== SCREEN MANAGEMENT ===== */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  transform: translateY(12px);
+  overflow: hidden;
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+
+/* ===== SHARED COMPONENTS ===== */
+/* O topo dos jogos é a única barra fixa das telas de partida: volta, nome e
+   placar. Em janelas estreitas o placar desce para a segunda linha em vez de
+   empurrar o título para fora da tela. */
+.game-top-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px var(--gap);
+  padding: 10px var(--pad);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 3px solid rgba(255, 107, 157, 0.5);
+  box-shadow: 0 2px 12px rgba(255,107,157,0.15);
+  flex-shrink: 0;
+  z-index: 10;
+}
+.btn-back {
+  background: linear-gradient(135deg, var(--pink), var(--pink2));
+  color: #fff;
+  border: none;
+  min-height: var(--alvo);
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(13px, 1.3vw, 15px);
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 3px 10px rgba(255,107,157,0.4);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-back:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(255,107,157,0.5); }
+.gtb-title {
+  flex: 1 1 140px;
+  min-width: 0;
+  font-family: 'Fredoka One', cursive;
+  font-size: var(--fs-titulo);
+  color: var(--purple);
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1.15;
+}
+.gtb-info {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font-size: var(--fs-apoio);
+  font-weight: 700;
+  color: var(--text2);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.gtb-info .fa-star { color: var(--yellow); }
+
+/* ===== SPLASH SCREEN ===== */
+#screenSplash {
+  background: linear-gradient(160deg, #FF6B9D 0%, #9B5DE5 60%, #4ECDC4 100%);
+  /* Sem justify-content: o 'margin:auto' do .splash-content centra quando cabe
+     e mantém o topo alcançável quando a janela é baixa demais. */
+  align-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.splash-stripe {
+  position: absolute;
+  inset: 0;
+  /* Listras de toldo + uma malha rala de pontinhos: o fundo do splash ganha
+     granulado de açúcar em vez de ficar só no degradê liso. */
+  background:
+    radial-gradient(rgba(255,255,255,0.10) 1.6px, transparent 2.4px) 0 0 / 34px 34px,
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.04) 0px,
+      rgba(255,255,255,0.04) 20px,
+      transparent 20px,
+      transparent 40px
+    );
+}
+.candy-float {
+  position: absolute;
+  font-size: calc(clamp(20px, 4vw, 32px) * var(--s, 1));
+  left: var(--x);
+  top: -60px;
+  animation: candyFall 5s ease-in infinite;
+  animation-delay: var(--d);
+  opacity: 0.8;
+  color: rgba(255,255,255,0.7);
+}
+/* Queda das versões antigas, pedida de volta pelo dono: o doce desce girando uma
+   volta inteira, com ease-in acelerando no fim — é o que dá o ar de doce caindo
+   de verdade, não de ícone descendo reto. */
+@keyframes candyFall {
+  0%   { top: -60px; transform: rotate(0deg);   opacity: 0.8; }
+  80%  { opacity: 0.8; }
+  100% { top: 110%;  transform: rotate(360deg); opacity: 0; }
+}
+.splash-content {
+  text-align: center;
+  color: #fff;
+  z-index: 1;
+  width: min(92vw, 560px);
+  flex: 0 0 auto;
+  margin: auto;
+  padding: clamp(6px, 1.6vh, 20px) 0;
+  animation: popIn 0.7s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { transform:scale(0.7); opacity:0; }
+  to   { transform:scale(1);   opacity:1; }
+}
+.splash-onca-wrap {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.splash-onca-icon {
+  /* vw e vh juntos: em janela deitada a onça não empurra o botão para fora. */
+  width: clamp(78px, min(18vw, 17vh), 112px);
+  height: clamp(78px, min(18vw, 17vh), 112px);
+  background: #FF9A3C;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  animation: oncaWiggle 2.5s ease-in-out infinite;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2), 0 0 0 6px rgba(255,255,255,0.15);
+  border: 3px solid rgba(255,255,255,0.4);
+}
+.splash-onca-icon .fa-paw {
+  font-size: clamp(32px, min(9vw, 8.6vh), 58px);
+  color: #3A2A4D;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3));
+}
+@keyframes oncaWiggle {
+  0%,100% { transform:rotate(-6deg) translateY(0); }
+  50%     { transform:rotate(6deg)  translateY(-10px); }
+}
+/* A fala fica embaixo da onça, centralizada. Pendurada ao lado, ela saía da
+   tela em janelas estreitas. */
+.splash-onca-bubble {
+  position: absolute;
+  top: calc(100% + 10px); left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: var(--purple);
+  font-size: clamp(12px, 1.5vw, 14px);
+  font-weight: 800;
+  padding: 7px 14px;
+  border-radius: 20px 20px 20px 4px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  /* Depois do pop, a fala continua respirando devagar. `translate` é propriedade
+     separada de `transform`, então o flutuar não briga com o centralizar. */
+  animation: bubblePop 0.5s 0.8s both cubic-bezier(0.34,1.56,0.64,1),
+             bubbleFloat 3.4s 1.6s ease-in-out infinite alternate;
+}
+@keyframes bubbleFloat {
+  from { translate: 0 0; }
+  to   { translate: 0 -4px; }
+}
+/* 48 px é o piso: a fala pendurada na onça ocupa ~40 px abaixo do ícone. */
+.splash-content > .splash-onca-wrap { margin-bottom: clamp(48px, 8vh, 58px); }
+@keyframes bubblePop {
+  from { transform:translateX(-50%) scale(0); opacity:0; }
+  to   { transform:translateX(-50%) scale(1); opacity:1; }
+}
+.splash-title {
+  font-family: 'Fredoka One', cursive;
+  /* 9.6vh segura o 'Candy Math' em duas linhas dentro de uma janela deitada. */
+  font-size: clamp(30px, min(11vw, 9.6vh), 76px);
+  line-height: 1.05;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.25), 0 0 40px rgba(255,255,255,0.15);
+  letter-spacing: 0.04em;
+  margin-bottom: clamp(6px, 1.6vh, 12px);
+}
+.splash-sub {
+  font-size: clamp(15px, 2vw, 19px);
+  font-weight: 700;
+  opacity: 0.95;
+  margin-bottom: clamp(12px, 4vh, 30px);
+}
+.splash-features {
+  /* flex:1 em vez de pílulas do tamanho do texto: elas dividem a linha e ficam
+     com a mesma largura, em vez de quebrar em 2 + 1 em tela de celular. */
+  display: flex;
+  gap: clamp(6px, 1.4vw, 10px);
+  justify-content: center;
+  flex-wrap: wrap;
+  width: min(100%, 420px);
+  margin: 0 auto clamp(12px, 5vh, 38px);
+}
+.splash-feat {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: clamp(7px, 1.1vh, 9px) clamp(6px, 1.4vw, 18px);
+  border-radius: var(--r-pill);
+  font-size: clamp(11.5px, min(1.5vw, 1.9vh), 14px);
+  font-weight: 800;
+  border: 2px solid rgba(255,255,255,0.7);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: rotate 0.15s ease, transform 0.15s ease;
+}
+/* Pílulas claras com letra colorida: sobre o gradiente, o texto translúcido
+   anterior tinha contraste baixo demais para leitura. */
+.feat-pink   { background: rgba(255,255,255,0.92); color: var(--pink2); rotate: -1.2deg; }
+.feat-yellow { background: rgba(255,255,255,0.92); color: #9A6B00;  rotate: 0.9deg; }
+.feat-mint   { background: rgba(255,255,255,0.92); color: #1F7C75;  rotate: -0.7deg; }
+.feat-pink i   { color: var(--pink); }
+.feat-yellow i { color: var(--yellow); }
+.feat-mint i   { color: var(--mint); }
+/* Cada pílula tem uma inclinação própria, como adesivo colado à mão; no hover
+   ela endireita — resposta ao gesto, não decoração parada. */
+.splash-feat:hover { rotate: 0deg; transform: translateY(-2px); }
+
+.btn-play {
+  background: linear-gradient(135deg, var(--yellow) 0%, var(--orange) 100%);
+  color: #fff;
+  border: none;
+  min-height: var(--alvo);
+  padding: clamp(10px, 1.9vh, 16px) clamp(34px, 8vw, 54px);
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(19px, 2.6vw, 26px);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(58,42,77,0.22), 0 8px 28px rgba(255,154,60,0.5), 0 0 0 4px rgba(255,255,255,0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-play:hover { transform:translateY(-4px) scale(1.04); box-shadow: 0 8px 0 rgba(58,42,77,0.22), 0 14px 36px rgba(255,154,60,0.6); }
+.btn-play:active { transform:translateY(0) scale(0.98); }
+
+/* ===== HUB SCREEN ===== */
+#screenHub {
+  /* Papel de confeitaria: duas malhas de pontinhos deslocadas sobre o degradê,
+     como açúcar salpicado — fundo liso de duas cores é cara de tela gerada. */
+  background: var(--malha-acucar),
+    linear-gradient(180deg, #FFF0F7 0%, #F0EDFF 100%);
+  overflow: hidden;
+}
+/* Apenas a lista rola; header, seletor e ações ficam sempre visíveis */
+.hub-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-bottom: 6px;
+}
+/* No celular e em janelas baixas as três faixas fixas (cabeçalho, seletor e
+   atalhos) já somam mais altura do que a janela, então o hub passa a rolar
+   inteiro, com o placar colado no topo. Em janela alta nada muda: a lista
+   continua rolando sozinha. */
+@media (max-height: 780px) {
+  #screenHub {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  #screenHub .hub-header { position: sticky; top: 0; z-index: 6; }
+  #screenHub .hub-body { flex: 0 0 auto; overflow: visible; }
+}
+.hub-header {
+  padding: 8px var(--pad);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 3px solid rgba(255, 107, 157, 0.45);
+  box-shadow: var(--shadow-card);
+  flex-shrink: 0;
+}
+/* Glacê escorrendo das barras: meias-luas da mesma cor pingando sobre o
+   conteúdo logo abaixo — detalhe de confeitaria que nenhuma tela pronta traz.
+   Absolutas e sem ponteiro, não mexem em medida nem em clique. */
+.hub-header::after,
+.game-top-bar::after {
+  content: "";
+  position: absolute; left: 0; right: 0; top: 100%;
+  height: 8px;
+  background: radial-gradient(circle at 9px -3px, rgba(255,255,255,0.92) 7px, transparent 8px)
+              0 0 / 18px 8px repeat-x;
+  pointer-events: none;
+}
+/* Uma única faixa centrada: mascote e comentário à esquerda, placar à
+   direita. Em telas largas o conteúdo para de se espalhar pela janela. */
+.hh-inner {
+  max-width: var(--max-linha);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  flex-wrap: wrap;
+}
+.hub-mascote {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 2vw, 16px);
+  min-width: 0;
+}
+/* Ficha horizontal e baixa: o placar informa sem virar protagonista do
+   cabeçalho — três cartões empilhados comiam um terço da banda. */
+.hub-stat {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg,#FFF0F7,#FFE0EF);
+  border: 2px solid var(--pink);
+  border-radius: var(--r-pill);
+  padding: 4px clamp(9px, 1.4vw, 14px);
+  min-width: 0;
+}
+.hs-estrelas { border-color: var(--yellow); background: linear-gradient(135deg,#FFFDE7,#FFF3C4); }
+.hub-stat-icon { font-size: clamp(12px, 1.4vw, 15px); }
+.hub-stat-icon .fa-star  { color: var(--yellow); }
+.hub-stat-icon .fa-trophy { color: var(--orange); }
+.hub-stat-val  { font-family:'Fredoka One',cursive; font-size: clamp(13px, 1.6vw, 17px); color:var(--purple); line-height:1.1; }
+
+/* Onça do cabeçalho */
+.onca-display {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(46px, 6.6vw, 62px);
+  height: clamp(46px, 6.6vw, 62px);
+  flex-shrink: 0;
+}
+.onca-base-icon {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #FFD93D, #FF9A3C);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--purple);
+  box-shadow: 0 4px 16px rgba(155,93,229,0.25);
+}
+.onca-base-icon .fa-paw { font-size: clamp(20px, 3.2vw, 30px); color: #3A2A4D; }
+.o-layer {
+  position: absolute;
+  font-size: clamp(15px, 2.2vw, 21px);
+  display: block;
+  pointer-events: none;
+}
+.o-hat    { top:-22%; left:50%; transform:translateX(-50%); }
+.o-glass  { top:28%;  left:50%; transform:translateX(-50%); }
+.o-outfit { bottom:-8%; left:50%; transform:translateX(-55%); }
+.o-acc    { top:16%;  right:-16%; }
+.onca-speech {
+  font-size: var(--fs-apoio);
+  font-weight: 700;
+  color: var(--purple);
+  background: #fff;
+  border: 2px solid var(--pink);
+  border-radius: var(--r-sm);
+  padding: 4px 10px;
+  box-shadow: var(--shadow-card);
+  max-width: min(48vw, 250px);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hub-title {
+  font-family:'Fredoka One',cursive;
+  font-size: clamp(19px, 2.3vw, 26px); color:var(--purple);
+  text-align:center; padding: clamp(8px,1.6vh,14px) 0 clamp(10px, 1.8vh, 16px);
+  /* Sublinhado ondulado de letreiro: o título deixa de ser texto solto
+     centralizado e vira placa de confeitaria. */
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--yellow);
+  text-decoration-thickness: 3px;
+  text-underline-offset: clamp(6px, 1vh, 9px);
+}
+
+/* Sections that group the games by type */
+.hub-cat {
+  padding: 0 var(--pad) clamp(14px, 2.4vh, 22px);
+  max-width: var(--max-linha);
+  margin: 0 auto;
+}
+/* Divisória de confeitos entre famílias: uma pontilha curta e centrada, não
+   uma régua de borda a borda — separa sem pesar. */
+.hub-cat + .hub-cat::before {
+  content: "";
+  display: block;
+  width: min(58%, 230px); height: 4px;
+  margin: 0 auto clamp(12px, 2vh, 18px);
+  background: radial-gradient(circle, rgba(155,93,229,0.35) 1.6px, transparent 2.3px)
+              0 0 / 12px 4px repeat-x;
+}
+.hub-cat-hdr {
+  display:flex; align-items:center; gap:clamp(9px, 1.4vw, 13px);
+  background:
+    repeating-linear-gradient(45deg, rgba(255,107,157,0.05) 0 9px, transparent 9px 18px),
+    var(--card);
+  border:3px solid var(--border);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.2vw, 11px) clamp(10px, 1.5vw, 15px);
+  margin-bottom:clamp(9px, 1.4vw, 13px); box-shadow:var(--shadow-card);
+}
+.hub-cat-icon {
+  width:clamp(32px, 4vw, 40px); height:clamp(32px, 4vw, 40px);
+  border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center;
+  font-size:clamp(13px, 1.7vw, 17px); color:#fff;
+}
+.hub-cat-text { flex:1; min-width:0; }
+.hub-cat-name {
+  font-family:'Fredoka One',cursive; font-size:clamp(15px, 1.8vw, 19px);
+  color:var(--purple); line-height:1.2;
+}
+.hub-cat-desc {
+  font-size:var(--fs-apoio); font-weight:700; color:var(--text2);
+  line-height:1.3; overflow-wrap:anywhere;
+}
+.hub-cat-count {
+  flex-shrink:0; white-space:nowrap;
+  font-size:clamp(10px, 1.1vw, 12px); font-weight:800; color:var(--purple);
+  background:rgba(155,93,229,0.12); border-radius:var(--r-pill); padding:4px 10px;
+  rotate: 1.4deg;
+}
+.hc-calc   .hub-cat-hdr { border-color:rgba(255,107,157,0.45); }
+.hc-calc   .hub-cat-icon { background:linear-gradient(135deg,var(--pink),var(--pink2)); }
+.hc-calc   .hub-cat-count { color:var(--pink2); background:rgba(255,107,157,0.14); }
+.hc-logic  .hub-cat-hdr { border-color:rgba(155,93,229,0.45); }
+.hc-logic  .hub-cat-icon { background:linear-gradient(135deg,var(--purple),#7B3BC8); }
+.hc-action .hub-cat-hdr { border-color:rgba(78,205,196,0.5); }
+.hc-action .hub-cat-icon { background:linear-gradient(135deg,var(--mint),var(--blue)); }
+.hc-action .hub-cat-count { color:#2aada4; background:rgba(78,205,196,0.18); }
+
+/* Mode cards */
+/* auto-fit + 1fr: o número de colunas é decidido pela largura disponível e os
+   cards ocupam a linha inteira, sem deixar buraco no fim nem estourar em 320 px. */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(clamp(120px, 21vw, 170px), 1fr));
+  gap: clamp(10px, 1.4vw, 16px);
+  align-content: start;
+}
+.mode-card {
+  position:relative; overflow:hidden;
+  width: 100%;
+  /* Adesivo recortado à mão: quatro raios diferentes (nada de canto uniforme),
+     borda branca de sticker e uma inclinação própria — grade perfeita demais é
+     o que denuncia tela gerada. */
+  border-radius: calc(var(--r) * 1.15) calc(var(--r) * 0.82) calc(var(--r) * 1.05) calc(var(--r) * 0.9) /
+                 calc(var(--r) * 0.88) calc(var(--r) * 1.12) calc(var(--r) * 0.92) calc(var(--r) * 1.06);
+  padding:clamp(12px, 1.7vw, 18px) clamp(9px, 1.3vw, 14px);
+  text-align:center;
+  cursor:pointer;
+  border:3px solid rgba(255,255,255,0.85);
+  transition:transform 0.2s, box-shadow 0.2s, rotate 0.2s;
+  color:#fff;
+  display:flex; flex-direction:column; align-items:center;
+  rotate:-0.5deg;
+}
+.mode-card:nth-child(even) {
+  rotate:0.6deg;
+  border-radius: calc(var(--r) * 0.85) calc(var(--r) * 1.12) calc(var(--r) * 0.9) calc(var(--r) * 1.08) /
+                 calc(var(--r) * 1.1) calc(var(--r) * 0.86) calc(var(--r) * 1.06) calc(var(--r) * 0.94);
+}
+.mode-card:hover { transform:translateY(-6px) scale(1.03); rotate:0deg; }
+.mc-quiz   { background:linear-gradient(145deg,#FF6B9D,#FF4D8F); box-shadow:0 6px 24px rgba(255,107,157,0.45); }
+.mc-race   { background:linear-gradient(145deg,#FF9A3C,#FF6B1A); box-shadow:0 6px 24px rgba(255,154,60,0.45); }
+.mc-puzzle { background:linear-gradient(145deg,#9B5DE5,#7B3BC8); box-shadow:0 6px 24px rgba(155,93,229,0.45); }
+.mc-catch { background:linear-gradient(145deg,#4ECDC4,#3DBBFF); box-shadow:0 6px 24px rgba(78,205,196,0.45); }
+.mc-truefalse { background:linear-gradient(145deg,#06D6A0,#04AA7F); box-shadow:0 6px 24px rgba(6,214,160,0.45); }
+.mc-memory { background:linear-gradient(145deg,#EF476F,#C93A5B); box-shadow:0 6px 24px rgba(239,71,111,0.45); }
+.mc-operator { background:linear-gradient(145deg,#FFD166,#E5BC5C); box-shadow:0 6px 24px rgba(255,209,102,0.45); }
+.mc-balloon { background:linear-gradient(145deg,#118AB2,#0D6E8E); box-shadow:0 6px 24px rgba(17,138,178,0.45); }
+.mc-fishing { background:linear-gradient(145deg,#073B4C,#052C39); box-shadow:0 6px 24px rgba(7,59,76,0.45); }
+.mc-sort { background:linear-gradient(145deg,#F77F00,#D66E00); box-shadow:0 6px 24px rgba(247,127,0,0.45); }
+.mc-whack { background:linear-gradient(145deg,#8D5A97,#72487A); box-shadow:0 6px 24px rgba(141,90,151,0.45); }
+.mc-sequence { background:linear-gradient(145deg,#3A86FF,#2A65CC); box-shadow:0 6px 24px rgba(58,134,255,0.45); }
+.mc-balance { background:linear-gradient(145deg,#8338EC,#652BC2); box-shadow:0 6px 24px rgba(131,56,236,0.45); }
+.mc-roulette { background:linear-gradient(145deg,#FF006E,#CC0058); box-shadow:0 6px 24px rgba(255,0,110,0.45); }
+.mc-glow {
+  position:absolute; inset:0;
+  /* Brilho + confeitos salpicados em duas malhas: a cartela deixa de ser um
+     ladrilho liso de duas cores e ganha textura de papel de bala. */
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent 60%),
+    radial-gradient(rgba(255,255,255,0.30) 1.4px, transparent 2.1px) 0 0 / 24px 24px,
+    radial-gradient(rgba(255,255,255,0.18) 1.1px, transparent 1.8px) 12px 12px / 24px 24px;
+  pointer-events:none;
+}
+.mc-icon  {
+  font-size:clamp(22px, 3vw, 32px);
+  margin-bottom:clamp(6px, 1.2vh, 12px);
+  /* Selo de confeitaria: o ícone mora num círculo tracejado, como carimbo no
+     papel de bala, em vez de flutuar solto sobre o degradê. */
+  width:clamp(46px, 6.4vw, 62px); height:clamp(46px, 6.4vw, 62px);
+  border-radius:50%;
+  background:rgba(255,255,255,0.20);
+  border:2px dashed rgba(255,255,255,0.65);
+  display:flex; align-items:center; justify-content:center;
+}
+.mc-icon .fa-candy-cane,
+.mc-icon .fa-flag-checkered,
+.mc-icon .fa-puzzle-piece { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)); }
+.mc-name  { font-family:'Fredoka One',cursive; font-size:clamp(15px, 1.8vw, 19px); margin-bottom:4px; text-shadow:0 1px 2px rgba(58,42,77,0.28); }
+.mc-desc  { font-size:clamp(10.5px, 1.1vw, 12px); opacity:0.92; line-height:1.4; margin-bottom:8px; flex:1; }
+.mc-stars { font-size:clamp(10.5px, 1.1vw, 12.5px); font-weight:800; background:rgba(255,255,255,0.22); border-radius:var(--r-pill); padding:4px 10px; display:inline-flex; align-items:center; gap:5px; rotate:-1.5deg; }
+/* Amarelo-claro + branco fica abaixo de 1,5:1 de contraste. Nesta única cartela
+   clara o texto é escuro; as demais mantêm o branco sobre saturado. */
+.mc-operator { color:#4A3600; }
+.mc-operator .mc-name { text-shadow:none; }
+.mc-operator .mc-stars { background:rgba(74,54,0,0.14); color:#3A2A00; }
+.mc-operator .mc-icon .fa-plus-minus { color:#4A3600; }
+
+/* Hub action buttons */
+.hub-actions {
+  /* Grade, não fileira solta: os quatro atalhos têm o mesmo peso — duas
+     colunas no celular, quatro na tela larga, sem órfão nem larguras
+     discordantes de acordo com o tamanho do rótulo. */
+  display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:var(--gap);
+  width:100%; max-width:var(--max-linha);
+  margin:0 auto; padding:0 var(--pad) clamp(10px, 1.6vh, 16px);
+  flex-shrink:0;
+}
+@media (min-width: 700px) {
+  .hub-actions { grid-template-columns:repeat(4, minmax(0,1fr)); }
+}
+/* Pílulas com base dura de botão de brinquedo: a sombra chapada embaixo dá
+   peso de peça de plástico, não de cartão de site. */
+.btn-hub-action {
+  display:flex; flex-direction:row; align-items:center; justify-content:center; gap:8px;
+  min-width:0;
+  min-height:var(--alvo);
+  border:none; border-radius:var(--r-pill); padding:clamp(9px, 1.3vw, 12px) clamp(10px, 1.6vw, 18px);
+  font-family:'Nunito',sans-serif; font-size:var(--fs-apoio); font-weight:800;
+  cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
+  color:#fff;
+}
+.btn-hub-action > i { font-size:clamp(15px, 1.8vw, 19px); }
+.bha-shop    { background:linear-gradient(135deg,#FF6B9D,#9B5DE5); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(155,93,229,0.35); }
+.bha-records { background:linear-gradient(135deg,#FFD93D,#FF9A3C); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(255,154,60,0.35); }
+.bha-sound   { background:linear-gradient(135deg,#4ECDC4,#3DBBFF); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(78,205,196,0.35); }
+.btn-hub-action:hover { transform:translateY(-3px); }
+
+/* ===== QUIZ SCREEN ===== */
+#screenQuiz {
+  --tela: var(--pink);
+  background: var(--malha-acucar), linear-gradient(180deg,#FFF5FA 0%,#F6F1FF 100%);
+  overflow-y: auto;
+}
+.q-progress-dots {
+  display:flex; gap:clamp(6px, 1.2vw, 11px); justify-content:center;
+  padding:clamp(9px, 1.8vh, 16px) var(--pad) 6px;
+  flex-shrink:0;
+}
+.qdot {
+  width:clamp(13px, 1.7vw, 17px); height:clamp(13px, 1.7vw, 17px); border-radius:50%;
+  background:rgba(155,93,229,0.2); border:2px solid rgba(155,93,229,0.3);
+  transition:all 0.3s;
+}
+.qdot.done    { background:var(--green); border-color:var(--green); transform:scale(1.15); }
+.qdot.wrong   { background:var(--red);   border-color:var(--red);   transform:scale(1.15); }
+.qdot.current { background:var(--yellow); border-color:var(--orange); transform:scale(1.3); }
+
+/* Entrada coreografada: as peças da rodada chegam em fila, com um tico de atraso
+   entre si — tudo aparecendo de uma vez só parece tela impressa. O atraso mora
+   numa variável, não na propriedade animation: assim a animação de acerto/erro,
+   que vem depois no arquivo e leva a propriedade inteira, não herda espera. */
+#screenQuiz.active .q-progress-dots .qdot {
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) var(--atraso, 0s) backwards;
+}
+.q-progress-dots .qdot:nth-child(2) { --atraso: 0.05s; }
+.q-progress-dots .qdot:nth-child(3) { --atraso: 0.1s; }
+.q-progress-dots .qdot:nth-child(4) { --atraso: 0.15s; }
+.q-progress-dots .qdot:nth-child(5) { --atraso: 0.2s; }
+
+.quiz-card {
+  margin:0 auto; width: min(100% - 2 * var(--pad), var(--largura-leitura));
+  background:var(--card);
+  border-radius:var(--r); border:3px solid var(--pink);
+  padding:clamp(14px, 2.4vw, 24px); box-shadow:var(--shadow-pink);
+  animation:slideUp 0.4s ease;
+  flex-shrink:0;
+}
+.qcard-top {
+  display:flex; justify-content:space-between; align-items:center;
+  gap:var(--gap); margin-bottom:clamp(8px, 1.6vh, 16px);
+}
+.diff-tag {
+  background:linear-gradient(135deg,var(--yellow),var(--orange));
+  color:#fff; padding:5px clamp(10px, 1.6vw, 18px); border-radius:var(--r-pill);
+  font-size:var(--fs-apoio); font-weight:800; letter-spacing:0.3px;
+}
+.btn-speak {
+  background:linear-gradient(135deg,var(--mint),#2aada4);
+  border:none; border-radius:50%; width:var(--alvo); height:var(--alvo);
+  font-size:clamp(14px, 1.7vw, 18px); cursor:pointer; transition:transform 0.15s;
+  box-shadow:0 3px 10px rgba(78,205,196,0.4);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.btn-speak:hover { transform:scale(1.15); }
+
+.qcard-emoji {
+  width: clamp(56px, 8vw, 82px);
+  height: clamp(56px, 8vw, 82px);
+  background: linear-gradient(135deg, #FFF0F7, #F0EDFF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto clamp(8px, 1.6vh, 14px);
+  border: 3px solid var(--pink);
+  box-shadow: 0 4px 16px rgba(255,107,157,0.2);
+}
+.qcard-emoji i {
+  font-size: clamp(26px, 3.6vw, 38px);
+  color: var(--pink);
+}
+.qcard-text  {
+  font-size: clamp(15px, 1.9vw, 21px); font-weight:700; text-align:center; line-height:1.4;
+  color:var(--text); margin-bottom:4px;
+}
+
+.quiz-answers {
+  /* 42 vw mantém duas colunas no celular e no desktop; o min(100%, …) só
+     entrega coluna única quando a janela fica estreita demais para o par. */
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, clamp(130px, 42vw, 260px)), 1fr));
+  gap:clamp(8px, 1.2vw, 14px); padding:clamp(9px, 1.8vh, 18px) var(--pad);
+  flex-shrink:0; width:100%; max-width:var(--largura-leitura); margin:0 auto;
+}
+/* Em janela alta o bloco pergunta+respostas fica centrado, em vez de grudado no
+   topo com um vazio embaixo. Sobra espaço? as margens auto dividem. Não sobra?
+   elas viram zero e a tela continua rolando normalmente. */
+#screenQuiz .q-progress-dots { margin-top:auto; }
+#screenQuiz .quiz-feedback { margin-bottom:auto; }
+.ans-btn {
+  min-height:clamp(48px, 7.5vh, 70px);
+  padding:clamp(10px, 1.6vw, 16px) clamp(8px, 1.2vw, 14px);
+  border-radius:var(--r-sm);
+  /* Base dura embaixo: é o que diz "isto se aperta" sem precisar de contorno
+     grosso — o contorno pesado deixava a rodada inteira parecida com formulário. */
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF9FC 100%);
+  border:2px solid rgba(255,107,157,0.32);
+  font-family:'Fredoka One',cursive; font-size:clamp(15px, 2vw, 22px);
+  color:var(--text); cursor:pointer; line-height:1.25;
+  transition:all 0.2s; box-shadow:0 3px 0 rgba(155,93,229,0.10), var(--shadow-card);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  overflow-wrap:anywhere;
+}
+/* Cada resposta nova entra com um pop atrasado em relação à vizinha: a rodada
+   parece distribuída, não colada de uma vez. */
+.quiz-answers .ans-btn {
+  animation: popIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) var(--atraso, 0s) backwards;
+}
+.quiz-answers .ans-btn:nth-child(2) { --atraso: 0.06s; }
+.quiz-answers .ans-btn:nth-child(3) { --atraso: 0.12s; }
+.quiz-answers .ans-btn:nth-child(4) { --atraso: 0.18s; }
+.ans-btn:hover:not(:disabled) { transform:translateY(-3px) scale(1.03); border-color:var(--pink); box-shadow:var(--shadow-pink); }
+.ans-btn.correct  { background:linear-gradient(135deg,var(--green),#4da34d); border-color:var(--green); color:#fff; animation:correctPop 0.5s ease; }
+.ans-btn.wrong    { background:linear-gradient(135deg,var(--red),#cc2222);   border-color:var(--red);   color:#fff; animation:shakeAnim 0.4s ease; }
+.ans-btn.reveal   { background:linear-gradient(135deg,var(--green),#4da34d); border-color:var(--green); color:#fff; opacity:0.7; }
+.ans-btn:disabled { cursor:not-allowed; }
+
+@keyframes correctPop  { 0%{transform:scale(1)} 50%{transform:scale(1.1)} 100%{transform:scale(1)} }
+@keyframes shakeAnim   { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+.quiz-feedback {
+  display:flex; align-items:center; gap:clamp(9px, 1.4vw, 14px);
+  padding:0 var(--pad) clamp(8px, 1.6vh, 14px); opacity:0;
+  transition:opacity 0.3s; flex-shrink:0;
+  width:100%; max-width:var(--largura-leitura); margin:0 auto;
+}
+.quiz-feedback.show { opacity:1; }
+.qf-onca {
+  width: clamp(36px, 5vw, 48px);
+  height: clamp(36px, 5vw, 48px);
+  background: linear-gradient(135deg, #FFD93D, #FF9A3C);
+  border-radius: 50%;
+  border: 2px solid var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.qf-onca .fa-paw { font-size: clamp(17px, 2.4vw, 24px); color: #3A2A4D; }
+.qf-bubble  {
+  background:var(--card); border:2px solid var(--pink);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.2vw, 12px) clamp(11px, 1.6vw, 17px);
+  font-weight:700; font-size:clamp(13px, 1.5vw, 17px); color:var(--purple);
+  box-shadow:var(--shadow-card); line-height:1.4; min-width:0;
+}
+/* A fala da onça sobe enquanto aparece: só acender no lugar parece aviso de
+   sistema; subindo parece que ela acabou de dizer. */
+.quiz-feedback .qf-bubble, .game-feedback .qf-bubble {
+  translate: 0 6px; transition: translate 0.3s ease;
+}
+.quiz-feedback.show .qf-bubble, .game-feedback.show .qf-bubble { translate: 0 0; }
+
+/* ===== CATCH SCREEN ===== */
+#screenCatch {
+  --tela: var(--blue);
+  background: var(--malha-acucar), linear-gradient(180deg,#EDF7FE 0%,#D9EDFB 100%);
+  overflow: hidden;
+}
+.catch-question-wrap {
+  margin:clamp(6px, 1.4vh, 13px) auto; padding:clamp(9px, 1.5vw, 16px) clamp(11px, 1.8vw, 20px);
+  background:var(--card); border-radius:var(--r);
+  border:3px solid var(--blue);
+  box-shadow:0 4px 18px rgba(61,187,255,0.3);
+  flex-shrink:0; text-align: center; line-height:1.35;
+  width: min(100% - 2 * var(--pad), var(--largura-leitura));
+}
+.catch-q-text {
+  font-family: 'Fredoka One', cursive;
+  font-size:clamp(16px, 2.1vw, 23px); color:var(--text); line-height:1.35;
+}
+.catch-stage {
+  flex:1; min-height:0; position:relative; overflow:hidden;
+  margin:0 var(--pad) var(--pad); border: 3px solid rgba(255,255,255,0.6);
+  border-radius: var(--r-sm); background: rgba(255,255,255,0.25);
+  box-shadow: inset 0 3px 14px rgba(100,60,120,0.12);
+}
+.catch-player {
+  position:absolute; bottom:10px; left:50%; transform:translateX(-50%);
+  width:clamp(44px, 7vw, 64px); height:clamp(44px, 7vw, 64px); z-index:5;
+}
+.catch-juba {
+  width:100%; height:100%; background: linear-gradient(135deg, #FFD93D, #FF9A3C);
+  border-radius: 50%; border: 3px solid #3A2A4D; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px rgba(58,42,77,0.28);
+}
+.catch-juba i { font-size: clamp(22px, 3.2vw, 32px); color: #3A2A4D; }
+/* O doces é pílula, não círculo de 44 px: em 1º ao 9º ano o número cai com
+   5 ou 6 algarismos e precisa caber inteiro no desenho. */
+.catch-item {
+  position:absolute; top:-44px; transform:translateX(-50%);
+  min-width:clamp(38px, 6.4vw, 50px); height:clamp(38px, 6.4vw, 50px);
+  padding:0 7px;
+  background:linear-gradient(140deg,#FF87AF,#FF4D8F); border-radius:var(--r-pill); display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:bold; font-size:clamp(12px, 1.9vw, 20px); border:2px solid #fff;
+  text-shadow:0 1px 2px rgba(58,42,77,0.35);
+  box-shadow: 0 4px 10px rgba(255,77,143,0.35); transition: top 0.05s linear;
+}
+
+/* ===== PUZZLE SCREEN ===== */
+#screenPuzzle {
+  --tela: var(--purple);
+  background: var(--malha-acucar), linear-gradient(180deg,#F5F2FF 0%,#EAF6EE 100%);
+  overflow-y:auto;
+}
+.puzzle-info-card {
+  display:flex; align-items:center; gap:clamp(9px, 1.4vw, 14px);
+  margin:clamp(6px, 1.4vh, 13px) auto; padding:clamp(9px, 1.5vw, 16px) clamp(11px, 1.7vw, 18px);
+  background:var(--card); border-radius:var(--r);
+  border:3px solid var(--purple); box-shadow:0 4px 16px rgba(155,93,229,0.2);
+  flex-shrink:0; min-width:0;
+  width: min(100% - 2 * var(--pad), var(--largura-leitura));
+}
+.puzzle-onca {
+  width: clamp(38px, 5.4vw, 50px);
+  height: clamp(38px, 5.4vw, 50px);
+  background: linear-gradient(135deg, #FFD93D, #FF9A3C);
+  border-radius: 50%;
+  border: 2px solid var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.puzzle-onca .fa-paw { font-size: clamp(19px, 2.6vw, 26px); color: #3A2A4D; }
+.puzzle-info-card strong { font-size:clamp(14px, 1.6vw, 17px); color:var(--purple); }
+.puzzle-info-card p { font-size:var(--fs-apoio); color:var(--text2); margin-top:3px; line-height:1.35; }
+
+.puzzle-outer {
+  flex:1; min-height:0; display:flex; align-items:center; justify-content:center;
+  padding:clamp(6px, 1.4vh, 16px) var(--pad);
+  overflow-y:auto;
+}
+/* O tabuleiro é uma grade de 1fr: as casas dividem a largura que existe, então
+   a cruzadinha inteira cabe em 320 px sem cortar casa nem soma. */
+.puzzle-grid-wrap {
+  background:var(--card); border-radius:var(--r);
+  border:3px solid var(--purple); padding:clamp(9px, 1.4vw, 18px);
+  box-shadow:0 6px 24px rgba(155,93,229,0.22);
+  width:100%; max-width:min(100%, 480px);
+}
+.puzzle-grid {
+  display:grid;
+  gap:clamp(3px, 0.7vw, 7px);
+  width:100%;
+}
+.pcell {
+  width:auto; aspect-ratio:1; height:auto; border-radius:clamp(7px, 1vw, 11px);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fredoka One',cursive; font-size:clamp(11px, 1.9vw, 22px);
+  min-width:0;
+}
+.pcell.fixed {
+  background:linear-gradient(135deg,#EDE9FE,#DDD6FE);
+  color:var(--purple); border:2px solid #C4B5FD;
+  font-weight:700;
+}
+.pcell.blank input {
+  width:100%; height:100%; border:none; background:transparent;
+  font-family:'Fredoka One',cursive; font-size:clamp(11px, 1.9vw, 22px);
+  text-align:center; color:var(--text); outline:none; min-width:0;
+  -moz-appearance:textfield;
+}
+.pcell.blank input::-webkit-outer-spin-button,
+.pcell.blank input::-webkit-inner-spin-button { -webkit-appearance:none; }
+.pcell.blank {
+  background:#fff; border:3px dashed var(--purple);
+  cursor:text; transition:border-color 0.2s;
+}
+.pcell.blank:focus-within { border-color:var(--pink); border-style:solid; }
+.pcell.blank.correct-cell { background:#DCFCE7; border-color:var(--green); border-style:solid; }
+.pcell.blank.wrong-cell   { background:#FEE2E2; border-color:var(--red);   border-style:solid; animation:shakeAnim 0.4s; }
+.pcell.blank.hinted       { background:#FEF9C3; border-color:var(--yellow); border-style:solid; }
+
+.pcell.sum-label {
+  background:none; border:none; font-size:clamp(10px, 1.3vw, 15px); color:var(--text2); font-weight:800;
+}
+.pcell.op-label {
+  background:none; border:none; font-size:clamp(12px, 1.6vw, 19px); color:var(--orange);
+}
+.pcell.corner {
+  background:none; border:none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pcell.corner .fa-candy-cane {
+  font-size: clamp(13px, 1.7vw, 21px);
+  color: var(--pink);
+}
+
+.puzzle-btns {
+  display:flex; gap:clamp(8px, 1.2vw, 12px);
+  padding:clamp(6px, 1.4vh, 14px) var(--pad) clamp(10px, 2vh, 18px);
+  flex-shrink:0; width:100%; max-width:var(--largura-leitura); margin:0 auto;
+}
+.btn-hint {
+  flex:1 1 0; min-height:var(--alvo); padding:12px 8px; border-radius:var(--r-sm); border:none;
+  background:linear-gradient(135deg,var(--yellow),var(--orange));
+  color:#fff; font-family:'Fredoka One',cursive; font-size:clamp(13px, 1.6vw, 17px);
+  cursor:pointer; box-shadow:0 4px 14px rgba(255,154,60,0.4);
+  transition:transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width:0;
+}
+.btn-check-puzzle {
+  flex:2 1 0; min-height:var(--alvo); padding:12px 8px; border-radius:var(--r-sm); border:none;
+  background:linear-gradient(135deg,var(--green),#38a338);
+  color:#fff; font-family:'Fredoka One',cursive; font-size:clamp(13px, 1.6vw, 17px);
+  cursor:pointer; box-shadow:0 4px 14px rgba(107,203,119,0.4);
+  transition:transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width:0;
+}
+.btn-next-puzzle {
+  flex:1 1 0; min-height:var(--alvo); padding:12px 8px; border-radius:var(--r-sm); border:none;
+  background:linear-gradient(135deg,var(--purple),#7b3bc8);
+  color:#fff; font-family:'Fredoka One',cursive; font-size:clamp(13px, 1.6vw, 17px);
+  cursor:pointer; box-shadow:0 4px 14px rgba(155,93,229,0.4);
+  transition:transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width:0;
+}
+.btn-hint:hover, .btn-check-puzzle:hover, .btn-next-puzzle:hover { transform:translateY(-3px); }
+
+/* ===== MODALS ===== */
+.modal-overlay {
+  position:fixed; inset:0;
+  background:rgba(40,15,70,0.55);
+  z-index:1000; display:none;
+  animation:fadeIn 0.25s ease;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display:block; }
+
+.modal {
+  position:fixed; top:50%; left:50%;
+  transform:translate(-50%,-50%) scale(0.9);
+  z-index:1100; width:min(94vw,540px);
+  max-height:88vh; overflow-y:auto; overscroll-behavior:contain;
+  border-radius:var(--r); box-shadow:0 20px 60px rgba(40,15,70,0.38);
+  animation:modalPop 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes modalPop { from{transform:translate(-50%,-50%) scale(0.8); opacity:0} to{transform:translate(-50%,-50%) scale(1); opacity:1} }
+
+.modal-box {
+  --modal-pad: clamp(14px, 2.6vw, 24px);
+  /* Mesmo papel das telas: o diálogo é vidro fosco com açúcar por cima, não uma
+     folha branca colada em cima do jogo. */
+  background: var(--malha-acucar), rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  padding: var(--modal-pad);
+}
+/* Cabeçalho colado na borda e fixo: ao rolar um modal longo, o título e o
+   botão de fechar continuam legíveis em vez de sumirem atrás do conteúdo. */
+.modal-hdr {
+  display:flex; align-items:center; gap:8px;
+  margin:calc(-1 * var(--modal-pad)) calc(-1 * var(--modal-pad)) 14px;
+  padding:calc(var(--modal-pad) * 0.75) var(--modal-pad) 10px;
+  position:sticky; top:0; z-index:5;
+  background:rgba(255,251,253,0.96);
+  border-bottom:2px solid var(--border);
+}
+.modal-hdr h2 {
+  font-family:'Fredoka One',cursive; font-size:clamp(17px, 2vw, 22px); color:var(--purple);
+  flex:1; min-width:0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height:1.15;
+}
+.modal-coins {
+  font-weight:800; color:var(--orange); font-size:clamp(13px, 1.6vw, 17px);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space:nowrap;
+}
+.modal-coins .fa-star { color: var(--yellow); }
+.btn-close-modal {
+  background:linear-gradient(140deg,#FF7A88,#E9324C); color:#fff; border:none;
+  width:var(--alvo); height:var(--alvo); border-radius:50%; font-size:clamp(13px, 1.5vw, 16px);
+  cursor:pointer; transition:transform 0.15s; flex-shrink:0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-close-modal:hover { transform:scale(1.15); }
+
+/* ===== SHOP MODAL ===== */
+.shop-box { border-top:5px solid var(--pink); border-radius:var(--r); }
+.wardrobe-preview {
+  display:flex; flex-direction:column; align-items:center;
+  padding:clamp(8px, 1.6vw, 14px); background:linear-gradient(135deg,#FFF0F7,#F0EDFF);
+  border-radius:var(--r-sm); border:2px dashed var(--pink);
+  margin-bottom:clamp(9px, 1.6vw, 16px); gap:8px;
+}
+.wd-onca-wrap {
+  position:relative; display:inline-block;
+  width:clamp(64px, 10vw, 88px); height:clamp(64px, 10vw, 88px);
+}
+.wd-onca-base {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #FFD93D, #FF9A3C);
+  border-radius: 50%;
+  border: 3px solid var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(155,93,229,0.25);
+}
+.wd-onca-base .fa-paw { font-size:clamp(30px, 4.6vw, 44px); color:#3A2A4D; }
+.wd-layer { position:absolute; font-size:clamp(18px, 2.8vw, 28px); display:block; }
+.wd-hat    { top:-26%; left:50%; transform:translateX(-50%); }
+.wd-glass  { top:30%;  left:50%; transform:translateX(-52%); }
+.wd-outfit { bottom:-11%; left:50%; transform:translateX(-55%); }
+.wd-acc    { top:18%;  right:-16%; }
+.wd-equipped-list {
+  font-size:var(--fs-apoio); font-weight:600; color:var(--text2); text-align:center;
+}
+
+.shop-tabs {
+  display:flex; gap:var(--gap-sm); flex-wrap:wrap; margin-bottom:clamp(9px, 1.6vw, 16px);
+}
+.stab {
+  min-height:40px;
+  padding:6px 14px; border-radius:var(--r-pill); border:2px solid var(--border);
+  font-size:clamp(11.5px, 1.3vw, 13px); font-weight:700; cursor:pointer; background:#fff;
+  color:var(--text2); transition:all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.stab.active { background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff; border-color:transparent; }
+.stab:hover:not(.active) { border-color:var(--pink); color:var(--pink); }
+
+.shop-items-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(clamp(126px, 26vw, 150px),1fr));
+  gap:clamp(8px, 1.3vw, 14px);
+}
+.shop-item-card {
+  border-radius:var(--r-sm); padding:clamp(10px, 1.6vw, 16px) clamp(7px, 1.1vw, 11px); text-align:center;
+  border:3px solid var(--border); background:#fff;
+  transition:transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  cursor:pointer; position:relative;
+  display:flex; flex-direction:column;
+}
+.shop-item-card:hover { transform:translateY(-4px); box-shadow:var(--shadow-pink); border-color:var(--pink); }
+.shop-item-card.owned { border-color:var(--green); }
+.shop-item-card.equipped { background:linear-gradient(135deg,#DCFCE7,#BBF7D0); border-color:var(--green); }
+.sic-icon {
+  width: clamp(42px, 6vw, 58px);
+  height: clamp(42px, 6vw, 58px);
+  background: linear-gradient(135deg, #FFF0F7, #F0EDFF);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  border: 2px solid var(--border);
+  font-size: clamp(20px, 2.8vw, 28px);
+}
+.sic-name  { font-size:clamp(11px, 1.3vw, 13.5px); font-weight:700; color:var(--text); margin-bottom:4px; overflow-wrap:anywhere; flex:1; }
+.sic-price {
+  font-size:clamp(10px, 1.15vw, 12.5px); color:var(--text2); margin-bottom:8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.sic-price .fa-star { color: var(--yellow); font-size:clamp(10px, 1.05vw, 12px); }
+.sic-price .fa-circle-check { color: var(--green); }
+.sic-btn {
+  width:100%; min-height:40px; padding:8px; border-radius:var(--r-sm); border:none;
+  font-size:clamp(11px, 1.25vw, 13px); font-weight:700; cursor:pointer; transition:transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.sic-btn.buy-btn     { background:linear-gradient(135deg,var(--purple),#7b3bc8); color:#fff; }
+.sic-btn.equip-btn   { background:linear-gradient(135deg,var(--green),#38a338); color:#fff; }
+.sic-btn.unequip-btn { background:linear-gradient(135deg,var(--orange),#cc6600); color:#fff; }
+.sic-btn.locked-btn  { background:#ddd; color:#888; cursor:not-allowed; }
+.sic-btn:hover:not(.locked-btn) { transform:scale(1.05); }
+.sic-badge-owned {
+  position:absolute; top:6px; right:6px;
+  background:var(--green); color:#fff;
+  border-radius:var(--r-pill); font-size:clamp(9px, 1vw, 11px); font-weight:800; padding:2px clamp(5px, 0.9vw, 8px);
+}
+
+/* ===== RECORDS MODAL ===== */
+.records-box { border-top:5px solid var(--yellow); border-radius:var(--r); }
+/* auto-fit: em 320 px vira coluna única, em tela larga volta a 2x2 sem
+   deixar os cartões esticarem até ficar feio. */
+.records-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(clamp(132px, 20vw, 190px), 1fr));
+  gap:var(--gap); margin-bottom:clamp(14px, 2.4vh, 20px);
+}
+.rec-card {
+  padding:clamp(12px, 2vw, 18px); border-radius:var(--r-sm); text-align:center;
+  border:3px solid transparent;
+  min-width:0;
+}
+.rc-yellow { background:linear-gradient(135deg,#FFFDE7,#FFF9C4); border-color:#FFD93D; }
+.rc-pink   { background:linear-gradient(135deg,#FFF0F7,#FFE0EF); border-color:var(--pink); }
+.rc-orange { background:linear-gradient(135deg,#FFF3E0,#FFE0C0); border-color:var(--orange); }
+.rc-mint   { background:linear-gradient(135deg,#E0F7F6,#C0F0ED); border-color:var(--mint); }
+.rc-icon   {
+  width: clamp(40px, 7vw, 54px);
+  height: clamp(40px, 7vw, 54px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto clamp(6px, 1vh, 9px);
+  font-size: clamp(17px, 2.6vw, 23px);
+}
+.rc-yellow .rc-icon { background: rgba(255,217,61,0.2); color: var(--yellow); border: 2px solid var(--yellow); }
+.rc-pink   .rc-icon { background: rgba(255,107,157,0.15); color: var(--pink); border: 2px solid var(--pink); }
+.rc-orange .rc-icon { background: rgba(255,154,60,0.15); color: var(--orange); border: 2px solid var(--orange); }
+.rc-mint   .rc-icon { background: rgba(78,205,196,0.15); color: var(--mint); border: 2px solid var(--mint); }
+.rc-label  { font-size:var(--fs-apoio); font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px; }
+.rc-val    { font-family:'Fredoka One',cursive; font-size:clamp(22px, 3.4vw, 30px); color:var(--purple); line-height:1.1; overflow-wrap:anywhere; }
+
+.btn-reset-all {
+  width:100%; min-height:var(--alvo); padding:clamp(10px, 1.6vh, 14px) 14px;
+  border-radius:var(--r-sm); border:none;
+  background:linear-gradient(135deg,var(--red),#cc2222);
+  color:#fff; font-family:'Fredoka One',cursive; font-size:var(--fs-corpo);
+  cursor:pointer; box-shadow:0 4px 14px rgba(255,71,87,0.4); transition:transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-reset-all:hover { transform:translateY(-2px); }
+
+/* ===== LEVEL UP MODAL ===== */
+.levelup-box {
+  border-top:5px solid var(--yellow); border-radius:var(--r);
+  text-align:center; padding:clamp(18px, 4vh, 32px) var(--modal-pad, 22px);
+  overflow:hidden; position:relative;
+  background:linear-gradient(145deg,#FFF9C4,#FFFDE7);
+}
+.lu-confetti {
+  position:absolute; inset:0; pointer-events:none; overflow:hidden;
+}
+.lu-onca {
+  width: clamp(72px, 16vw, 104px);
+  height: clamp(72px, 16vw, 104px);
+  background: linear-gradient(135deg, #FFD93D, #FF9A3C);
+  border-radius: 50%;
+  border: 4px solid var(--purple);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto clamp(10px, 2vh, 16px);
+  animation: oncaWiggle 1.5s infinite;
+  box-shadow: 0 8px 24px rgba(155,93,229,0.3);
+}
+.lu-onca .fa-paw { font-size: clamp(34px, 7.5vw, 50px); color: #3A2A4D; }
+.lu-title  { font-family:'Fredoka One',cursive; font-size:clamp(24px, 4vw, 34px); color:var(--purple); margin-bottom:8px; line-height:1.1; }
+.lu-phase  { font-size:clamp(16px, 2.2vw, 21px); font-weight:700; color:var(--text2); margin-bottom:6px; }
+.lu-stars  {
+  font-family:'Fredoka One',cursive; font-size:clamp(20px, 3.2vw, 29px); color:var(--orange);
+  margin-bottom:clamp(16px, 3vh, 26px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.lu-stars .fa-star { color: var(--yellow); }
+/* A lista de conteúdos da rodada é longa: vive numa coluna legível e quebra
+   em vez de esticar o cartão até sair da janela. */
+.lu-conteudo {
+  font-size: var(--fs-apoio); line-height:1.45; color:var(--text2);
+  max-width: min(100%, 420px); margin:0 auto clamp(14px, 2.6vh, 22px);
+  overflow-wrap:anywhere;
+}
+.lu-conteudo:empty { display:none; }
+.btn-lu-continue {
+  min-height:var(--alvo); padding:clamp(11px, 1.8vh, 16px) clamp(26px, 6vw, 48px);
+  border-radius:var(--r-pill); border:none;
+  background:linear-gradient(135deg,var(--pink),var(--purple));
+  color:#fff; font-family:'Fredoka One',cursive; font-size:clamp(17px, 2.4vw, 22px);
+  cursor:pointer; box-shadow:var(--shadow-pink); transition:transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-lu-continue:hover { transform:translateY(-4px) scale(1.04); }
+
+/* ===== SHARED ANIMATIONS ===== */
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
+@keyframes pulse {
+  0%,100% { transform:scale(1); }
+  50%      { transform:scale(1.06); }
+}
+
+/* ===== NOTIFICATION TOAST ===== */
+.toast {
+  position:fixed; top:clamp(10px, 2vh, 18px); right:var(--pad); z-index:9998;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  color:#fff; padding:clamp(9px, 1.4vw, 13px) clamp(14px, 2.4vw, 22px); border-radius:var(--r-sm);
+  font-weight:700; font-size:var(--fs-corpo); line-height:1.3; box-shadow:var(--shadow-pink);
+  animation:toastIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+  /* Nunca mais largo que a própria janela: em 320 px o aviso encosta nas margens. */
+  max-width:min(84vw, 320px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap:anywhere;
+}
+@keyframes toastIn {
+  from { opacity:0; transform:translateY(-16px) scale(0.9); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  from { opacity:1; transform:translateY(0); }
+  to   { opacity:0; transform:translateY(-16px); }
+}
+
+/* ===== CONFETTI PARTICLES ===== */
+.confetti-piece {
+  position:absolute; width:10px; height:10px;
+  border-radius:2px; animation:confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform:translateY(-40px) rotate(0deg); opacity:1; }
+  100% { transform:translateY(500px) rotate(720deg); opacity:0; }
+}
+
+/* ===== 10 NEW GAMES CSS =====
+   Cada tela de jogo segue a mesma regra: o enunciado vive numa coluna que para
+   de crescer na largura de leitura, os botões têm alvo de toque de 44 px e nada
+   depende de uma janela com medida fixa. */
+
+/* True/False */
+#screenTrueFalse { --tela: var(--mint); background: var(--malha-acucar), linear-gradient(180deg, #EDF8FA 0%, #D9EEF2 100%); overflow-y: auto; }
+.tf-card-area { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: clamp(10px, 3vh, 26px) var(--pad); }
+.tf-equation { background: #fff; padding: clamp(16px, 3.4vh, 34px) clamp(14px, 3vw, 26px); border-radius: var(--r); font-weight: 800; border: 3px solid var(--purple); box-shadow: 0 10px 25px rgba(155,93,229,0.2); color: var(--text); text-align: center; width: 100%; }
+.tf-actions { display: flex; gap: var(--gap); padding: clamp(10px, 2.4vh, 20px) var(--pad); flex-shrink: 0; flex-wrap: wrap; justify-content: center; width: 100%; max-width: var(--largura-leitura); margin: 0 auto; }
+.btn-tf { flex: 1 1 190px; min-height: clamp(50px, 8vh, 68px); padding: clamp(10px, 1.8vw, 16px); border: none; border-radius: var(--r); font-size: clamp(17px, 2.1vw, 23px); font-family: 'Fredoka One', cursive; cursor: pointer; color: #fff; text-shadow: 0 1px 2px rgba(58,42,77,0.3); box-shadow: 0 4px 0 rgba(58,42,77,0.2), 0 6px 15px rgba(100,60,120,0.16); transition: transform 0.2s; }
+.btn-tf:hover { transform: translateY(-5px); }
+.btn-tf-false { background: linear-gradient(140deg,#FF7A88,#E9324C); }
+.btn-tf-true { background: linear-gradient(140deg,#83DA91,#43A85C); }
+/* Os dois botões de julgamento entram um após o outro quando a tela abre. */
+#screenTrueFalse.active .tf-actions .btn-tf {
+  animation: popIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) var(--atraso, 0s) backwards;
+}
+#screenTrueFalse.active .tf-actions .btn-tf:nth-child(2) { --atraso: 0.08s; }
+/* Mesma coreografia nos tabuleiros que o JS reconstrói a cada rodada: as cartas
+   são distribuídas, as fichas chegam em fila, as opções sobem uma após a outra. */
+.mem-grid .mem-card {
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) var(--atraso, 0s) backwards;
+}
+.mem-grid .mem-card:nth-child(2) { --atraso: 0.04s; }
+.mem-grid .mem-card:nth-child(3) { --atraso: 0.08s; }
+.mem-grid .mem-card:nth-child(4) { --atraso: 0.12s; }
+.mem-grid .mem-card:nth-child(5) { --atraso: 0.16s; }
+.mem-grid .mem-card:nth-child(6) { --atraso: 0.2s; }
+.mem-grid .mem-card:nth-child(7) { --atraso: 0.24s; }
+.mem-grid .mem-card:nth-child(8) { --atraso: 0.28s; }
+.sort-item {
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) var(--atraso, 0s) backwards;
+}
+.sort-item:nth-child(2) { --atraso: 0.05s; }
+.sort-item:nth-child(3) { --atraso: 0.1s; }
+.sort-item:nth-child(4) { --atraso: 0.15s; }
+.sort-item:nth-child(5) { --atraso: 0.2s; }
+.sort-item:nth-child(6) { --atraso: 0.25s; }
+.btn-op {
+  animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) var(--atraso, 0s) backwards;
+}
+.btn-op:nth-child(2) { --atraso: 0.06s; }
+.btn-op:nth-child(3) { --atraso: 0.12s; }
+.btn-op:nth-child(4) { --atraso: 0.18s; }
+.btn-op:nth-child(5) { --atraso: 0.24s; }
+#screenSequence.active .seq-box { animation: slideUp 0.4s ease backwards; }
+
+/* Memory */
+#screenMemory { --tela: var(--purple); background: var(--malha-acucar), linear-gradient(180deg, #F6F0FC 0%, #E9DAF5 100%); overflow-y: auto; }
+/* width:100% é obrigatório aqui: com margin:0 auto o stretch do flex é
+   desligado, e as quatro colunas 1fr não têm conteúdo intrínseco (o número mora
+   num filho absoluto). Sem largura própria a grade encolhia para 46 px e cada
+   carta virava 0x0 — invisível e injogável. */
+.mem-grid { width: 100%; display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(7px, 1.2vw, 12px); padding: clamp(10px, 2.4vh, 22px) var(--pad); margin: 0 auto; max-width: min(100%, 470px); flex: 1; align-content: center; }
+.mem-card { aspect-ratio: 1; background: linear-gradient(140deg,#A96BF0,#7B3BC8); border-radius: var(--r-sm); cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s; position: relative; box-shadow: 0 5px 14px rgba(90,50,120,0.24); }
+.mem-card.flipped { transform: perspective(700px) rotateY(180deg); }
+/* As duas faces precisam estar EMPILHADAS no mesmo lugar e cada uma escondendo o
+   próprio verso. O invólucro era flex e achatado: a frente (cartela) e o verso
+   (número) viravam dois itens lado a lado, o número aparecia espelhado com a
+   carta fechada — entregava a resposta — e ao girar o invólucro escondia a si
+   mesmo, deixando a carta em branco. */
+.mem-card-inner { position: absolute; inset: 0; transform-style: preserve-3d; border-radius: var(--r-sm); }
+.mem-card-front, .mem-card-back {
+  position: absolute; inset: 0; backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: 4px; border-radius: var(--r-sm); line-height: 1.2; overflow-wrap: anywhere;
+  font-size: clamp(12px, 1.8vw, 20px); font-weight: 800;
+}
+.mem-card-front { background: linear-gradient(140deg,#A96BF0,#7B3BC8); color: rgba(255,255,255,0.92); }
+.mem-card-front i { font-size: clamp(19px, 3.6vw, 30px); }
+.mem-card-back { background: #fff; color: var(--text); transform: rotateY(180deg); border: 2px solid var(--purple); }
+/* A opacidade vai na face, não na carta: opacity numa caixa com preserve-3d
+   achata o espaço 3D do navegador, e a carta casada voltava a mostrar a cartela
+   em vez do número. Esmaecer só o verso resolve e mantém o par legível. */
+.mem-card.matched { pointer-events: none; }
+.mem-card.matched .mem-card-back { opacity: 0.62; }
+
+/* Operator */
+#screenOperator { --tela: var(--orange); background: var(--malha-acucar), linear-gradient(180deg, #FFF6EA 0%, #FFE9CF 100%); overflow-y: auto; }
+.op-eq-box { text-align: center; margin: clamp(12px, 3vh, 34px) auto 0; background: #fff; padding: clamp(12px, 2.4vw, 24px); border-radius: var(--r); border: 3px solid var(--orange); box-shadow: 0 8px 20px rgba(255,154,60,0.3); color: var(--text); width: min(100% - 2 * var(--pad), var(--largura-leitura)); }
+.op-hole { display: inline-flex; align-items: center; justify-content: center; width: clamp(38px, 7vw, 58px); aspect-ratio: 1; border: 3px dashed var(--orange); border-radius: 10px; color: transparent; vertical-align: middle; }
+.op-options { display: flex; gap: clamp(8px, 1.4vw, 16px); padding: clamp(10px, 2.4vh, 22px) var(--pad); justify-content: center; flex-wrap: wrap; max-width: var(--largura-leitura); margin: 0 auto; }
+.btn-op { width: clamp(52px, 9vw, 70px); height: clamp(52px, 9vw, 70px); min-height: var(--alvo); border-radius: var(--r-sm); background: linear-gradient(140deg,#FFB05C,#F58220); color: #fff; font-size: clamp(24px, 3.4vw, 32px); font-weight: bold; border: none; cursor: pointer; transition: transform 0.2s; box-shadow: 0 4px 0 rgba(58,42,77,0.18), 0 6px 14px rgba(245,130,32,0.3); }
+.btn-op:hover { transform: translateY(-4px); }
+
+/* Balloon */
+#screenBalloon { --tela: var(--green); background: var(--malha-acucar), linear-gradient(180deg, #EFF8F0 0%, #DCEFDD 100%); overflow: hidden; }
+.bal-question { text-align: center; margin: clamp(8px, 2vh, 20px) auto; background: #fff; padding: clamp(10px, 1.8vw, 16px); border-radius: var(--r); border: 3px solid var(--green); box-shadow: 0 4px 15px rgba(107,203,119,0.3); color: var(--text); z-index: 10; position: relative; width: min(100% - 2 * var(--pad), var(--largura-leitura)); }
+.bal-area { flex: 1; position: relative; overflow: hidden; }
+.balloon { position: absolute; width: clamp(46px, 8vw, 66px); height: clamp(58px, 10vw, 82px); background: radial-gradient(circle at 32% 26%, rgba(255,255,255,0.75) 0 14%, transparent 15%), linear-gradient(160deg, #FF87AF 0%, #FF4D8F 100%); border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff; font-size: clamp(12px, 1.8vw, 19px); cursor: pointer; transition: transform 0.1s; bottom: -90px; text-shadow: 0 1px 2px rgba(58,42,77,0.35); }
+.balloon::after { content: ''; position: absolute; bottom: -10px; left: 50%; width: 2px; height: 30px; background: rgba(58,42,77,0.28); }
+.balloon:hover { transform: scale(1.1); }
+.balloon.popped { animation: pop 0.2s forwards; }
+@keyframes pop { to { transform: scale(1.5); opacity: 0; } }
+
+/* Fishing */
+#screenFishing { --tela: var(--blue); background: var(--malha-acucar), linear-gradient(180deg, #EDF5FD 0%, #D9EAF9 100%); overflow: hidden; }
+.fish-question { text-align: center; margin: clamp(8px, 2vh, 20px) auto; background: #fff; padding: clamp(10px, 1.8vw, 16px); border-radius: var(--r); border: 3px solid var(--blue); color: var(--text); z-index: 10; position: relative; width: min(100% - 2 * var(--pad), var(--largura-leitura)); }
+.fish-area { flex: 1; position: relative; overflow: hidden; border-top: 2px dashed rgba(255,255,255,0.75); background: rgba(61,187,255,0.12); }
+.fish-hook { position: absolute; top: 0; left: 50%; transform: translateX(-50%); font-size: clamp(24px, 3.6vw, 32px); color: var(--text); z-index: 5; transition: top 0.5s; width: 2px; height: clamp(28px, 6vh, 44px); background: rgba(58,42,77,0.55); }
+.fish-hook i { position: absolute; bottom: -0.66em; left: -0.34em; }
+.fish { position: absolute; font-size: clamp(12px, 1.6vw, 18px); padding: clamp(6px, 1vw, 10px) clamp(9px, 1.4vw, 16px); background: linear-gradient(135deg,#FFB05C,#F58220); color: #fff; border: 2px solid rgba(255,255,255,0.8); border-radius: var(--r-pill); font-weight: bold; white-space: nowrap; transition: left 0.1s linear; box-shadow: 0 4px 10px rgba(245,130,32,0.28); }
+.btn-fish-action { display: block; margin: clamp(8px, 2vh, 20px) auto; min-height: var(--alvo); padding: clamp(11px, 1.6vw, 15px) clamp(22px, 4vw, 40px); border-radius: var(--r); background: linear-gradient(140deg,#5FC8FF,#2A9FE0); color: #fff; font-size: clamp(15px, 1.9vw, 19px); font-family: 'Fredoka One', cursive; border: none; cursor: pointer; text-shadow: 0 1px 2px rgba(58,42,77,0.3); box-shadow: 0 4px 0 rgba(58,42,77,0.2), 0 6px 14px rgba(61,187,255,0.35); }
+
+/* Sort */
+#screenSort { --tela: var(--pink); background: var(--malha-acucar), linear-gradient(180deg, #FDF0F6 0%, #F8DFEA 100%); overflow-y: auto; }
+.sort-inst { text-align: center; margin: clamp(8px, 1.8vh, 16px) var(--pad); font-weight: bold; color: var(--pink); font-size: clamp(14px, 1.6vw, 18px); }
+.sort-area { display: flex; flex-direction: column; gap: clamp(7px, 1.2vh, 12px); padding: 0 var(--pad) clamp(8px, 2vh, 18px); flex: 1; width: 100%; max-width: var(--largura-leitura); margin: 0 auto; }
+.sort-item { background: #fff; border: 3px solid var(--pink); padding: clamp(9px, 1.6vw, 16px); border-radius: var(--r-sm); font-size: clamp(15px, 2vw, 22px); font-weight: bold; text-align: center; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.sort-item i { color: var(--pink); }
+.btn-check-sort { display: block; margin: clamp(8px, 2vh, 20px) auto; width: min(100% - 2 * var(--pad), 440px); min-height: var(--alvo); padding: clamp(11px, 1.6vw, 15px); border-radius: var(--r-sm); background: linear-gradient(140deg,#FF87AF,#FF4D8F); color: #fff; font-size: clamp(15px, 1.9vw, 19px); font-family: 'Fredoka One', cursive; border: none; cursor: pointer; text-shadow: 0 1px 2px rgba(58,42,77,0.3); box-shadow: 0 4px 0 rgba(58,42,77,0.2), 0 6px 14px rgba(255,107,157,0.35); }
+.sort-item.selected { transform: scale(1.03); border-color: var(--purple); box-shadow: 0 4px 15px rgba(155,93,229,0.4); }
+
+/* Whack-a-Mole */
+#screenWhack { --tela: #8D6E63; background: var(--malha-acucar), linear-gradient(180deg, #FBF2E9 0%, #F0DECB 100%); overflow: hidden; }
+.whack-question { text-align: center; margin: clamp(8px, 2vh, 20px) auto; background: #fff; padding: clamp(10px, 1.8vw, 16px); border-radius: var(--r); border: 3px solid #8D6E63; color: var(--text); width: min(100% - 2 * var(--pad), var(--largura-leitura)); }
+.whack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(9px, 1.5vw, 16px); padding: clamp(10px, 2vh, 20px) var(--pad); flex: 1; align-content: center; max-width: min(100%, 560px); margin: 0 auto; width: 100%; }
+/* O buraco tem boca: sombra interna e borda mais escura embaixo dão a
+   profundidade que o disco marrom chapado não tinha. */
+.mole-hole { aspect-ratio: 1.5; background: linear-gradient(180deg, #6B4A3B 0%, #4A3128 100%); border-radius: 50%; position: relative; overflow: hidden; border-bottom: 5px solid #3E2723; box-shadow: inset 0 9px 14px rgba(46,26,20,0.55), 0 4px 10px rgba(101,67,52,0.22); }
+.mole { position: absolute; bottom: -100%; left: 10%; width: 80%; height: 90%; background: linear-gradient(180deg, #A9765C 0%, #8D6E63 100%); border-radius: 40% 40% 0 0; display: flex; align-items: center; justify-content: center; font-size: clamp(14px, 2vw, 22px); font-weight: bold; color: #fff; transition: bottom 0.2s; cursor: pointer; pointer-events: none; }
+.mole.up { bottom: 0; pointer-events: auto; }
+.mole.hit { background: var(--red); }
+/* Janela deitada (celular em paisagem, split de tablet): as seis toupeiras vão
+   para uma linha só. Duas linhas de buracos quadrados não cabem em 420 px de
+   altura e empurravam a fala da onça para fora da tela. */
+@media (max-height: 560px) and (min-width: 560px) {
+  .whack-grid { grid-template-columns:repeat(6, 1fr); max-width:min(100%, 720px); }
+}
+
+/* Sequence */
+#screenSequence { --tela: var(--purple); background: var(--malha-acucar), linear-gradient(180deg, #F6F0FC 0%, #E9DAF5 100%); overflow-y: auto; }
+.seq-box { text-align: center; margin: clamp(12px, 3vh, 34px) auto 0; background: #fff; padding: clamp(12px, 2.4vw, 24px); border-radius: var(--r); border: 3px solid var(--purple); color: var(--text); width: min(100% - 2 * var(--pad), var(--largura-leitura)); }
+.seq-hole { display: inline-flex; align-items: flex-end; justify-content: center; width: clamp(44px, 8vw, 66px); height: clamp(32px, 5vw, 48px); border-bottom: 4px solid var(--purple); color: var(--purple); text-align: center; }
+.seq-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(clamp(118px, 26vw, 180px), 1fr)); gap: clamp(9px, 1.3vw, 15px); padding: clamp(10px, 2.4vh, 20px) var(--pad); width: 100%; max-width: var(--largura-leitura); margin: 0 auto; }
+
+/* Balance */
+#screenBalance { --tela: var(--orange); background: var(--malha-acucar), linear-gradient(180deg, #FFFBEA 0%, #FCEFC0 100%); overflow-y: auto; }
+/* A altura era fixa e maior que os pratos: sobrava um vazio entre a etiqueta e a
+   balança. Com os pratos agora abraçando o próprio texto, a caixa encolhe até eles
+   e a travessa fica onde a mão espera. */
+.baln-scale { display: flex; justify-content: space-around; align-items: flex-end; border-bottom: 4px solid #8D6E63; margin: clamp(14px, 4vh, 40px) auto clamp(24px, 5vh, 46px); position: relative; width: min(100% - 2 * var(--pad), var(--largura-leitura)); }
+.baln-center { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-bottom: 40px solid #8D6E63; }
+/* Os dois pratos viram pratos: antes eram só texto flutuando em cima de uma
+   linha laranja, e ninguém sabia onde a balança terminava. */
+.baln-side { min-height: clamp(46px, 8vh, 62px); display: flex; align-items: center; justify-content: center; font-weight: bold; transition: transform 0.5s; margin-bottom: 5px; text-align: center; background: rgba(255,255,255,0.8); border: 2px solid rgba(255,154,60,0.4); border-bottom: 4px solid var(--orange); border-radius: var(--r-sm) var(--r-sm) 4px 4px; padding: clamp(9px, 1.8vh, 16px) clamp(6px, 1.2vw, 12px); box-shadow: 0 6px 14px rgba(100,60,120,0.12); }
+.baln-options { display: flex; gap: clamp(8px, 1.2vw, 14px); padding: 0 var(--pad) clamp(12px, 2.6vh, 22px); justify-content: center; flex-wrap: wrap; max-width: var(--largura-leitura); margin: 0 auto; }
+.baln-side.heavy { transform: translateY(15px); }
+.baln-side.light { transform: translateY(-15px); }
+
+/* Roulette */
+#screenRoulette { --tela: var(--pink); background: var(--malha-acucar), linear-gradient(180deg, #FDF0F6 0%, #F8DFEA 100%); overflow-y: auto; }
+.roul-area { position: relative; margin: clamp(12px, 3vh, 34px) auto; width: clamp(180px, min(78vw, 44vh), 300px); height: clamp(180px, min(78vw, 44vh), 300px); }
+.roul-wheel { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--pink) 0 60deg, var(--yellow) 60deg 120deg, var(--mint) 120deg 180deg, var(--purple) 180deg 240deg, var(--orange) 240deg 300deg, var(--blue) 300deg 360deg); border: 5px solid #fff; box-shadow: 0 0 0 3px rgba(255,107,157,0.25), 0 8px 20px rgba(100,60,120,0.22); transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1); }
+.roul-pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 30px solid var(--text); z-index: 10; filter: drop-shadow(0 2px 4px rgba(58,42,77,0.3)); }
+.btn-spin { margin: 0 auto clamp(12px, 2.4vh, 22px); display: block; min-height: var(--alvo); padding: clamp(12px, 1.6vw, 16px) clamp(28px, 5vw, 44px); border-radius: var(--r-pill); background: linear-gradient(140deg,#FF87AF,#FF4D8F); color: #fff; font-size: clamp(17px, 2.1vw, 23px); font-family: 'Fredoka One', cursive; border: none; cursor: pointer; text-shadow: 0 1px 2px rgba(58,42,77,0.3); box-shadow: 0 4px 0 rgba(58,42,77,0.2), 0 6px 14px rgba(255,107,157,0.35); }
+.roul-question { background: #fff; padding: clamp(12px, 2vw, 20px); margin: 0 auto clamp(12px, 2.4vh, 22px); border-radius: var(--r); border: 3px solid var(--purple); text-align: center; width: min(100% - 2 * var(--pad), var(--largura-leitura)); }
+.roul-opts { display: flex; gap: clamp(8px, 1.2vw, 12px); justify-content: center; margin-top: 15px; flex-wrap: wrap; }
+.game-feedback { display:flex; align-items:center; gap:12px; padding:0 var(--pad) 10px; opacity:0; transition:opacity 0.3s; flex-shrink:0; justify-content: center; margin-top: auto; }
+.game-feedback.show { opacity:1; }
+
+/* ===== POUSO CENTRAL NAS TELAS DE POUCO CONTEÚDO ===== */
+/* Sinal, Sequência e Balança mostram uma linha e quatro botões: colados na
+   etiqueta, o resto da tela de celular virava vazio. Os dois auto dividem o
+   espaço livre e o conjunto pousa no centro óptico, embaixo da etiqueta e acima
+   da fala da onça. Onde não sobra espaço (janela deitada curta) os auto viram
+   zero e a tela rola do mesmo jeito. */
+#screenOperator .game-tag, #screenSequence .game-tag, #screenBalance .game-tag { margin-top: auto; }
+#screenOperator .op-options, #screenSequence .seq-options, #screenBalance .baln-options { margin-bottom: auto; }
+#screenOperator .game-feedback, #screenSequence .game-feedback, #screenBalance .game-feedback { margin-top: 0; }
+
+/* ===== PAINÉIS DAS TELAS DE JOGO ===== */
+/* Cada tela declara --tela no próprio fundo e os painéis herdam a cor dali: uma
+   receita só para treze telas, em vez de treze contornos saturados parecidos.
+   O que mudou para a tela ficar mais agradável de olhar: papel que puxa levemente
+   para a cor do jogo (branco puro brilha contra o fundo pastel), borda a 45% da
+   cor em vez do pastel cheio, e sombra na cor do jogo em vez de preto — sombra
+   preta suja o doce. */
+.quiz-card, .catch-question-wrap, .puzzle-info-card, .puzzle-grid-wrap,
+.tf-equation, .op-eq-box, .seq-box, .roul-question, .bal-question,
+.fish-question, .whack-question, .sort-item, .mem-card-back, .qf-bubble {
+  background: linear-gradient(180deg, #fff 0%, color-mix(in srgb, var(--tela, var(--pink)) 7%, #fff) 100%);
+  border-color: color-mix(in srgb, var(--tela, var(--pink)) 45%, #fff);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--tela, var(--pink)) 18%, transparent);
+}
+
+/* ===== SELETOR DE ANO E NIVEL (hub) ===== */
+.hub-stats { display:flex; gap:var(--gap); flex-wrap:wrap; justify-content:flex-end; }
+.hub-stats .fa-graduation-cap { color:var(--purple); }
+.hub-stats .fa-signal { color:var(--mint); }
+
+/* Painel, não faixa: ao virar cartão, o seletor para de criar uma emenda dura
+   entre o branco e o rosa do fundo. */
+.hub-seletor {
+  width: 100%; max-width: var(--max-linha);
+  margin: clamp(8px, 1.4vh, 14px) auto clamp(8px, 1.2vh, 12px);
+  padding: clamp(8px, 1.2vw, 12px) clamp(10px, 1.5vw, 14px);
+  background: var(--card);
+  border: 3px solid rgba(155,93,229,0.28);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-card);
+  flex-shrink: 0;
+  display: flex; flex-direction: column; gap: var(--gap-sm);
+}
+.hsl-row { display:flex; align-items:center; gap:8px clamp(8px, 1.2vw, 12px); flex-wrap:wrap; }
+/* Em janela larga o painel vira duas colunas: fichas à esquerda, explicação à
+   direita. Antes a metade direita do painel era só espaço vazio. */
+@media (min-width: 900px) {
+  .hub-seletor {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: clamp(16px, 2.4vw, 28px);
+    align-items: start;
+  }
+  .hub-seletor .hsl-row:nth-of-type(1) { grid-column: 1; grid-row: 1; }
+  .hub-seletor .hsl-row:nth-of-type(2) { grid-column: 1; grid-row: 2; }
+  .hub-seletor .hsl-explica { grid-column: 2; grid-row: 1; }
+  .hub-seletor .hsl-regra  { grid-column: 2; grid-row: 2; }
+}
+/* No celular o rótulo sobe e as fichas viram grade de colunas iguais: com
+   flex-wrap o 9º ano ficava órfão num segundo renglão, e nove colunas numa
+   linha só dariam fichas de 18 px em 320 px — abaixo do alvo de toque. */
+@media (max-width: 559px) {
+  .hsl-row { flex-direction: column; align-items: stretch; gap: 4px; }
+  #chipsAno, #chipsNivel { display: grid; gap: 4px; min-width: 0; }
+  #chipsAno   { grid-template-columns: repeat(5, minmax(0, 72px)); }
+  #chipsNivel { grid-template-columns: repeat(4, minmax(0, 88px)); }
+  #chipsAno .stab, #chipsNivel .stab { padding: 4px 0; justify-content: center; }
+  /* 2x2 em vez de 3+1: com flex o "Som" sobrava órfão num segundo renglão. */
+  .hub-actions { gap: var(--gap-sm); }
+}
+.hsl-rotulo {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-apoio); color:var(--purple);
+  min-width:clamp(58px, 8vw, 74px); display:flex; align-items:center; gap:6px;
+}
+.hsl-chips { display:flex; gap:var(--gap-sm); flex-wrap:wrap; min-width:0; }
+.hsl-chips .stab { padding:5px 12px; font-size:clamp(11.5px, 1.3vw, 14px); }
+
+/* ===== SELO CURRICULAR (ano · unidade) ===== */
+.game-tag, .qcard-tag {
+  align-self:center; margin:clamp(6px, 1.2vh, 12px) auto 0;
+  padding:5px 16px; border-radius:var(--r-pill);
+  background:rgba(255,255,255,0.9); border:2px solid rgba(155,93,229,0.35);
+  color:var(--purple); font-size:var(--fs-apoio); font-weight:800; letter-spacing:0.2px;
+  max-width:92%; text-align:center; flex-shrink:0;
+}
+/* A etiqueta dentro do cartão tem a largura do próprio texto: em bloco ela se
+   esticava e virava uma faixa vazia de borda a borda. */
+.qcard-tag { display:block; width:max-content; }
+.game-tag:empty, .qcard-tag:empty { display:none; }
+
+/* ===== TEXTO LONGO NAS TELAS DE JOGO ===== */
+/* Toda tela de jogo escreve num enunciado grande. Ele escala com a janela e
+   para na coluna de leitura, para não virar uma faixa de texto de 1400 px. */
+.tf-equation, .bal-question, .fish-question, .whack-question,
+.op-eq-box, .seq-box, .roul-question p, .baln-side {
+  font-family:'Nunito',sans-serif; font-weight:800; line-height:1.35;
+}
+/* Enunciado não termina em palavra sozinha: a última linha leva pelo menos duas
+   palavras, o que tira o efeito "faixa cortada" das perguntas longas. */
+.tf-equation, .bal-question, .fish-question, .whack-question, .op-eq-box,
+.seq-box, .roul-question p, .qcard-text, .catch-q-text, .qf-bubble {
+  text-wrap: pretty;
+}
+.tf-equation { font-size:clamp(17px, 2.1vw, 24px); max-width:var(--largura-leitura); }
+.bal-question, .fish-question, .whack-question {
+  font-size:clamp(15px, 1.8vw, 20px);
+  max-width:var(--largura-leitura); margin:clamp(8px, 2vh, 20px) auto;
+}
+.op-eq-box { font-size:clamp(21px, 3vw, 32px); max-width:var(--largura-leitura); }
+.seq-box   { font-size:clamp(18px, 2.4vw, 27px); max-width:var(--largura-leitura); }
+.baln-side { font-size:clamp(14px, 1.8vw, 20px); width:clamp(84px, 26vw, 140px); }
+.roul-question p { font-size:clamp(15px, 1.8vw, 19px); color:var(--text); margin-bottom:4px; }
+
+/* Alternativas que sao numeros, fracoes ou porcentagens */
+.btn-tf.btn-opcao-numerica {
+  flex:0 1 auto; min-width:88px; min-height:var(--alvo); padding:14px 16px;
+  font-size:clamp(16px, 2vw, 22px); font-family:'Nunito',sans-serif; font-weight:800;
+  /* Sem fundo próprio o botão vestia o cinza do navegador com letra branca e
+     ninguém lia a alternativa. Agora ele pega a cor do jogo: claro no topo,
+     escuro na base para o número branco ter contraste. */
+  background: var(--tela, var(--purple));
+  background: linear-gradient(140deg,
+    color-mix(in srgb, var(--tela, var(--purple)) 62%, #fff) 0%,
+    color-mix(in srgb, var(--tela, var(--purple)) 84%, #3A2A4D) 100%);
+}
+#seqOptions .btn-tf.btn-opcao-numerica { flex:1; }
+
+/* Buraco do termo desconhecido na balanca */
+.baln-hole {
+  display:inline-block; min-width:40px; padding:0 4px;
+  border-bottom:4px solid var(--orange); color:var(--orange); text-align:center;
+}
+
+/* Numeros da roleta (o raio vem do tamanho real da roda, ver montarRoleta) */
+.roul-num {
+  position:absolute; top:50%; left:50%;
+  font-family:'Fredoka One',cursive; font-size:clamp(12px, 1.7vw, 17px); color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,0.35); pointer-events:none;
+}
+
+/* Único ajuste de janela que ainda faz diferença: no celular o balão da mascote
+   divide linha com ela, então 48 vw ficava apertado demais para ler. */
+@media (max-width:560px) {
+  .onca-speech { max-width:64vw; }
+}
+/* =========================================================
+   13. ACESSIBILIDADE: FOCO, TECLADO E MOVIMENTO REDUZIDO
+   ========================================================= */
+
+/* Texto só para leitor de tela. */
+.sr-only {
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* Tela escondida sai da tabulacao e dos leitores de tela. A visibilidade
+   nao entra na transicao: com delay, o Chrome mantinha a tela ativa oculta. */
+.screen { visibility:hidden; }
+.screen.active { visibility:visible; }
+.screen:focus { outline:none; }
+
+/* Foco sempre visível, inclusive nos cards clicáveis do hub. */
+:focus-visible { outline:3px solid var(--purple); outline-offset:3px; }
+.mode-card:focus-visible, .shop-item-card:focus-visible, .hub-cat:focus-visible { outline-offset:5px; }
+/* O diálogo recebe o foco no contêiner: o anel entra pela borda, senão metade
+   dele fica fora da tela e parece defeito do cartão. */
+.modal-box:focus-visible { outline-offset:-6px; }
+
+/* Acerto e erro tambem tem simbolo, para quem nao distingue as cores. */
+.ans-btn.correct::after { content:" \2713"; font-size:0.75em; }
+.ans-btn.wrong::after   { content:" \2717"; font-size:0.75em; }
+.qdot { position:relative; }
+.qdot.done::after, .qdot.wrong::after {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:clamp(8px, 1.05vw, 11px); font-weight:900; color:#fff; line-height:1;
+}
+.qdot.done::after  { content:"\2713"; }
+.qdot.wrong::after { content:"\2717"; }
+
+/* Opções da roleta depois de uma tentativa. */
+.btn-tf.btn-opcao-numerica.errada { opacity:0.45; text-decoration:line-through; }
+.btn-tf.btn-opcao-numerica.certa  { box-shadow:0 0 0 4px rgba(77,163,77,0.6); }
+
+/* Alvos de toque: .btn-close-modal e .stab já saem de fábrica com 40-44 px
+   (ver --alvo), então a garantia está nos tokens e não em overrides soltos aqui. */
+
+/* =========================================================
+   14. ROLAGEM: barra que sobe + seções que entram na vista
+   ========================================================= */
+/* As três barras grudam no topo da sua área rolável: o placar continua legível
+   enquanto a pessoa rola, até o JS mandar ele recolher. */
+.game-top-bar, .hub-header, .modal-hdr {
+  position: sticky;
+  top: 0;
+  transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+              margin-top 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+              opacity 0.22s ease;
+}
+.barra-subindo {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+/* Barra grudada (sticky) não precisa devolver espaço: o conteúdo já passa por
+   baixo dela. Só a do hub em janela alta fica FORA de quem rola — ali o .hub-body
+   é que rola e, se o cabeçalho apenas sumisse, sobraria um buraco do tamanho do
+   placar. O JS põe esta classe nesses casos; --barra-altura é a altura medida. */
+.barra-subindo.barra-recolhe-espaco {
+  margin-top: calc(-1 * var(--barra-altura, 0px));
+}
+/* Entrada da barra: é assim que ela aparece no instante em que a tela abre, e é
+   essa mesma animação que o JS repete (.barra-voltando) quando a rolagem devolve
+   a barra — o retorno é o pop da abertura, não um deslizamento seco. A curva com
+   passar do ponto é a mesma do popIn do splash, para o retorno ter o mesmo
+   tempero da chegada. */
+@keyframes barraEntrada {
+  from { transform: translateY(-100%); opacity: 0; }
+  70%  { transform: translateY(3%);    opacity: 1; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+.screen.active > .game-top-bar:not(.barra-subindo),
+.screen.active > .hub-header:not(.barra-subindo),
+.barra-voltando {
+  animation: barraEntrada 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#screenHub .antes-de-revelar {
+  opacity: 0;
+  translate: 0 18px;
+  pointer-events: none;
+}
+.hub-title.revelada, .hub-cat-hdr.revelada, .mode-card.revelada {
+  animation: revelarAoRolar 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) var(--atraso-revelacao, 0s) backwards;
+}
+/* translate mantém a entrada independente do transform usado no hover e no toque. */
+@keyframes revelarAoRolar {
+  from { opacity: 0; translate: 0 18px; }
+  to   { opacity: 1; translate: 0 0; }
+}
+.mode-card.revelada:focus-visible { animation: none; }
+/* Toque com retorno em qualquer superfície acionável: afunda 1 px no instante
+   do toque. :where() deixa a regra com especificidade mínima de propósito: onde o
+   componente já tem :active ou :hover próprio (cartão que levanta, botão jogar),
+   é o desenho dele que manda — no celular, que não tem hover, o afundamento é o
+   retorno que a pessoa vê.
+   touch-action tira o atraso de ~300 ms que o navegador espera por um segundo
+   toque para dar zoom; pinçar com dois dedos continua funcionando. */
+:where(button, [role="button"], .mode-card):active {
+  transform: translateY(1px) scale(0.985);
+}
+button, [role="button"], .mode-card { touch-action: manipulation; }
+
+/* Barra de rolagem fina e cor de doce em vez da cinza do sistema: detalhe que a
+   pessoa não nomeia, mas que faz a tela parecer cuidada. A borda transparente
+   com fundo recortado deixa o trilho arredondado e afastado da borda. */
+* { scrollbar-width: thin; scrollbar-color: rgba(255, 107, 157, 0.5) transparent; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 107, 157, 0.45);
+  border: 3px solid transparent;
+  border-radius: var(--r-pill);
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 107, 157, 0.68); background-clip: content-box; }
+/* Teclado também joga: anel de foco visível em qualquer superfície acionável. */
+:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0.01ms !important;
+  }
+  .screen { transition:opacity 0.12s ease; }
+  #screenHub .antes-de-revelar { translate: none; }
+  .hub-title.revelada, .hub-cat-hdr.revelada, .mode-card.revelada {
+    animation: fadeIn 0.25s ease var(--atraso-revelacao, 0s) backwards !important;
+  }
+  .mode-card.revelada:focus-visible { animation: none !important; }
+  /* A chuva de doces fica igual à das versões antigas (pedido do dono: "estava
+     mais bonito"): giro e queda completos também com movimento reduzido. É
+     movimento de fundo, lento e translúcido, que não desloca a página; o que
+     mexe a tela inteira (barras, revelações, troca de tela) segue instantâneo.
+     O !important só desfaz o corte de duração do seletor * acima. */
+  .candy-float {
+    animation: candyFall 5s ease-in infinite !important;
+    animation-delay: var(--d, 0s) !important;
+  }
+  .splash-onca-icon { animation: oncaWiggle 4s ease-in-out infinite !important; }
+  .splash-onca-bubble {
+    animation: bubblePop 0.5s 0.8s both cubic-bezier(0.34,1.56,0.64,1),
+               bubbleFloat 4.5s 1.6s ease-in-out infinite alternate !important;
+  }
+  /* Acertar ou errar tem de ter resposta visível também para quem pede menos
+     movimento: o pop e o tremor são curtos e num botão só. */
+  .ans-btn.correct { animation: correctPop 0.5s ease !important; }
+  .ans-btn.wrong   { animation: shakeAnim 0.4s ease !important; }
+}
+
+/* =========================================================
+   15. RECORDES: ROTEIRO DE ESTUDO
+   ========================================================= */
+.rec-roteiro {
+  margin:-6px 0 clamp(12px, 2.2vh, 18px);
+  padding:clamp(10px, 1.6vw, 16px) clamp(12px, 1.9vw, 18px);
+  background:var(--white); border:2px solid var(--border); border-radius:var(--r-sm);
+}
+.rec-roteiro-titulo {
+  font-family:'Fredoka One',cursive; font-size:clamp(14px, 1.8vw, 18px); color:var(--purple); margin-bottom:10px;
+}
+.rec-lista { list-style:none; display:flex; flex-direction:column; gap:var(--gap-sm); }
+.rec-item {
+  display:flex; flex-wrap:wrap; align-items:baseline; gap:8px;
+  font-size:var(--fs-corpo); font-weight:700; color:var(--text); line-height:1.4;
+}
+.rec-item-situacao {
+  font-size:clamp(9.5px, 1vw, 11.5px); font-weight:800; text-transform:uppercase; letter-spacing:0.4px;
+  padding:3px 9px; border-radius:var(--r-sm); white-space:nowrap;
+}
+.ri-revisar .rec-item-situacao { background:#FFF3E0; color:#9A5B00; border:1px solid var(--orange); }
+.ri-domina  .rec-item-situacao { background:#EAF8EA; color:#256D2A; border:1px solid var(--green); }
+.rec-nota { margin-top:10px; font-size:var(--fs-apoio); line-height:1.45; color:var(--text2); }
+
+/* ===================================================
+   16. QUIZ: REPRESENTAÇÃO DA SITUAÇÃO EM DOCES
+   =================================================== */
+/* O desenho é parte do enunciado: ele acompanha a janela, mas a contagem dos
+   doces continua legível em 320 px e a malha de 10 colunas nunca estoura. */
+.quiz-visual {
+  margin: clamp(8px, 1.6vh, 14px) auto 0;
+  width: min(100%, 540px);
+  background: rgba(255, 255, 255, 0.86);
+  border: 2px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: clamp(9px, 1.5vw, 14px) clamp(10px, 1.8vw, 16px);
+}
+.cv-legenda {
+  font-size: var(--fs-corpo);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text2);
+  margin-bottom: clamp(7px, 1.4vh, 11px);
+  overflow-wrap: anywhere;
+}
+.cv-corpo { display: flex; flex-wrap: wrap; gap: clamp(4px, 0.9vw, 7px); justify-content: center; }
+.cv-doce {
+  width: clamp(13px, 2.2vw, 18px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #FFF3F8;
+  border: 2px solid var(--border);
+}
+.cv-pintado { background: var(--pink); border-color: var(--pink2); }
+.cv-grupos { flex-direction: column; align-items: center; }
+.cv-grupos .cv-linha { display: flex; gap: clamp(4px, 0.8vw, 6px); }
+.cv-repartir .cv-prato {
+  display: flex; flex-wrap: wrap; gap: clamp(3px, 0.6vw, 5px);
+  width: clamp(54px, 13vw, 76px); min-height: clamp(40px, 9vw, 52px);
+  padding: clamp(4px, 0.8vw, 7px);
+  align-content: flex-start;
+  background: #FFF;
+  border: 2px dashed var(--mint);
+  border-radius: var(--r-sm);
+}
+.cv-barra { gap: clamp(3px, 0.6vw, 5px); }
+.cv-barra .cv-doce {
+  width: clamp(26px, 4.4vw, 38px);
+  height: clamp(20px, 3.2vw, 28px);
+  aspect-ratio: auto;
+  border-radius: 7px;
+}
+.cv-malha {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: clamp(2px, 0.5vw, 4px);
+  width: min(100%, clamp(170px, 44vw, 240px));
+  margin: 0 auto;
+}
+.cv-malha .cv-doce { width: 100%; height: auto; border-radius: 3px; }
+
+/* ===================================================
+   17. NÍVEL EXPLICADO NO HUB + PAINEL DOS RESPONSÁVEIS
+   =================================================== */
+.hsl-explica {
+  margin: 2px 2px 0;
+  font-size: clamp(13px, 1.35vw, 16px);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--text);
+}
+.hsl-regra {
+  margin: 2px 2px 0;
+  font-size: var(--fs-apoio);
+  line-height: 1.45;
+  color: var(--text2);
+  max-width: 74ch;
+}
+.bha-pais { background:linear-gradient(135deg,#9B5DE5,#3DBBFF); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(61,187,255,0.35); }
+
+.pais-box { border-top:5px solid var(--blue); border-radius:var(--r); text-align:left; }
+.pais-intro { font-size:var(--fs-corpo); color:var(--text2); margin-bottom:8px; line-height:1.4; }
+.pais-situacao {
+  font-family:'Fredoka One',cursive; font-size:clamp(14px, 1.8vw, 18px); color:var(--purple);
+  background:#F3ECFF; border:2px solid rgba(155,93,229,0.3);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 10px) clamp(10px, 1.6vw, 14px); margin-bottom:4px;
+  line-height:1.3; overflow-wrap:anywhere;
+}
+.pais-titulo {
+  font-family:'Fredoka One',cursive; font-size:clamp(13px, 1.6vw, 16px); color:var(--text);
+  margin:clamp(12px, 2vh, 18px) 0 8px;
+}
+.pai-resumo {
+  display:grid; gap:var(--gap);
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, clamp(140px, 24vw, 200px)), 1fr));
+}
+.pai-num {
+  display:flex; flex-direction:column; gap:2px; min-width:0;
+  background:#FFF8E7; border:2px solid rgba(255,217,61,0.5);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+}
+.pai-num-rotulo { font-size:var(--fs-apoio); font-weight:800; text-transform:uppercase; letter-spacing:0.4px; color:var(--text2); }
+.pai-num-valor { font-family:'Fredoka One',cursive; font-size:clamp(18px, 2.6vw, 26px); color:var(--orange); line-height:1.15; overflow-wrap:anywhere; }
+
+.pai-unidades { display:flex; flex-direction:column; gap:var(--gap-sm); }
+/* minmax(0, …) nas colunas: sem isso o nome da unidade empurrava a barra para
+   fora do cartão quando o texto não cabia na janela estreita. */
+.pai-unidade { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto; align-items:center; gap:8px; }
+.pai-unidade-nome { font-size:var(--fs-apoio); font-weight:700; color:var(--text); line-height:1.3; min-width:0; overflow-wrap:anywhere; }
+.pai-unidade-num { font-size:var(--fs-apoio); font-weight:800; color:var(--text2); min-width:clamp(32px, 9vw, 44px); text-align:right; white-space:nowrap; }
+.pai-barra { height:clamp(10px, 1.6vh, 13px); border-radius:8px; background:rgba(155,93,229,0.15); overflow:hidden; }
+.pai-barra-fill { display:block; height:100%; background:linear-gradient(90deg,var(--mint),var(--green)); border-radius:8px; }
+.pai-sem-dado .pai-barra { background:rgba(122,107,138,0.12); }
+.pai-sem-dado .pai-unidade-nome { color:var(--text2); }
+
+.pai-vazio, .pai-nota, .pai-pendentes, .pai-privacidade {
+  font-size:var(--fs-apoio); line-height:1.5; color:var(--text2); margin-top:8px;
+}
+.pai-pendentes { background:#E0F7F6; border:2px solid rgba(78,205,196,0.4); border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px); }
+.pai-privacidade { border-top:2px solid rgba(255,255,255,0.4); padding-top:10px; }
+.pai-privacidade code { font-size:clamp(10.5px, 1.1vw, 12.5px); background:#F3ECFF; padding:1px 5px; border-radius:6px; }
+.rec-item-texto { flex:1; min-width:0; overflow-wrap:anywhere; }
+
+.pais-como { list-style:none; display:flex; flex-direction:column; gap:var(--gap-sm); }
+.pais-como li {
+  font-size:var(--fs-apoio); line-height:1.45; color:var(--text);
+  padding-left:20px; position:relative;
+}
+.pais-como li::before {
+  content:"\2713"; position:absolute; left:0; top:0;
+  font-weight:900; color:var(--green);
+}
+.pai-codigos { display:flex; flex-wrap:wrap; gap:6px; }
+.pai-codigo {
+  font-size:clamp(10.5px, 1.1vw, 12.5px); font-weight:800; color:var(--purple);
+  background:#F3ECFF; border:1px solid rgba(155,93,229,0.35);
+  border-radius:var(--r-sm); padding:3px 8px;
+}
+
+/* ===================================================
+   18. GUARDA-ROUPA AMPLIADO: perucas, calçados e conjuntos
+   =================================================== */
+/* A peruca vem antes do chapéu na pilha (e no HTML), então o chapéu
+   pousa sobre o cabelo em vez de sumir debaixo dele. */
+.o-wig   { top:-16%;  left:50%; transform:translateX(-50%); opacity:0.92; }
+.o-shoes { bottom:-19%; left:50%; transform:translateX(-50%); }
+.wd-wig   { top:-18%;  left:50%; transform:translateX(-50%); opacity:0.92; }
+.wd-shoes { bottom:-20%; left:50%; transform:translateX(-50%); }
+
+/* Ficha de preço com sobrenome: a descrição curta é o que faz a loja
+   deixar de ser uma grade de ícones sem explicação. */
+.sic-desc {
+  font-size:var(--fs-apoio); line-height:1.35; color:var(--text2);
+  margin-bottom:6px; overflow-wrap:anywhere;
+}
+.sic-tag {
+  position:absolute; top:-9px; left:8px;
+  font-size:clamp(9.5px, 1vw, 11px); font-weight:900; letter-spacing:0.5px;
+  color:#fff; background:linear-gradient(135deg,var(--orange),var(--red));
+  border:2px solid rgba(58,42,77,0.25); border-radius:var(--r-pill);
+  padding:2px 8px;
+}
+.sic-brinde {
+  font-size:clamp(10px, 1.05vw, 11.5px); line-height:1.35; color:#1F7C75;
+  background:#E0F7F6; border:1px dashed rgba(78,205,196,0.7);
+  border-radius:var(--r-sm); padding:4px 6px; margin-top:6px;
+  overflow-wrap:anywhere;
+}
+/* O conjunto se destaca na grade: mais alto na hierarquia, com a
+   borda de doce derretido, porque é peça completa. */
+.shop-item-card.completo { border-color:rgba(255,154,60,0.6); background:linear-gradient(180deg,#FFF8F0,#FFF0F7); }
+.shop-item-card.completo .sic-icon { background:linear-gradient(135deg,#FFE9C7,#FFD9E9); border-color:rgba(255,154,60,0.5); }
+
+/* As abas da loja agora são oito. Em janela estreita elas quebram em
+   duas linhas sem virar trilho de rolagem lateral. */
+.shop-tabs { align-content:flex-start; }
+
+/* ===================================================
+   19. PASSADA CARTUNESCA NOS BOTÕES
+   =================================================== */
+/* Botão de brinquedo é isto: contorno escuro de adesivo, uma base dura
+   embaixo (o botão tem espessura) e o afundamento quando aperta. A
+   passada troca só contorno, sombra e transição — cor, tamanho e letra
+   continuam nas regras de cada componente, para nada brigar no CSS. */
+.btn-play, .btn-back, .btn-hub-action, .btn-close-modal, .sic-btn,
+.btn-tf, .btn-op, .btn-spin, .btn-hint, .btn-check-puzzle,
+.btn-next-puzzle, .btn-fish-action, .btn-check-sort, .btn-lu-continue,
+.btn-reset-all, .seq-opt, .btn-duelo, .btn-tuto, .btn-nuvem, .btn-prova {
+  border:3px solid var(--linha-boneco);
+  box-shadow: var(--base-boneco), 0 6px 16px rgba(120,70,150,0.22);
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.14s ease;
+}
+/* Chips e abas são peças menores: levam o mesmo contorno, mais fino e
+   claro, para não virar muralha de borda em volta de cada palavra. */
+.stab, .chip-opcao, .chip-voz {
+  border:2px solid var(--linha-boneco-suave);
+  box-shadow: 0 3px 0 var(--linha-boneco-suave);
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.14s ease;
+}
+.btn-play:active, .btn-back:active, .btn-hub-action:active, .btn-close-modal:active,
+.sic-btn:active, .btn-tf:active, .btn-op:active, .btn-spin:active,
+.btn-hint:active, .btn-check-puzzle:active, .btn-next-puzzle:active,
+.btn-fish-action:active, .btn-check-sort:active, .btn-lu-continue:active,
+.btn-reset-all:active, .seq-opt:active, .btn-duelo:active,
+.btn-tuto:active, .btn-nuvem:active, .btn-prova:active,
+.stab:active, .chip-opcao:active, .chip-voz:active {
+  transform: translateY(4px) scale(0.99);
+  box-shadow: 0 1px 0 var(--linha-boneco), 0 2px 8px rgba(120,70,150,0.18);
+}
+/* No hover o botão sobe e a base engrossa: é o mesmo material, só que
+   levantado da mesa. Sem isso o hover perdia a base dura para a sombra
+   colorida antiga de cada botão. */
+.btn-play:hover, .btn-back:hover, .btn-hub-action:hover, .sic-btn:hover:not(.locked-btn),
+.btn-tf:hover, .btn-op:hover, .btn-spin:hover, .btn-hint:hover, .btn-check-puzzle:hover,
+.btn-next-puzzle:hover, .btn-fish-action:hover, .btn-check-sort:hover,
+.btn-lu-continue:hover, .btn-reset-all:hover, .seq-opt:hover, .btn-duelo:hover,
+.btn-tuto:hover, .btn-nuvem:hover, .btn-prova:hover {
+  box-shadow: var(--base-boneco-hover), 0 12px 22px rgba(120,70,150,0.26);
+}
+/* O cartão de jogo mantém a borda branca de adesivo e a sombra colorida de
+   cada família; recebe só o afundamento no toque, sem trocar a própria caixa. */
+.mode-card:active { transform: translateY(4px) scale(0.99); }
+/* :hover com :not() pesa mais que o :active sozinho: sem tirar o estado
+   pressionado, a levantada do hover vencia o afundamento e o toque ficava sem
+   resposta nenhuma em chip não selecionado. */
+.stab:hover:not(.active):not(:active), .chip-opcao:hover:not(.ativa):not(:active),
+.chip-voz:hover:not(.ativa):not(:active) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--linha-boneco-suave);
+}
+
+/* ===================================================
+   20. COMO JOGAR — a explicação antes da primeira partida
+   =================================================== */
+.tuto-box { border-top:5px solid var(--mint); border-radius:var(--r); text-align:left; }
+.tuto-corpo { display:flex; flex-direction:column; gap:clamp(9px, 1.6vw, 14px); }
+.tuto-cabeca { display:flex; align-items:center; gap:clamp(9px, 1.6vw, 14px); }
+.tuto-icone {
+  flex-shrink:0;
+  width:clamp(44px, 6.6vw, 60px); height:clamp(44px, 6.6vw, 60px);
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,#FFF0F7,#F0EDFF);
+  border:3px solid var(--linha-boneco-suave); border-radius:50%;
+  font-size:clamp(20px, 2.8vw, 28px); color:var(--purple);
+}
+.tuto-cabeca-texto { min-width:0; }
+.tuto-nome {
+  font-family:'Fredoka One',cursive; font-size:clamp(16px, 2vw, 21px);
+  color:var(--purple); line-height:1.15; overflow-wrap:anywhere;
+}
+.tuto-treina {
+  font-size:var(--fs-corpo); line-height:1.4; color:var(--text); margin-top:4px;
+  overflow-wrap:anywhere;
+}
+.tuto-treina i { color:var(--mint); margin-right:4px; }
+
+/* Passos numerados como fichas de receita: o número é uma peça à parte,
+   então a segunda linha do texto alinha embaixo dele, não em cima. */
+.tuto-passos { list-style:none; display:flex; flex-direction:column; gap:var(--gap-sm); counter-reset:none; }
+.tuto-passo { display:grid; grid-template-columns:auto minmax(0,1fr); gap:clamp(7px, 1.2vw, 10px); align-items:start; }
+.tuto-passo-num {
+  width:clamp(22px, 3.2vw, 26px); height:clamp(22px, 3.2vw, 26px);
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,var(--yellow),var(--orange));
+  color:#fff; font-family:'Fredoka One',cursive; font-size:clamp(11.5px, 1.3vw, 14px);
+  border-radius:50%; border:2px solid rgba(58,42,77,0.18);
+}
+.tuto-passo-texto { font-size:var(--fs-corpo); line-height:1.45; color:var(--text); overflow-wrap:anywhere; }
+
+/* As três faixas de rodapé separam o que é aviso do que é regra de ponto. */
+.tuto-faixa {
+  display:flex; align-items:flex-start; gap:8px;
+  font-size:var(--fs-apoio); line-height:1.5;
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+  overflow-wrap:anywhere;
+}
+.tuto-faixa i { flex-shrink:0; margin-top:2px; }
+.tuto-faixa b { font-weight:900; }
+.tuto-faixa-erro    { background:#FFF0F7; border:2px solid rgba(255,107,157,0.4); color:var(--text); }
+.tuto-faixa-erro i  { color:var(--pink); }
+.tuto-faixa-estrela { background:#FFF8E7; border:2px solid rgba(255,217,61,0.6); color:var(--text); }
+.tuto-faixa-estrela i { color:var(--orange); }
+.tuto-faixa-extra   { background:#E0F7F6; border:2px solid rgba(78,205,196,0.45); color:var(--text); }
+.tuto-faixa-extra i { color:#1F7C75; }
+
+/* Demonstração do duelo: três números e a criança toca no certo antes de
+   entrar na partida de verdade. Textinho não ensina a mecânica de procurar. */
+.tuto-demo {
+  background:linear-gradient(135deg,#F0EDFF,#FFF0F7);
+  border:2px dashed var(--purple); border-radius:var(--r-sm);
+  padding:clamp(9px, 1.6vw, 14px);
+}
+.tuto-demo-conta {
+  font-family:'Fredoka One',cursive; font-size:clamp(15px, 2vw, 20px);
+  color:var(--purple); text-align:center; margin-bottom:8px;
+}
+.tuto-demo-area {
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 64px), 1fr));
+  gap:var(--gap-sm);
+}
+.tuto-demo-num {
+  min-height:var(--alvo);
+  font-family:'Fredoka One',cursive; font-size:clamp(15px, 2vw, 20px);
+  color:var(--text); background:#fff; cursor:pointer;
+  border-radius:var(--r-pill);
+}
+.tuto-demo-num.acerto { background:linear-gradient(135deg,var(--green),#38a338); color:#fff; }
+.tuto-demo-num.erro   { background:linear-gradient(135deg,var(--red),#cc2b3a); color:#fff; }
+.tuto-demo-fala {
+  font-size:var(--fs-apoio); line-height:1.45; color:var(--text2);
+  text-align:center; margin-top:8px; overflow-wrap:anywhere;
+}
+
+.tuto-acoes { display:flex; flex-wrap:wrap; gap:var(--gap-sm); margin-top:clamp(10px, 1.8vw, 16px); }
+.btn-tuto {
+  flex:1 1 clamp(150px, 30vw, 220px); min-height:var(--alvo);
+  border-radius:var(--r-pill); cursor:pointer;
+  font-family:'Fredoka One',cursive; font-size:clamp(14px, 1.7vw, 18px);
+  color:#fff; display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:clamp(8px, 1.4vw, 12px) clamp(12px, 2vw, 18px);
+}
+.btn-tuto-primario   { background:linear-gradient(135deg,var(--green),#38a338); }
+.btn-tuto-secundario { background:linear-gradient(135deg,var(--purple),#7b3bc8); }
+
+/* O "?" do cartão do hub. Fica pequeno de propósito, mas mantém o alvo de
+   toque: o quadrado de toque é maior que o glifo desenhado. */
+.mc-info {
+  position:absolute; top:6px; right:6px; z-index:2;
+  width:var(--alvo); height:var(--alvo);
+  display:flex; align-items:center; justify-content:center;
+  font-size:clamp(14px, 1.7vw, 17px); color:var(--purple);
+  background:rgba(255,255,255,0.92); border:2px solid rgba(58,42,77,0.18);
+  border-radius:50%; cursor:pointer; transition:transform 0.15s;
+}
+.mc-info:hover { transform:scale(1.1) rotate(8deg); }
+.mode-card { position:relative; }
+
+/* ===================================================
+   21. HUB: PARA DOIS E PARA PROVAR
+   =================================================== */
+.hc-duelo .hub-cat-hdr   { border-color:rgba(255,154,60,0.5); }
+.hc-duelo .hub-cat-icon  { background:linear-gradient(135deg,var(--orange),#E07B12); }
+.hc-duelo .hub-cat-count { color:#B4600C; background:rgba(255,154,60,0.16); }
+.mc-duelo { background:linear-gradient(145deg,#FF9A3C,#E0552B); box-shadow:0 6px 24px rgba(224,85,43,0.45); }
+.mc-prova { background:linear-gradient(145deg,#4CC9F0,#3A86FF); box-shadow:0 6px 24px rgba(58,134,255,0.45); }
+
+/* ===================================================
+   22. DUELO 1x1 — CAÇA AO NÚMERO
+   =================================================== */
+/* A tela é a única do jogo com placar dos dois lados, tabuleiro cheio de
+   números e um portão de passagem por cima. Tudo em grade fluida: em 320 px
+   o tabuleiro rola, nada estoura. */
+#screenDuelo {
+  background:linear-gradient(165deg,#FFE9D6 0%,#FFF0F7 45%,#E7F6FF 100%), var(--malha-acucar);
+  padding:0 var(--pad) var(--pad);
+  overflow-y:auto;
+}
+.duelo-setup, .duelo-jogo {
+  width:100%; max-width:var(--largura-leitura); margin:0 auto;
+  display:flex; flex-direction:column; gap:clamp(8px, 1.5vh, 14px);
+}
+.duelo-setup { padding-top:var(--bloco); }
+/* A caçada é o único jogo da casa em que a tela CHEIA é a graça: "20, 40, 60,
+   80 números espalhados". Na coluna de leitura de 640 px, um notebook de 1280
+   mostrava o tabuleiro espremido no meio de duas faixas vazias. Em janela
+   larga a partida ganha fôlego; o formulário de montagem continua na coluna de
+   leitura, porque ali o que se lê é texto. */
+@media (min-width:900px) {
+  .duelo-jogo { max-width:min(100%, 920px); }
+}
+
+.duelo-rotulo {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--purple);
+  margin:clamp(4px, 1vh, 8px) 0 0;
+}
+.duelo-rotulo i { color:var(--orange); margin-right:6px; }
+.duelo-chips { display:flex; flex-wrap:wrap; gap:var(--gap-sm); }
+/* O chip é a peça de escolha da caçada: 20/40/60/80 e os dois modos de jogo.
+   O contorno e a base dura vêm da passada cartunesca (seção 19) — aqui entra
+   só o corpo: altura de alvo, letra de brinquedo e o estado escolhido. Por
+   isso esta regra não repete border nem box-shadow: repetiria por cima. */
+.chip-opcao {
+  min-height:var(--alvo);
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  padding:0 clamp(11px, 1.8vw, 17px);
+  border-radius:var(--r-pill);
+  background:#FFFDF7; color:var(--text2);
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); line-height:1.1;
+  cursor:pointer;
+}
+.chip-opcao i { color:var(--blue); }
+.chip-opcao.ativa {
+  background:linear-gradient(135deg,var(--pink),var(--purple)); color:#fff;
+  border-color:var(--linha-boneco);
+  box-shadow:0 3px 0 var(--linha-boneco), 0 6px 14px rgba(155,93,229,0.32);
+}
+.chip-opcao.ativa i { color:#FFE9C7; }
+.chip-opcao:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+.duelo-nota {
+  font-size:var(--fs-apoio); line-height:1.45; color:var(--text2);
+  overflow-wrap:anywhere;
+}
+.duelo-nota b { color:var(--purple); }
+.duelo-aviso {
+  font-size:var(--fs-apoio); font-weight:800; line-height:1.45; color:#8A3B12;
+  background:#FFF1DC; border:2px dashed rgba(255,154,60,0.6);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+  overflow-wrap:anywhere;
+}
+
+.duelo-nomes, .duelo-rede-linha { display:flex; flex-wrap:wrap; align-items:flex-end; gap:var(--gap-sm); }
+.duelo-campo {
+  flex:1 1 clamp(140px, 40%, 240px); min-width:0;
+  display:flex; flex-direction:column; gap:4px;
+  font-size:var(--fs-apoio); font-weight:800; color:var(--text2);
+}
+.duelo-campo input {
+  min-height:var(--alvo); width:100%; min-width:0;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--text);
+  background:#FFFDF7; border:3px solid var(--linha-boneco-suave);
+  border-radius:var(--r-sm); padding:0 clamp(9px, 1.4vw, 13px);
+}
+.duelo-campo input:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+.duelo-campo-codigo { flex:0 1 clamp(110px, 26%, 150px); }
+.duelo-campo-codigo input { text-transform:uppercase; letter-spacing:3px; text-align:center; }
+.duelo-rede { display:flex; flex-direction:column; gap:var(--gap-sm); }
+
+.duelo-alt {
+  display:flex; align-items:center; gap:9px; min-height:var(--alvo);
+  font-size:var(--fs-apoio); font-weight:700; color:var(--text);
+  background:rgba(255,255,255,0.7); border:2px solid var(--border);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 10px) clamp(9px, 1.4vw, 13px);
+  cursor:pointer; overflow-wrap:anywhere;
+}
+.duelo-alt input { width:20px; height:20px; flex-shrink:0; accent-color:var(--purple); }
+
+/* Placar: dois lados iguais, separados por um "×" de briga de desenho. */
+.duelo-placar {
+  display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:var(--gap-sm); align-items:stretch;
+}
+.duelo-lado {
+  display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px var(--gap-sm);
+  align-items:center; min-width:0;
+  background:rgba(255,255,255,0.78); border:3px solid var(--linha-boneco-suave);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+  transition:transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.duelo-lado-nome {
+  grid-column:1 / -1;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--purple);
+  line-height:1.2; overflow-wrap:anywhere;
+}
+.duelo-lado-num {
+  display:flex; align-items:center; gap:5px;
+  font-size:var(--fs-apoio); font-weight:800; color:var(--text2); white-space:nowrap;
+}
+.duelo-lado-num b { font-family:'Fredoka One',cursive; font-size:clamp(14px, 2vw, 19px); color:var(--green); }
+.duelo-lado-erro i { color:var(--red); }
+.duelo-lado-erro b { color:var(--red); }
+.duelo-lado-rel {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--text2);
+  text-align:right; font-variant-numeric:tabular-nums;
+}
+.duelo-lado.ativo {
+  border-color:var(--orange); transform:translateY(-3px) scale(1.02);
+  box-shadow:0 8px 20px rgba(255,154,60,0.35);
+}
+.duelo-versus {
+  align-self:center; font-family:'Fredoka One',cursive;
+  font-size:clamp(15px, 2.2vw, 22px); color:rgba(58,42,77,0.35);
+}
+.duelo-jogo.vez-0 .duelo-lado:last-of-type,
+.duelo-jogo.vez-1 .duelo-lado:first-of-type { opacity:0.62; }
+
+.duelo-vez {
+  font-size:var(--fs-apoio); font-weight:800; color:var(--text2); text-align:center;
+  overflow-wrap:anywhere;
+}
+
+/* A conta do turno: grande, centrada, com a etiqueta do conteúdo ao lado. */
+.duelo-conta-area {
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:var(--gap-sm);
+  background:#FFFFFF; border:3px solid var(--linha-boneco-suave);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.4vw, 13px);
+  box-shadow:var(--shadow-card);
+}
+.duelo-conta {
+  font-family:'Fredoka One',cursive; font-size:clamp(20px, 4.2vw, 34px); color:var(--text);
+  line-height:1.15; text-align:center; min-width:0; overflow-wrap:anywhere;
+}
+.duelo-tag {
+  font-size:clamp(10.5px, 1.1vw, 12px); font-weight:800; color:#fff;
+  background:linear-gradient(135deg,var(--mint),var(--blue));
+  border-radius:var(--r-pill); padding:4px 10px; white-space:nowrap;
+}
+
+/* Réua do tempo: uma barra que encolhe e avermelha nos últimos segundos. */
+.duelo-tempo {
+  height:clamp(9px, 1.4vh, 12px); border-radius:var(--r-pill);
+  background:rgba(58,42,77,0.12); overflow:hidden;
+}
+.duelo-tempo-barra {
+  display:block; height:100%; width:100%;
+  background:linear-gradient(90deg,var(--green),var(--mint));
+  border-radius:var(--r-pill); transition:width 0.2s linear, background 0.3s;
+}
+.duelo-tempo-barra.aperta { background:linear-gradient(90deg,var(--red),var(--orange)); }
+
+/* O tabuleiro. As colunas vêm do JavaScript (--colunas), medido na largura
+   real da área — é por isso que 20 números grandes e 80 números miúdos cabem
+   na mesma janela sem quebrar o alvo de toque. */
+.duelo-tabuleiro {
+  display:grid;
+  grid-template-columns:repeat(var(--colunas, 5), minmax(0, 1fr));
+  gap:var(--vão, 6px);
+  flex:1 1 auto; min-height:clamp(160px, 38vh, 420px);
+  /* O teto é o que segura a conta e a réua do tempo na tela: com 80 números o
+     tabuleiro rola dentro dele, e ninguém precisa descer a página enquanto o
+     relógio corre. */
+  max-height:clamp(220px, 46vh, 560px);
+  align-content:start; overflow:auto;
+  overscroll-behavior:contain;
+  padding:4px;
+  background:rgba(255,255,255,0.55); border:3px dashed rgba(155,93,229,0.28);
+  border-radius:var(--r-sm);
+}
+.duelo-num {
+  min-height:var(--alvo); width:100%; min-width:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fredoka One',cursive; font-size:clamp(13px, 1.8vw, 20px);
+  color:var(--text); background:linear-gradient(150deg,#FFFFFF,#FFEFF7);
+  border:2px solid var(--linha-boneco-suave); border-radius:var(--r-sm);
+  box-shadow:0 3px 0 rgba(58,42,77,0.18);
+  cursor:pointer; padding:2px 4px;
+  font-variant-numeric:tabular-nums; overflow-wrap:anywhere;
+  transition:transform 0.12s, opacity 0.3s, box-shadow 0.2s;
+}
+.duelo-num:hover { transform:translateY(-2px); border-color:var(--purple); }
+.duelo-num.sumiu {
+  opacity:0.14; pointer-events:none; transform:scale(0.86);
+  box-shadow:none; filter:grayscale(1);
+}
+.duelo-num.tremendo { animation:duelo-tremor 0.42s ease; border-color:var(--red); }
+.duelo-num.brilhando {
+  background:linear-gradient(150deg,var(--yellow),var(--orange)); color:#4A2B00;
+  border-color:var(--linha-boneco); animation:duelo-brilho 1.1s ease-in-out infinite;
+}
+@keyframes duelo-tremor {
+  0%,100% { transform:translateX(0); }
+  25%     { transform:translateX(-5px) rotate(-2deg); }
+  75%     { transform:translateX(5px) rotate(2deg); }
+}
+@keyframes duelo-brilho {
+  0%,100% { box-shadow:0 0 0 rgba(255,217,61,0.0), 0 3px 0 rgba(58,42,77,0.18); }
+  50%     { box-shadow:0 0 18px rgba(255,180,40,0.85), 0 3px 0 rgba(58,42,77,0.18); }
+}
+
+.duelo-roda {
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:var(--gap);
+}
+.duelo-tempo-texto {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--text2);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Botões do duelo: mesmo plástico dos outros, cor de brasa. */
+.btn-duelo {
+  flex:1 1 clamp(150px, 40%, 260px); min-height:var(--alvo); min-width:0;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:#fff;
+  background:linear-gradient(135deg,var(--purple),#7B3BC8);
+  border-radius:var(--r-pill); cursor:pointer;
+  padding:clamp(8px, 1.4vw, 12px) clamp(12px, 2vw, 18px);
+  overflow-wrap:anywhere;
+}
+.btn-duelo-primario { background:linear-gradient(135deg,var(--orange),#E0552B); }
+.btn-duelo-passar { background:linear-gradient(135deg,#9B8FA8,#6E6480); font-size:var(--fs-apoio); }
+
+/* Portão de passagem: cobre a tela para que ninguém veja a conta do outro. */
+.duelo-passagem {
+  position:fixed; inset:0; z-index:60;
+  display:flex; align-items:center; justify-content:center; padding:var(--pad);
+  background:rgba(58,42,77,0.72); backdrop-filter:blur(4px);
+}
+.duelo-passagem[hidden] { display:none; }
+.duelo-passagem-caixa {
+  width:100%; max-width:min(100%, 420px);
+  display:flex; flex-direction:column; align-items:center; gap:var(--gap-sm);
+  text-align:center;
+  background:var(--card); border:4px solid var(--linha-boneco-suave);
+  border-radius:var(--r); box-shadow:var(--shadow-pink);
+  padding:clamp(14px, 2.6vw, 24px);
+}
+.duelo-passagem-onca {
+  width:clamp(48px, 8vw, 64px); height:clamp(48px, 8vw, 64px);
+  display:flex; align-items:center; justify-content:center;
+  font-size:clamp(20px, 3.4vw, 28px); color:#fff;
+  background:linear-gradient(135deg,var(--orange),var(--red));
+  border-radius:50%; box-shadow:0 6px 16px rgba(255,107,87,0.4);
+}
+.duelo-passagem-nome {
+  font-family:'Fredoka One',cursive; font-size:clamp(17px, 2.4vw, 22px); color:var(--purple);
+  overflow-wrap:anywhere;
+}
+.duelo-passagem-texto {
+  font-size:var(--fs-apoio); line-height:1.5; color:var(--text2); overflow-wrap:anywhere;
+}
+
+/* Resultado do duelo (modal). */
+.duelo-box { border-top:5px solid var(--orange); border-radius:var(--r); text-align:left; }
+.duelo-fim { display:flex; flex-direction:column; gap:var(--gap-sm); }
+.duelo-fim-onca { font-size:clamp(22px, 3.6vw, 30px); color:var(--orange); text-align:center; }
+.duelo-fim-titulo {
+  font-family:'Fredoka One',cursive; font-size:clamp(16px, 2.2vw, 20px);
+  color:var(--purple); text-align:center; overflow-wrap:anywhere;
+}
+.duelo-fim-marcador {
+  display:grid; gap:var(--gap-sm);
+  grid-template-columns:minmax(0,1fr);
+}
+/* Só divide em duas colunas quando cada lado tem folga para ler os três
+   números sem quebrar no meio. */
+@media (min-width:520px) {
+  .duelo-fim-marcador { grid-template-columns:repeat(2, minmax(0,1fr)); }
+}
+.duelo-fim-jogador {
+  display:flex; flex-direction:column; gap:4px; min-width:0; text-align:center;
+  font-size:var(--fs-apoio); font-weight:800; color:var(--text2); overflow-wrap:anywhere;
+  background:rgba(255,255,255,0.78); border:3px solid var(--linha-boneco-suave);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+}
+/* Quem levou a caçada ganha a mesma moldura de brasa do placar. */
+.duelo-fim-jogador.venceu {
+  border-color:var(--orange); background:#FFF6E9;
+  box-shadow:0 6px 16px rgba(255,154,60,0.3);
+}
+.duelo-fim-linha {
+  display:flex; flex-wrap:wrap; justify-content:center; gap:4px 6px;
+}
+.duelo-fim-stat {
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+  background:#FFFDF7; border:2px solid var(--linha-boneco-suave);
+  border-radius:var(--r-pill); padding:2px 9px;
+  font-variant-numeric:tabular-nums;
+}
+.duelo-fim-stat i { color:var(--purple); font-size:0.9em; }
+.duelo-fim-stat.erro i { color:var(--red); }
+.duelo-fim-jogador b { font-family:'Fredoka One',cursive; font-size:clamp(18px, 2.6vw, 24px); color:var(--purple); }
+.duelo-fim-motivo, .duelo-fim-nota {
+  font-size:var(--fs-apoio); line-height:1.5; color:var(--text2); overflow-wrap:anywhere;
+}
+.duelo-fim-nota {
+  background:#E0F7F6; border:2px solid rgba(78,205,196,0.4);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+}
+.duelo-fim-estrelas {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--orange); text-align:center;
+}
+.duelo-fim-acoes { display:flex; flex-wrap:wrap; gap:var(--gap-sm); }
+
+/* ===================================================
+   23. PROVA DE APRENDIZAGEM
+   =================================================== */
+#screenProva {
+  background:linear-gradient(165deg,#E7F6FF 0%,#FFF0F7 60%,#F3ECFF 100%), var(--malha-acucar);
+  padding:0 var(--pad) var(--pad);
+  overflow-y:auto;
+}
+.prova-painel, .prova-fim {
+  width:100%; max-width:var(--largura-leitura); margin:0 auto;
+  display:flex; flex-direction:column; gap:clamp(8px, 1.5vh, 14px);
+  padding-top:var(--bloco);
+}
+.prova-regua {
+  font-size:var(--fs-apoio); line-height:1.45; color:#1F7C75;
+  background:#E0F7F6; border:2px solid rgba(78,205,196,0.45);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px) clamp(10px, 1.5vw, 14px);
+  overflow-wrap:anywhere;
+}
+.prova-card {
+  background:#FFFFFF; border:3px solid var(--linha-boneco-suave);
+  border-radius:var(--r); box-shadow:var(--shadow-card);
+  padding:clamp(14px, 2.4vw, 22px);
+}
+.prova-texto {
+  font-size:var(--fs-corpo); line-height:1.55; color:var(--text);
+  font-weight:700; overflow-wrap:anywhere;
+}
+.prova-respostas {
+  display:grid; gap:var(--gap-sm);
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, clamp(140px, 44%, 240px)), 1fr));
+}
+.btn-prova {
+  min-height:var(--alvo); width:100%; min-width:0;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--text);
+  background:linear-gradient(150deg,#FFFFFF,#F3ECFF);
+  border-radius:var(--r-sm); cursor:pointer; text-align:center;
+  padding:clamp(9px, 1.5vw, 13px) clamp(10px, 1.6vw, 14px);
+  overflow-wrap:anywhere;
+}
+.btn-prova.marcada {
+  background:linear-gradient(150deg,var(--blue),#2A65CC); color:#fff;
+  border-color:var(--linha-boneco);
+}
+.btn-prova:disabled { cursor:default; opacity:0.85; }
+.prova-nota {
+  font-size:var(--fs-apoio); color:var(--text2); text-align:center; overflow-wrap:anywhere;
+}
+
+.prova-fim-nota {
+  font-size:var(--fs-apoio); font-weight:800; color:#1F7C75; text-align:center;
+  background:#E0F7F6; border:2px solid rgba(78,205,196,0.45);
+  border-radius:var(--r-pill); padding:clamp(8px, 1.3vw, 12px) clamp(10px, 1.6vw, 16px);
+  overflow-wrap:anywhere;
+}
+.prova-fim-titulo {
+  font-family:'Fredoka One',cursive; font-size:clamp(24px, 4vw, 38px);
+  color:var(--purple); text-align:center;
+}
+.prova-fim-leitura {
+  font-size:var(--fs-corpo); line-height:1.5; color:var(--text); text-align:center;
+  overflow-wrap:anywhere;
+}
+.prova-fim-unidades {
+  display:grid; gap:var(--gap-sm);
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, clamp(140px, 30%, 200px)), 1fr));
+}
+.prova-unidade {
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+  background:rgba(255,255,255,0.8); border:2px solid var(--border);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 10px) clamp(9px, 1.4vw, 12px);
+}
+.prova-unidade-nome { font-size:var(--fs-apoio); font-weight:800; color:var(--text2); min-width:0; overflow-wrap:anywhere; }
+.prova-unidade-num {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--purple);
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+}
+.prova-fim-parcial {
+  font-size:var(--fs-apoio); line-height:1.5; color:var(--text2);
+  background:#FFF8E7; border:2px dashed rgba(255,217,61,0.7);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px) clamp(10px, 1.5vw, 14px);
+  overflow-wrap:anywhere;
+}
+.prova-fim-acoes { display:flex; flex-wrap:wrap; gap:var(--gap-sm); }
+.btn-prova-acao {
+  flex:1 1 clamp(150px, 30%, 240px); min-height:var(--alvo);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:#fff;
+  background:linear-gradient(135deg,var(--purple),#7B3BC8);
+  border-radius:var(--r-pill); cursor:pointer;
+  padding:clamp(8px, 1.4vw, 12px) clamp(12px, 2vw, 18px);
+  overflow-wrap:anywhere;
+}
+.btn-prova-acao-primario { background:linear-gradient(135deg,var(--mint),#2A9D8F); }
+
+/* ===================================================
+   24. BOLETIM DOS RESPONSÁVEIS
+   =================================================== */
+.pais-cabecalho {
+  font-size:var(--fs-apoio); line-height:1.5; color:var(--text2); font-style:italic;
+  border-left:4px solid var(--blue); padding-left:clamp(9px, 1.4vw, 13px);
+  overflow-wrap:anywhere;
+}
+.bol-situacao-texto {
+  font-size:var(--fs-corpo); line-height:1.5; color:var(--text);
+  background:#F3ECFF; border:2px solid rgba(155,93,229,0.3);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px) clamp(10px, 1.5vw, 14px);
+  margin-bottom:var(--gap-sm); overflow-wrap:anywhere;
+}
+.bol-texto { font-size:var(--fs-corpo); line-height:1.55; color:var(--text); overflow-wrap:anywhere; }
+.bol-colunas {
+  display:grid; gap:var(--gap-sm); margin-top:var(--gap-sm);
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, clamp(200px, 44%, 320px)), 1fr));
+}
+.bol-coluna {
+  min-width:0; border-radius:var(--r-sm); padding:clamp(9px, 1.4vw, 13px);
+  border:2px solid var(--linha-boneco-suave);
+}
+.bol-coluna h4 {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); margin-bottom:6px;
+  overflow-wrap:anywhere;
+}
+.bol-coluna ul { list-style:none; display:flex; flex-direction:column; gap:5px; }
+.bol-coluna li {
+  font-size:var(--fs-apoio); line-height:1.45; color:var(--text);
+  padding-left:16px; position:relative; overflow-wrap:anywhere;
+}
+.bol-coluna li::before {
+  content:"•"; position:absolute; left:4px; top:0; font-weight:900;
+}
+.bol-coluna-mede { background:#EAF8EA; }
+.bol-coluna-mede h4 { color:#256D2A; }
+.bol-coluna-mede li::before { color:#256D2A; }
+.bol-coluna-nao { background:#FFF0F0; }
+.bol-coluna-nao h4 { color:#9A2733; }
+.bol-coluna-nao li::before { color:#9A2733; }
+
+.bol-limites {
+  margin-top:var(--gap-sm);
+  font-size:var(--fs-apoio); line-height:1.5; color:#8A3B12;
+  background:#FFF1DC; border:2px dashed rgba(255,154,60,0.6);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px) clamp(10px, 1.5vw, 14px);
+  overflow-wrap:anywhere;
+}
+.bol-aviso-parcial { margin:0; }
+.bol-aviso-parcial i { color:var(--orange); margin-right:4px; }
+
+/* A faixa de leitura acompanha o nome da unidade, dentro da mesma linha. */
+.bol-u-faixa {
+  display:block; font-style:normal; font-weight:800;
+  font-size:clamp(10.5px, 1.1vw, 12px); margin-top:2px; overflow-wrap:anywhere;
+}
+.faixa-autonomia   { color:#256D2A; }
+.faixa-consolidacao { color:#9A5B00; }
+.faixa-construcao   { color:#9A2733; }
+.faixa-pouco        { color:var(--text2); }
+
+.bol-provas { display:flex; flex-direction:column; gap:var(--gap-sm); }
+.bol-prova {
+  display:grid; gap:2px var(--gap-sm); align-items:center;
+  grid-template-columns:repeat(auto-fit, minmax(0, 1fr));
+  background:rgba(255,255,255,0.8); border:2px solid var(--border);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+}
+.bol-prova-atual { border-color:rgba(155,93,229,0.55); background:#F3ECFF; }
+.bol-prova-data, .bol-prova-ano { font-size:var(--fs-apoio); font-weight:700; color:var(--text2); overflow-wrap:anywhere; }
+.bol-prova-nota {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--purple);
+  white-space:nowrap; font-variant-numeric:tabular-nums;
+}
+.bol-prova-faixa { font-size:var(--fs-apoio); font-weight:800; overflow-wrap:anywhere; }
+
+.bol-duas-colunas {
+  display:grid; gap:var(--gap-sm); margin-bottom:var(--gap-sm);
+  grid-template-columns:repeat(auto-fit, minmax(min(100%, clamp(150px, 40%, 240px)), 1fr));
+}
+.bol-mini {
+  display:flex; flex-direction:column; gap:2px; min-width:0;
+  background:#FFF8E7; border:2px solid rgba(255,217,61,0.55);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px);
+}
+.bol-mini-rotulo { font-size:var(--fs-apoio); font-weight:800; text-transform:uppercase; letter-spacing:0.4px; color:var(--text2); }
+.bol-mini-valor { font-family:'Fredoka One',cursive; font-size:clamp(20px, 3vw, 28px); color:var(--orange); }
+.bol-mini-dado { font-size:var(--fs-apoio); color:var(--text2); font-variant-numeric:tabular-nums; }
+
+/* Recomendações: mesmo cartão da lista de foco, com etiqueta azul. */
+.ri-dica .rec-item-situacao { background:#EAF4FF; color:#145C8C; border:1px solid var(--blue); }
+
+.pais-acoes {
+  display:flex; flex-wrap:wrap; gap:var(--gap-sm);
+  border-top:2px solid rgba(255,255,255,0.6); padding-top:clamp(10px, 1.6vw, 14px);
+  margin-top:clamp(12px, 2vh, 18px);
+}
+.btn-pais {
+  flex:1 1 clamp(160px, 40%, 260px); min-height:var(--alvo);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:#fff;
+  background:linear-gradient(135deg,var(--blue),#2A65CC);
+  border:3px solid var(--linha-boneco); border-radius:var(--r-pill);
+  box-shadow:var(--base-boneco), 0 6px 16px rgba(58,134,255,0.28);
+  cursor:pointer; padding:clamp(8px, 1.4vw, 12px) clamp(12px, 2vw, 18px);
+  /* .btn-pais também veste um <a> (a página de privacidade): sem isto o
+     botão-link sai sublinhado e diferente dos irmãos. */
+  text-decoration:none;
+  transition:transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.14s ease;
+  overflow-wrap:anywhere;
+}
+.btn-pais:hover { box-shadow:var(--base-boneco-hover), 0 12px 22px rgba(58,134,255,0.3); }
+.btn-pais:active {
+  transform:translateY(4px) scale(0.99);
+  box-shadow:0 1px 0 var(--linha-boneco), 0 2px 8px rgba(120,70,150,0.18);
+}
+
+/* Na impressão do boletim, só o documento: sem telas de jogo, sem botão. */
+@media print {
+  .screen, .modal-overlay, .pais-acoes, .btn-close-modal, #particleCanvas, .toast { display:none !important; }
+  .modal { position:static !important; display:block !important; }
+  .modal-box { box-shadow:none; border:none; max-width:100%; overflow:visible; max-height:none; }
+  body { background:#fff; color:#000; }
+}
+
+/* ===================================================
+   25. CONEXÃO: CONTA, VERIFICAÇÃO E SALAS
+   =================================================== */
+.nuvem-box { border-top:5px solid var(--mint); border-radius:var(--r); text-align:left; }
+.nuvem-corpo { display:flex; flex-direction:column; gap:var(--gap-sm); }
+.nuvem-estado {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:#1F7C75;
+  overflow-wrap:anywhere;
+}
+.nuvem-fit {
+  display:flex; flex-wrap:wrap; gap:6px;
+  font-size:clamp(10.5px, 1.1vw, 12px); font-weight:800; color:var(--text2);
+}
+.nuvem-fit span {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(78,205,196,0.14); border:1px solid rgba(78,205,196,0.4);
+  border-radius:var(--r-pill); padding:4px 10px; overflow-wrap:anywhere;
+}
+.nuvem-painel { display:flex; flex-direction:column; gap:var(--gap-sm); }
+.nuvem-titulo {
+  font-family:'Fredoka One',cursive; font-size:clamp(15px, 1.9vw, 19px); color:var(--purple);
+  overflow-wrap:anywhere;
+}
+.nuvem-texto { font-size:var(--fs-corpo); line-height:1.5; color:var(--text); overflow-wrap:anywhere; }
+.nuvem-nota, .nuvem-msg, .nuvem-erro {
+  font-size:var(--fs-apoio); line-height:1.45; color:var(--text2); overflow-wrap:anywhere;
+}
+/* O recado do formulário tem três caras, e elas não podem se confundir:
+   neutro enquanto trabalha, verde quando deu, vermelho quando não deu. As
+   regras compostas (.nuvem-msg.nuvem-x) vencem por especificidade, senão a
+   ordem do arquivo decidiria no lugar da intenção. */
+.nuvem-msg { font-weight:800; color:var(--text2); }
+.nuvem-msg.nuvem-ok { color:#1F7C75; }
+.nuvem-msg.nuvem-erro, .nuvem-erro { color:#9A2733; font-weight:800; }
+.nuvem-nota {
+  background:#FFF8E7; border:2px dashed rgba(255,217,61,0.7);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px) clamp(10px, 1.5vw, 14px);
+}
+.nuvem-passos {
+  list-style:none; counter-reset:passo; display:flex; flex-direction:column; gap:var(--gap-sm);
+}
+.nuvem-passos li {
+  font-size:var(--fs-apoio); line-height:1.5; color:var(--text);
+  padding-left:clamp(24px, 4vw, 30px); position:relative; overflow-wrap:anywhere;
+}
+.nuvem-passos li::before {
+  counter-increment:passo; content:counter(passo);
+  position:absolute; left:0; top:0;
+  width:clamp(18px, 2.6vw, 22px); height:clamp(18px, 2.6vw, 22px);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fredoka One',cursive; font-size:clamp(10.5px, 1.1vw, 12px); color:#fff;
+  background:linear-gradient(135deg,var(--mint),var(--blue));
+  border-radius:50%;
+}
+.nuvem-passos code {
+  font-size:clamp(10.5px, 1.1vw, 12.5px); background:#F3ECFF;
+  padding:1px 5px; border-radius:6px; overflow-wrap:anywhere;
+}
+
+.nuvem-abas { display:flex; flex-wrap:wrap; gap:var(--gap-sm); }
+.nuvem-aba {
+  flex:1 1 clamp(120px, 40%, 200px); min-height:var(--alvo);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-apoio); color:var(--text2);
+  background:rgba(255,255,255,0.7); border:2px solid var(--linha-boneco-suave);
+  border-radius:var(--r-pill) var(--r-sm) var(--r-pill) var(--r-sm);
+  cursor:pointer; padding:clamp(6px, 1vw, 10px);
+}
+.nuvem-aba.ativa {
+  color:#fff; background:linear-gradient(135deg,var(--purple),#7B3BC8);
+  border-color:var(--linha-boneco);
+}
+.nuvem-form { display:flex; flex-direction:column; gap:var(--gap-sm); }
+.nuvem-campo { display:flex; flex-direction:column; gap:4px; min-width:0; }
+.nuvem-rotulo { font-size:var(--fs-apoio); font-weight:800; color:var(--text2); overflow-wrap:anywhere; }
+.nuvem-campo input {
+  min-height:var(--alvo); width:100%; min-width:0;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--text);
+  background:#FFFDF7; border:3px solid var(--linha-boneco-suave);
+  border-radius:var(--r-sm); padding:0 clamp(9px, 1.4vw, 13px);
+}
+.nuvem-campo input:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+
+.btn-nuvem {
+  min-height:var(--alvo); width:100%; min-width:0;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:#fff;
+  background:linear-gradient(135deg,var(--mint),#2A9D8F);
+  border-radius:var(--r-pill); cursor:pointer;
+  padding:clamp(8px, 1.4vw, 12px) clamp(12px, 2vw, 18px);
+  overflow-wrap:anywhere;
+}
+.btn-nuvem-primario { background:linear-gradient(135deg,var(--blue),#2A65CC); }
+.btn-nuvem-perigo { background:linear-gradient(135deg,#9B8FA8,#6E6480); }
+.btn-nuvem-mini {
+  font-size:var(--fs-apoio); min-height:var(--alvo);
+  background:linear-gradient(135deg,var(--purple),#7B3BC8);
+}
+
+.nuvem-criancas { display:flex; flex-direction:column; gap:var(--gap-sm); }
+.nuvem-crianca {
+  display:grid; gap:2px var(--gap-sm); align-items:center;
+  grid-template-columns:repeat(auto-fit, minmax(0, 1fr));
+  background:rgba(155,93,229,0.08); border:2px solid rgba(155,93,229,0.28);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px);
+}
+.nuvem-crianca-nome { font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--purple); min-width:0; overflow-wrap:anywhere; }
+.nuvem-crianca-codigo {
+  font-size:var(--fs-corpo); font-weight:900; letter-spacing:2px; color:var(--text);
+  background:#FFF8E7; border-radius:var(--r-sm); padding:2px 8px; justify-self:start;
+}
+.nuvem-crianca-quando { font-size:var(--fs-apoio); color:var(--text2); grid-column:1 / -1; overflow-wrap:anywhere; }
+
+/* Movimento reduzido: o tabuleiro para de tremer e de brilhar, mas a
+   resposta continue marcada por cor e borda — a informação não some. */
+@media (prefers-reduced-motion: reduce) {
+  .duelo-num.tremendo, .duelo-num.brilhando { animation:none; }
+  .duelo-num.brilhando { border-width:4px; }
+  .duelo-num, .duelo-lado, .btn-duelo, .btn-prova, .btn-pais, .btn-nuvem, .nuvem-aba,
+  .chip-voz, .chip-opcao, .btn-reset-all {
+    transition:none;
+  }
+}
+
+/* ===================================================
+   26. VOZ DO JUBA — a narração das perguntas
+   =================================================== */
+/* O diálogos é feito do material dos outros modais; o que existe só aqui é a
+   lista de fichas de voz e a linha de estado. Essa linha já nasce com altura:
+   sem ela, cada clique em "Ouvir" empurraria o texto do modal um degrau. */
+.narracao-box { border-top:5px solid var(--blue); border-radius:var(--r); text-align:left; }
+.narracao-intro { font-size:var(--fs-corpo); line-height:1.5; color:var(--text2); }
+.voz-campo {
+  margin-top:var(--gap);
+  display:flex; flex-direction:column; gap:var(--gap-sm);
+  border:2px solid var(--border); border-radius:var(--r-sm);
+  padding:clamp(9px, 1.5vw, 13px);
+}
+.voz-legenda {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-apoio); color:var(--purple);
+  letter-spacing:0.3px; padding:0 6px;
+}
+.chips-voz { display:flex; flex-wrap:wrap; gap:var(--gap-sm); }
+.chip-voz {
+  min-height:var(--alvo);
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:0 clamp(11px, 1.8vw, 16px);
+  border-radius:var(--r-pill);
+  background:#FFFDF7; color:var(--text2);
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); line-height:1.15;
+  cursor:pointer;
+}
+.chip-voz.ativa {
+  background:linear-gradient(135deg,var(--blue),#2A65CC); color:#fff;
+  border-color:var(--linha-boneco);
+  box-shadow:0 3px 0 var(--linha-boneco), 0 6px 14px rgba(61,187,255,0.32);
+}
+/* A ficha "Voz por IA" se apaga quando não há função publicada: oferecer o
+   botão e deixar a criança falhar sozinha seria pior do que mostrar o motivo. */
+.chip-voz:disabled {
+  opacity:0.45; cursor:not-allowed; transform:none;
+  box-shadow:0 3px 0 var(--linha-boneco-suave);
+}
+.chip-voz:disabled:hover { transform:none; box-shadow:0 3px 0 var(--linha-boneco-suave); }
+.voz-nota {
+  font-size:var(--fs-apoio); line-height:1.45; color:var(--text2);
+  overflow-wrap:anywhere;
+}
+.voz-acoes { display:flex; flex-wrap:wrap; gap:var(--gap-sm); margin-top:var(--gap); }
+.btn-voz-parar { background:linear-gradient(135deg,#9B8FA8,#6E6480); }
+.voz-estado-linha {
+  min-height:1.5em;
+  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--text2);
+  overflow-wrap:anywhere;
+}
+.voz-estado-linha.voz-ativa { color:var(--blue); }
+.voz-privacidade {
+  font-size:var(--fs-apoio); line-height:1.5; color:var(--text);
+  background:rgba(61,187,255,0.10); border:2px dashed rgba(61,187,255,0.5);
+  border-radius:var(--r-sm); padding:clamp(8px, 1.3vw, 12px);
+}
+.voz-privacidade b { color:var(--purple); }
+.voz-pending, .voz-pendentes {
+  font-size:var(--fs-apoio); font-weight:800; line-height:1.45; color:#8A3B12;
+  background:#FFF1DC; border:2px dashed rgba(255,154,60,0.6);
+  border-radius:var(--r-sm); padding:clamp(7px, 1.2vw, 11px) clamp(9px, 1.4vw, 13px);
+  overflow-wrap:anywhere;
+}
+/* O respiradouro ao lado do botão "Ouvir" do cartão: uma palavra, nunca uma
+   frase — senão a quebra do empurra o texto da conta para baixo. */
+.voz-estado {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-apoio); color:var(--text2);
+  overflow-wrap:anywhere;
+}
+
+/* ===================================================
+   27. APAGAR DADOS — a tecla que destrói
+   Sobria de propósito: sem confete, sem vermelho pisçando. O botão que pede
+   o segundo clique é o único que muda de cor, e é para incomodar mesmo.
+   =================================================== */
+.apagar-box { border-top:5px solid var(--red); }
+.apagar-aviso {
+  font-size:var(--fs-corpo); font-weight:800; line-height:1.5; color:var(--text);
+  background:rgba(255,71,87,0.10); border:2px dashed rgba(255,71,87,0.45);
+  border-radius:var(--r-sm); padding:clamp(9px, 1.5vw, 13px); margin:0 0 var(--gap);
+}
+.apagar-opcao {
+  display:flex; flex-direction:column; gap:var(--gap-sm);
+  border:2px solid var(--border); border-radius:var(--r-sm);
+  padding:clamp(11px, 1.8vw, 16px); margin-bottom:var(--gap);
+  background:rgba(255,255,255,0.55);
+}
+.apagar-titulo {
+  font-family:'Fredoka One',cursive; font-size:var(--fs-apoio); color:var(--purple);
+  letter-spacing:0.3px; margin:0;
+}
+.apagar-texto { font-size:var(--fs-apoio); line-height:1.5; color:var(--text2); margin:0; }
+.apagar-conta {
+  font-size:var(--fs-apoio); line-height:1.45; color:var(--text); margin:0;
+  background:#F3ECFF; border-radius:var(--r-sm); padding:clamp(8px, 1.2vw, 12px);
+  overflow-wrap:anywhere;
+}
+.apagar-rodape { font-size:var(--fs-apoio); line-height:1.5; color:var(--text2); margin:var(--gap) 0 0; }
+.apagar-rodape a { color:var(--purple); font-weight:800; }
+/* Link no meio da frase tem 16 px de altura: o dedo erra. O padding faz a
+   caixa de toque crescer até o alvo da casa, e a margem negativa devolve o
+   mesmo tanto, então a frase não se desloca nem ganha entrelinha. */
+.pai-privacidade a, .apagar-rodape a {
+  display:inline-block; padding:13px 3px; margin:-13px -3px;
+  border-radius:8px; text-underline-offset:3px;
+}
+.btn-pais-apagar {
+  background:linear-gradient(135deg,#FF7C7C,var(--red));
+  border-color:#B3001B; box-shadow:0 3px 0 #B3001B, 0 6px 16px rgba(255,71,87,0.3);
+}
+.btn-pais-apagar:hover { box-shadow:0 5px 0 #B3001B, 0 12px 22px rgba(255,71,87,0.32); }
+.btn-reset-all:disabled { opacity:0.45; cursor:not-allowed; transform:none; box-shadow:none; }
+.btn-reset-all:disabled:hover { transform:none; }
+.btn-reset-all.armada {
+  background:linear-gradient(135deg,#B3001B,#7A0012);
+  box-shadow:0 0 0 3px rgba(255,71,87,0.4);
+}
