@@ -44,7 +44,15 @@ const PADROES = [
   },
   {
     nome: 'chave do Fish Audio no caminho do navegador',
-    re: /FISH_AUDIO_API_KEY\s*[:=]\s*['"][A-Za-z0-9]{20,}['"]/,
+    // O traço é obrigatório na classe: a chave real vem com prefixo e hífens.
+    re: /FISH_AUDIO_API_KEY\s*[:=]\s*['"][A-Za-z0-9_\-]{20,}['"]/,
+  },
+  {
+    nome: 'chave do Fish Audio pelo prefixo (sk-fish-…)',
+    // Mesmo caso da chave secreta do Supabase: o prefixo denuncia o papel sem
+    // depender do nome da variável, então quem colar a chave num campo com nome
+    // criativo continua pego. Sem isenção nenhuma.
+    re: /['"]sk-fish-[A-Za-z0-9_\-]{8,}['"]/,
   },
   {
     nome: 'chave de API no estilo 32+ caracteres aleatórios atribuída a variável de chave',
@@ -185,6 +193,7 @@ const JWT_LEGADO = ['eyJhbGciOiJIUzI1NiJ9.', 'cG9zdGdyZXN0LnN1cGFiYXNlLmNv', '.r
 const PUBLICAVEL = ['sb_', 'publishable_A1b2C3d4E5f6G7h8I9j0K1l2M3n4'].join('');
 const SUPERSECRETA = ['sb_', 'secret_UmaChaveDeServicoFalsa01'].join('');
 const DO_PEIXE = ['abcdefghij', 'klmnopqrstuvwxyz'].join('');
+const DO_PEIXE_NOVA = ['sk-fish-', 'ExemploFalsoDeTeste', '0123456789abcdef'].join('');
 const DE_SERVICO = ['um-valor-de-20-', 'caracteres-aqui'].join('');
 const linhaDe = (campo, valor) => "  " + campo + ": '" + valor + "',";
 const CASOS = [
@@ -202,6 +211,10 @@ const CASOS = [
     texto: linhaDe('service_role', DE_SERVICO), arquivo: 'config.js', espera: 1 },
   { nome: 'chave do Fish Audio no caminho do navegador é pega',
     texto: linhaDe('FISH_AUDIO_API_KEY', DO_PEIXE), arquivo: 'config.js', espera: 1 },
+  { nome: 'a chave do Fish com prefixo e hífens, no campo oficial, é pega',
+    texto: linhaDe('FISH_AUDIO_API_KEY', DO_PEIXE_NOVA), arquivo: 'config.js', espera: 1 },
+  { nome: 'a mesma chave do Fish num campo com nome criativo também é pega',
+    texto: linhaDe('chaveDeVoz', DO_PEIXE_NOVA), arquivo: 'config.js', espera: 1 },
 ];
 let casosRuins = 0;
 CASOS.forEach((c) => {
