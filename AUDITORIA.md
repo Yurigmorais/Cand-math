@@ -55,37 +55,38 @@ seis caracteres não sustenta essa função.
   não é alcançável de jeito nenhum ([schema.sql:184-191](supabase/schema.sql#L184),
   [204-209](supabase/schema.sql#L204)).
 - 17 políticas separadas por operação (SELECT / INSERT / UPDATE / DELETE), nenhuma
-  com `using (true)` — [schema.sql:219-312](supabase/schema.sql#L219).
+  com `using (true)` — [schema.sql:302-395](supabase/schema.sql#L302).
 - `revoke all ... from anon, authenticated` em todas as tabelas, e só então o
   `grant` estreito: `salas` e `jogadas` ficam **somente com SELECT** para
   membros ([schema.sql:196-202](supabase/schema.sql#L196),
-  [213-215](supabase/schema.sql#L213), [299](supabase/schema.sql#L299), [310](supabase/schema.sql#L310)). Não existe
+  [213-215](supabase/schema.sql#L213), [382](supabase/schema.sql#L382),
+  [393](supabase/schema.sql#L393)). Não existe
   política de escrita nessas duas tabelas: o navegador não pode escrever nelas,
   nem o anfitrião.
 - A escrita passou a acontecer dentro de funções: `criar_sala()`,
   `entrar_na_sala(text)`, `registrar_jogada(text, text, jsonb)`, `encerrar_sala(text)`,
-  `sair_da_sala(text)` ([schema.sql:418](supabase/schema.sql#L418),
-  [463](supabase/schema.sql#L463), [501](supabase/schema.sql#L501),
-  [588](supabase/schema.sql#L588), [609](supabase/schema.sql#L609)). Quem calcula
+  `sair_da_sala(text)` ([schema.sql:430](supabase/schema.sql#L430),
+  [475](supabase/schema.sql#L475), [513](supabase/schema.sql#L513),
+  [600](supabase/schema.sql#L600), [621](supabase/schema.sql#L621)). Quem calcula
   autor e assento é o banco, a partir de `auth.uid()` — o cliente não envia
   identidade nenhuma.
 - Lances conferidos no servidor por `_contas_validas` / `_acerto_valido` /
-  `_passada_valida` ([schema.sql:635](supabase/schema.sql#L635),
-  [670](supabase/schema.sql#L670), [685](supabase/schema.sql#L685)): tipo
+  `_passada_valida` ([schema.sql:647](supabase/schema.sql#L647),
+  [682](supabase/schema.sql#L682), [697](supabase/schema.sql#L697)): tipo
   conhecido, formato, tamanho, turno da vez, sala ativa.
-- Gatilho `_sem_transferencia` ([schema.sql:909](supabase/schema.sql#L909)) impede
+- Gatilho `_sem_transferencia` ([schema.sql:921](supabase/schema.sql#L921)) impede
   reatribuir dono ou código de uma sala já criada.
-- `vincular_por_codigo` ([schema.sql:752](supabase/schema.sql#L752)) passou a
+- `vincular_por_codigo` ([schema.sql:764](supabase/schema.sql#L764)) passou a
   exigir formato `^[A-Z0-9]{3,24}$` e a registrar tentativas em
   `tentativas_vinculo`, com teto de 8 por hora por conta — o código de sala e o
   código de vínculo deixaram de ser oráculo de enumeração.
 - Toda função `security definer` declara `set search_path = public` (20 de 20,
   conferidas por teste). `purgar_salas_velhas()` é executável apenas por
-  `service_role` ([schema.sql:834](supabase/schema.sql#L834)).
+  `service_role` ([schema.sql:846](supabase/schema.sql#L846)).
 - Códigos sorteados sem viés. O de **vínculo** da criança nasce no aparelho com
   `crypto.getRandomValues` e 10 caracteres ([nuvem.js:24](nuvem.js#L24),
   [nuvem.js:28](nuvem.js#L28)); o de **sala** nasce no banco, com 8, por
-  `_novo_codigo` ([schema.sql:394](supabase/schema.sql#L394)) e rejeição de
+  `_novo_codigo` ([schema.sql:406](supabase/schema.sql#L406)) e rejeição de
   módulo exata (248 = 8 × 31). O alfabeto dos dois omite I, L, O, 0 e 1, que se
   confundem quando alguém copia à mão.
 - O lado do navegador obedece a um portão único, `dueloLiberado()`

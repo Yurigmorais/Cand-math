@@ -526,7 +526,7 @@ roda com um clique só: o botão se arma e confirma no segundo toque.
   reenviado por cima;
 - **Apagar da conta** — o perfil deste adulto, as crianças que ele registrou,
   os vínculos e as cópias de progresso no banco, pela RPC
-  `apagar_meus_registros()` ([supabase/schema.sql:806](supabase/schema.sql#L806)).
+  `apagar_meus_registros()` ([supabase/schema.sql:818](supabase/schema.sql#L818)).
   O botão só acende com conta ativa; se o banco recusar, a linha escreve o
   erro em vez de fingir que apagou.
 
@@ -537,7 +537,7 @@ Fora do jogo, limpar os dados do site no navegador remove `candymath_v3*`.
 vínculo é por código de 10 caracteres gerado no aparelho da criança, e várias
 contas podem se vincular ao mesmo código (mãe e pai, por exemplo). A conta da
 criança não existe: ela é um apelido e um código. A exclusão remota é por RPC
-— `apagar_meus_registros()` ([supabase/schema.sql:806](supabase/schema.sql#L806))
+— `apagar_meus_registros()` ([supabase/schema.sql:818](supabase/schema.sql#L818))
 apaga a conta e tudo que ela gerou, e há um caminho para desvincular uma
 criança sem apagar a conta. As salas antigas saem com `purgar_salas_velhas()`,
 que **só a `service_role` executa** e ainda não tem agenda configurada —

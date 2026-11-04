@@ -48,17 +48,17 @@ do caminho específico do duelo.
 ## 3. Modelo de autorização do banco
 
 Tabela por tabela, o que o navegador pode. As 17 políticas estão em
-[supabase/schema.sql](supabase/schema.sql#L219); o `revoke all` anterior a qualquer
+[supabase/schema.sql](supabase/schema.sql#L302); o `revoke all` anterior a qualquer
 `grant` está em [schema.sql:196-202](supabase/schema.sql#L196).
 
 | tabela | SELECT | INSERT/UPDATE/DELETE pelo cliente | como |
 |---|---|---|---|
-| `perfis` | a própria conta | só a própria conta | `id = auth.uid()` ([219-234](supabase/schema.sql#L219)) |
-| `criancas` | conta com vínculo, ou o dono | dono registra, dono edita, dono apaga | `responsavel_id = auth.uid()` ([236-256](supabase/schema.sql#L236)) |
-| `vinculos` | os meus | criar com a minha conta; soltar o meu | ([258-275](supabase/schema.sql#L258)) |
-| `progressos` | quem tem vínculo com a criança | **só o aparelho dono** grava, apaga e atualiza | `_e_cuidador` / `_e_dono` ([277-297](supabase/schema.sql#L277)) |
-| `salas` | apenas anfitrião ou desafiante desta linha | **nenhuma** escrita direta | [299](supabase/schema.sql#L299), [215](supabase/schema.sql#L215) |
-| `jogadas` | apenas membro da mesa | **nenhuma** escrita direta | [310](supabase/schema.sql#L310) |
+| `perfis` | a própria conta | só a própria conta | `id = auth.uid()` ([302-317](supabase/schema.sql#L302)) |
+| `criancas` | conta com vínculo, ou o dono | dono registra, dono edita, dono apaga | `responsavel_id = auth.uid()` ([319-339](supabase/schema.sql#L319)) |
+| `vinculos` | os meus | criar com a minha conta; soltar o meu | ([341-358](supabase/schema.sql#L341)) |
+| `progressos` | quem tem vínculo com a criança | **só o aparelho dono** grava, apaga e atualiza | `_e_cuidador` / `_e_dono` ([360-379](supabase/schema.sql#L360)) |
+| `salas` | apenas anfitrião ou desafiante desta linha | **nenhuma** escrita direta | [382](supabase/schema.sql#L382), [215](supabase/schema.sql#L215) |
+| `jogadas` | apenas membro da mesa | **nenhuma** escrita direta | [393](supabase/schema.sql#L393) |
 | `tentativas_vinculo` | ninguém | ninguém | só as funções do banco escrevem |
 | `narracoes` | ninguém | ninguém | sem política **e** sem grant nenhum: RLS ligado nega tudo, e só a `service_role` da função de voz entra ([204-209](supabase/schema.sql#L204)) |
 
@@ -67,15 +67,15 @@ a partir de `auth.uid()` — o cliente não envia "quem sou eu":
 
 | função | o que ela decide |
 |---|---|
-| `criar_sala()` | dono = `auth.uid()`; recusa sem conta; teto de 3 salas `esperando` nos últimos 10 minutos por conta; código com rejeição de módulo e 12 tentativas contra colisão ([418](supabase/schema.sql#L418)) |
-| `entrar_na_sala(text)` | UPDATE condicional atômico: quem chega primeiro senta; o segundo recebe a **mesma resposta genérica** de um código errado — a API não serve de oráculo para enumerar salas ([463](supabase/schema.sql#L463)) |
-| `registrar_jogada(text, text, jsonb)` | confere tipo de lance, formato, tamanho, turno (`_vez_de`), sala ativa e consistência das contas antes de inserir; autor e assento vêm da sessão ([501](supabase/schema.sql#L501)) |
-| `encerrar_sala` / `sair_da_sala` | só membro; liberam a cadeira certa ([588](supabase/schema.sql#L588), [609](supabase/schema.sql#L609)) |
-| `vincular_por_codigo(text)` | formato `^[A-Z0-9]{3,24}$` + 8 tentativas por hora por conta ([752](supabase/schema.sql#L752)) |
-| `apagar_meus_registros()` | apaga conta, crianças, vínculos e progressos da própria conta ([806](supabase/schema.sql#L806)) |
-| `purgar_salas_velhas()` | `service_role` apenas; salas com mais de 1 dia somem com suas jogadas ([834](supabase/schema.sql#L834)) |
-| `narracao_usada(text, text, text)` | `service_role` apenas; conta em que a frase guardada foi ouvida — é o insumo da poda ([856](supabase/schema.sql#L856)) |
-| `purgar_narracoes(int, int)` | `service_role` apenas; devolve e apaga as frases além do teto, começando pelas menos usadas; a função de voz apaga o arquivo no bucket em seguida ([874](supabase/schema.sql#L874)) |
+| `criar_sala()` | dono = `auth.uid()`; recusa sem conta; teto de 3 salas `esperando` nos últimos 10 minutos por conta; código com rejeição de módulo e 12 tentativas contra colisão ([430](supabase/schema.sql#L430)) |
+| `entrar_na_sala(text)` | UPDATE condicional atômico: quem chega primeiro senta; o segundo recebe a **mesma resposta genérica** de um código errado — a API não serve de oráculo para enumerar salas ([475](supabase/schema.sql#L475)) |
+| `registrar_jogada(text, text, jsonb)` | confere tipo de lance, formato, tamanho, turno (`_vez_de`), sala ativa e consistência das contas antes de inserir; autor e assento vêm da sessão ([513](supabase/schema.sql#L513)) |
+| `encerrar_sala` / `sair_da_sala` | só membro; liberam a cadeira certa ([600](supabase/schema.sql#L600), [621](supabase/schema.sql#L621)) |
+| `vincular_por_codigo(text)` | formato `^[A-Z0-9]{3,24}$` + 8 tentativas por hora por conta ([764](supabase/schema.sql#L764)) |
+| `apagar_meus_registros()` | apaga conta, crianças, vínculos e progressos da própria conta ([818](supabase/schema.sql#L818)) |
+| `purgar_salas_velhas()` | `service_role` apenas; salas com mais de 1 dia somem com suas jogadas ([846](supabase/schema.sql#L846)) |
+| `narracao_usada(text, text, text)` | `service_role` apenas; conta em que a frase guardada foi ouvida — é o insumo da poda ([868](supabase/schema.sql#L868)) |
+| `purgar_narracoes(int, int)` | `service_role` apenas; devolve e apaga as frases além do teto, começando pelas menos usadas; a função de voz apaga o arquivo no bucket em seguida ([886](supabase/schema.sql#L886)) |
 
 A tabela `narracoes` é o único caso do schema **sem política nenhuma e sem grant
 nenhum**: RLS ligado sem política significa "nega tudo", e o
@@ -90,13 +90,21 @@ Invariantes de integridade:
 
 - 20/20 funções `security definer` com `set search_path = public` (conferido por teste).
 - Gatilhos `criancas_sem_transferencia` e `progressos_sem_transferencia`
-  ([932](supabase/schema.sql#L932), [937](supabase/schema.sql#L937)) barram UPDATE que
+  ([944](supabase/schema.sql#L944), [949](supabase/schema.sql#L949)) barram UPDATE que
   troque `responsavel_id`/`dono` ou `codigo` — um `UPDATE` não transfere registro.
-- `criancas_visiveis` é view com `security_invoker = true` ([737](supabase/schema.sql#L737)):
+- `criancas_visiveis` é view com `security_invoker = true` ([749](supabase/schema.sql#L749)):
   não empresta privilégio de dono.
 - As funções auxiliares usadas dentro de política têm `grant execute to authenticated`
-  ([386-388](supabase/schema.sql#L386)); sem isso todo SELECT quebraria com
+  ([296-298](supabase/schema.sql#L296)); sem isso todo SELECT quebraria com
   "permission denied" — erro que este projeto cometeu e agora testa.
+- Os quatro auxiliares e os grants deles moram na **seção 2.1**
+  ([231-298](supabase/schema.sql#L231)), antes da primeira `create policy`
+  ([302](supabase/schema.sql#L302)). Não é capricho de formatação: o Postgres resolve
+  o nome da função no instante do `CREATE POLICY`, então política acima da função
+  derruba o arquivo inteiro com
+  `42883: function ... does not exist`. Foi assim que o schema
+  falhou na primeira aplicação real, em 04/11/2026; hoje o validador confere a ordem
+  e a inversão deliberada desse bloco é provada por sabotagem.
 
 ## 4. O que o navegador filtra antes de incomodar o banco
 

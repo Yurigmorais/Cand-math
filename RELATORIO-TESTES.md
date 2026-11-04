@@ -28,7 +28,11 @@ Encadeia, nesta ordem, e para na primeira falha:
 |---|---|---|
 | `testes/testar-estrutura.js` | raiz, referências do HTML, ordem de carregamento dos módulos, caminhos dos scripts do `package.json` e do README, `node --check` em todo JS, e as páginas HTML (sem `<script>` inline, sem atributo `on*`, sem `javascript:`) | **725 checagens · 0 problemas** |
 | `testes/testar-segredos.js` | 40 arquivos lidos (eram 39; a migração do cache é a nova) atrás de `service_role`, JWT `eyJ…`, chave Fish, token genérico ≥ 32 caracteres e chave SSH; existência de `.gitignore`/`.env.example`; valores falsos no exemplo; 13 referências locais do HTML | **0 problemas · 0 avisos** |
-| `testes/testar-politicas-sql.js` | invariantes de autorização no `schema.sql` + 2 migrações + arquivos do navegador: RLS nas 8 tabelas, nenhuma política `using (true)`/`for all`, `revoke` do `anon`, 20/20 `security definer` com `search_path`, SELECT-only em `salas`/`jogadas`, formato e trava de enumeração do código, campo da sala comportando o código que o banco emite — e, do cache: `narracoes` sem política **e** sem grant, `caminho` derivado, chave em hex, bucket privado e as duas RPCs só para `service_role` | **81 verificações · 0 falhas** |
+| `testes/testar-politicas-sql.js` | invariantes de autorização no `schema.sql` + 2 migrações + arquivos do navegador: RLS nas 8 tabelas, nenhuma política `using (true)`/`for all`, `revoke` do `anon`, 20/20 `security definer` com `search_path`, SELECT-only em `salas`/`jogadas`, formato e trava de enumeração do código, campo da sala comportando o código que o banco emite — e, do cache: `narracoes` sem política **e** sem grant, `caminho` derivado, chave em hex, bucket privado e as duas RPCs só para `service_role` — e, desde a primeira aplicação
+real do schema, que **nenhuma função é chamada antes de existir**: `CREATE POLICY`,
+view, gatilho e `grant/revoke on function` resolvem o nome da função na criação, então
+uma política acima da função que ela usa derruba o arquivo inteiro (`testar-estrutura`
+não veria; só esta invariante vê) | **87 verificações · 0 falhas** (eram 81) |
 | `testes/testar-autorizacao.js` | parte estática (A0): o interruptor do duelo é conferido **antes** de cada chamada de rede, em 12 portas; e recusa o modo rede no clique, não só no desenho do chip | **17 verificações · 0 falhas** + `NÃO EXECUTADO — faltam credenciais de teste. Nada foi provado aqui.` |
 | `testes/testar-narracao.js` | ponte de voz com `fetch` e `env` falsos: teto de texto, vozes fora da lista, sem chave → 503, limite → 429, upstream → 502, interrupção, troca de voz, cache com revogação, ausência de segredo no navegador, ids do `config` batendo com a lista fechada do servidor — e, desde 04/11, o cache de áudio no Supabase: a procura pela chave sha256, o acerto que **não** chama a Fish Audio, a gravação do MP3 no bucket, o `usos` subindo, a poda das menos usadas, o banco caindo no meio de cada etapa, por status e por **queda de rede** (`fetch` rejeitando: dns, conexão resetada — a procura, o arquivo que não desce, o upload e a conta de uso), o SSRF recusado e `CM_CACHE=off` | `★ TESTE SIMULADO: ambiente, rede e navegador são falsos. Nada aqui prova a síntese real da Fish Audio.` — **260 verificações · todas verdes** (eram 208) |
 | `testes/validar-banco.js` | os 311 itens autorais e as 96 afirmações: id único, 4 alternativas sem repetição, `valor` batendo com a resposta, unidade válida, código BNCC presente na lista oficial | `itens autorais: 311 \| afirmações: 96` — **erros: 0** |
@@ -121,7 +125,12 @@ Além das medições, o fluxo foi percorrido no navegador sobre estes arquivos:
 - `testar-narracao.js` usa `fetch` falso. Ele prova o contrato da função, não a
   voz que sai da caixinha.
 - `testar-politicas-sql.js` lê SQL. Ele prova que a regra está escrita, não que o
-  Postgres a aplica.
+  Postgres a aplica — e isso cobrou um preço real: em 04/11/2026, quando o
+  `schema.sql` encontrou um Postgres de verdade pela primeira vez, ele falhou com
+  `ERROR 42883: function public._e_cuidador(text) does not exist`, com a suíte
+  estática toda verde. As políticas chamavam uma função que o arquivo só criava
+  mais abaixo. O arquivo foi reordenado (seção 2.1) e a invariante de ordem entrou
+  no validador; a lição é que "verde no Node" não significa "aplicável no banco".
 - O cache de áudio foi exercitado contra um Supabase falso, linha a linha: as
   requisições de tabela, de bucket e de RPC têm o formato esperado e as quedas do
   banco são tratadas. Nenhum MP3 foi gravado num Storage de verdade ainda — isso

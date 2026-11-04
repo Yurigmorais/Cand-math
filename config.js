@@ -25,7 +25,7 @@
   root.CM_CONFIG = {
     // Project URL do Supabase. Termina em .supabase.co — não precisa de nada
     // além do endereço; a chave pública faz o resto.
-    supabaseUrl: '',
+    supabaseUrl: 'https://jomezruaohlgvqizcsdf.supabase.co',
 
     // anon public key. É a chave que um navegador pode usar: as políticas de
     // segurança (RLS) do schema é que decidem o que ela consegue ler/gravar.

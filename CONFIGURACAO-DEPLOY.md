@@ -34,7 +34,7 @@ aparelho. A nuvem é opcional, e a voz por IA é opcional dentro da nuvem.
    17 políticas, as funções RPC, os gatilhos de integridade e entra `jogadas` na
    publicação do Realtime. No fim, cria também o bucket privado `narracoes` —
    em Postgres puro este passo passa direto, porque a tabela de buckets não existe
-   lá ([schema.sql:994-1003](supabase/schema.sql#L994)).
+   lá ([schema.sql:1006-1016](supabase/schema.sql#L1006)).
 3. **Se (e somente se) o projeto já tinha o schema da versão 3.0**, rodar também
    [`supabase/migrations/00001_endurecer_autorizacao_salas.sql`](supabase/migrations/00001_endurecer_autorizacao_salas.sql).
    Ela desfaz as quatro políticas permissivas antigas e **recria `salas` e
@@ -271,7 +271,7 @@ ligado.
 ## 6. Rotina de limpeza de salas (pendente de agendamento)
 
 `purgar_salas_velhas()` apaga salas com mais de um dia, junto com suas jogadas, e é
-executável **apenas por `service_role`** ([schema.sql:834](supabase/schema.sql#L834)).
+executável **apenas por `service_role`** ([schema.sql:846](supabase/schema.sql#L846)).
 Nada neste repositório a chama — não há cron configurado, e uma função com a
 `service_role` não pode morar no navegador.
 

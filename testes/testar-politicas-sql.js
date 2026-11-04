@@ -214,6 +214,67 @@ naTela.forEach((arquivo) => {
   exige(!/FISH_AUDIO_API_KEY\s*[:=]\s*['"][A-Za-z0-9_-]{10,}/.test(texto), arquivo + ': sem chave do Fish Audio embutida');
 });
 
+// ── 13. O arquivo aplica de uma ponta a outra ────────────
+// Em 04/11/2026 a primeira aplicação real no Supabase morreu no meio, com
+// "function public._e_cuidador(text) does not exist": as políticas chamavam
+// auxiliares que só eram criados depois delas. O Postgres resolve o nome da
+// função no instante do CREATE POLICY / CREATE VIEW / CREATE TRIGGER / GRANT,
+// então a ORDEM do arquivo é parte da correção, não estilo — e este bloco é o
+// que impede a gente de voltar a entregar um schema que não aplica.
+function referenciasAdiantadas(texto, nome) {
+  const linhas = texto.split('\n');
+  const defs = {};
+  linhas.forEach((l, i) => {
+    const m = /^\s*create or replace function (?:if not exists )?public\.([a-z_0-9]+)/i.exec(l);
+    if (m) defs[m[1].toLowerCase()] = i + 1;
+  });
+  const eager = /^\s*(create policy|create or replace view|create view|create trigger|grant |revoke |alter table|create index)/i;
+  const problemas = [];
+  let bloco = '';
+  let inicio = 0;
+  linhas.forEach((l, i) => {
+    if (!bloco.trim()) inicio = i + 1;
+    bloco += l + '\n';
+    if (/;\s*$/.test(l)) {
+      if (eager.test(bloco.split('\n')[0] || '')) {
+        const re = /public\.([a-z_0-9]+)\s*\(/gi;
+        let m;
+        while ((m = re.exec(bloco))) {
+          const f = m[1].toLowerCase();
+          if (defs[f] && inicio < defs[f]) {
+            problemas.push(nome + ':' + inicio + ' chama ' + f + '(), definida só na linha ' + defs[f]);
+          }
+        }
+      }
+      bloco = '';
+    }
+  });
+  return problemas;
+}
+{
+  const adiantadas = referenciasAdiantadas(sql, 'schema.sql')
+    .concat(migrations.map((m) => referenciasAdiantadas(semComentarios(m.texto), m.nome))
+      .reduce((a, b) => a.concat(b), []));
+  exige(adiantadas.length === 0,
+    'nenhuma função chamada antes de existir — o schema aplica sem morrer no meio'
+    + (adiantadas.length ? ' (' + adiantadas.join('; ') + ')' : ''));
+
+  // a regressão específica, conferida pelo nome e não só pela regra geral
+  const linhasSql = sql.split('\n');
+  const primeiraPolitica = linhasSql.findIndex((l) => /^\s*create policy/i.test(l)) + 1;
+  ['_membro_de', '_e_membro', '_e_cuidador', '_e_dono'].forEach((f) => {
+    const linha = linhasSql.findIndex((l) =>
+      new RegExp('create or replace function public\\.' + f + '\\(', 'i').test(l)) + 1;
+    exige(linha > 0 && linha < primeiraPolitica,
+      f + '() existe antes da primeira política (linha ' + linha + ' < ' + primeiraPolitica + ')');
+  });
+  // o grant que as políticas precisam tem de vir junto das funções, não depois
+  const antesDasPoliticas = sql.split('\n').slice(0, primeiraPolitica - 1).join('\n').length;
+  const grant = sql.toLowerCase().indexOf('grant execute on function public._e_cuidador');
+  exige(grant > 0 && grant < antesDasPoliticas,
+    'o grant de _e_cuidador também precede as políticas (sem ele, leitura vira "permission denied")');
+}
+
 // ── Resultado ─────────────────────────────────────────────
 console.log('políticas de autorização — ' + path.relative(RAIZ, emRaiz('supabase', 'schema.sql'))
   + (migrations.length ? ' + ' + migrations.length + ' migração(ões)' : ''));

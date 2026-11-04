@@ -214,6 +214,89 @@ grant select on public.perfis, public.criancas, public.vinculos, public.progress
 grant insert, update, delete on public.perfis, public.criancas, public.vinculos, public.progressos to authenticated;
 grant select on public.salas, public.jogadas to authenticated;
 
+-- ── 2.1. OS AUXILIARES QUE AS POLÍTICAS CHAMAM ───────────
+--
+-- A ordem deste arquivo é o que faz o schema aplicar de uma vez: o Postgres
+-- resolve o nome da função no instante do CREATE POLICY. Uma política que
+-- chama _e_cuidador() antes de a função existir derruba a execução inteira com
+-- "function public._e_cuidador(text) does not exist" — foi exatamente assim que
+-- este schema falhou na primeira aplicação real, em 04/11/2026. Os quatro
+-- auxiliares abaixo, e os grants deles, têm de preceder qualquer política.
+-- E como são language sql (o corpo é conferido na criação, não na execução),
+-- _membro_de também precisa vir antes de _e_membro, que o chama.
+--
+-- SECURITY DEFINER mantém a consulta fora do caminho recursivo do RLS; eles
+-- devolvem apenas um booleano sobre a conta que chamou, nunca as linhas de
+-- outra conta.
+create or replace function public._membro_de(p_codigo text)
+returns uuid
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select case
+           when s.anfitriao  = auth.uid() then s.anfitriao
+           when s.desafiante = auth.uid() then s.desafiante
+           else null
+         end
+  from public.salas s
+  where s.codigo = p_codigo;
+$$;
+
+create or replace function public._e_membro(p_codigo text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select public._membro_de(p_codigo) is not null;
+$$;
+
+-- Cuidador = dono ou vinculado por código (usado pela leitura do progresso).
+create or replace function public._e_cuidador(p_codigo_crianca text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.criancas c
+    where c.codigo = p_codigo_crianca
+      and (c.responsavel_id = auth.uid()
+           or exists (select 1 from public.vinculos v
+                      where v.crianca = c.id and v.responsavel = auth.uid()))
+  );
+$$;
+
+-- Dono = a conta que registrou a criança neste código.
+create or replace function public._e_dono(p_codigo_crianca text)
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1 from public.criancas c
+    where c.codigo = p_codigo_crianca and c.responsavel_id = auth.uid()
+  );
+$$;
+
+revoke all on function public._membro_de(text)              from public;
+-- As três funções abaixo são chamadas DENTRO das políticas, ou seja, no papel
+-- da conta autenticada que consulta. Se elas ficassem sem privilégio, toda
+-- leitura de jogada e de progresso daria "permission denied" — por isso a
+-- autorização do RLS depende deste grant, e não de uma chave secreta.
+revoke all on function public._e_membro(text)   from public, anon;
+revoke all on function public._e_cuidador(text) from public, anon;
+revoke all on function public._e_dono(text)     from public, anon;
+grant execute on function public._e_membro(text)   to authenticated;
+grant execute on function public._e_cuidador(text) to authenticated;
+grant execute on function public._e_dono(text)     to authenticated;
+
 -- Perfil: só a própria conta lê e escreve no próprio registro.
 drop policy if exists perfis_ler_proprio on public.perfis;
 create policy perfis_ler_proprio on public.perfis
@@ -313,79 +396,8 @@ create policy jogadas_ler_membros on public.jogadas
 -- Imutáveis: sem insert, update ou delete diretos do cliente.
 
 -- ── 3. FUNÇÕES DE APOIO E AS UNICAS PORTAS DE ENTRADA ─────
-
--- Estes auxiliares atravessam tabelas dentro das políticas. SECURITY DEFINER
--- mantém a consulta fora do caminho recursivo do RLS; eles devolvem apenas um
--- booleano sobre a conta que chamou, nunca as linhas de outra conta.
-create or replace function public._membro_de(p_codigo text)
-returns uuid
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select case
-           when s.anfitriao  = auth.uid() then s.anfitriao
-           when s.desafiante = auth.uid() then s.desafiante
-           else null
-         end
-  from public.salas s
-  where s.codigo = p_codigo;
-$$;
-
-create or replace function public._e_membro(p_codigo text)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select public._membro_de(p_codigo) is not null;
-$$;
-
--- Cuidador = dono ou vinculado por código (usado pela leitura do progresso).
-create or replace function public._e_cuidador(p_codigo_crianca text)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1 from public.criancas c
-    where c.codigo = p_codigo_crianca
-      and (c.responsavel_id = auth.uid()
-           or exists (select 1 from public.vinculos v
-                      where v.crianca = c.id and v.responsavel = auth.uid()))
-  );
-$$;
-
--- Dono = a conta que registrou a criança neste código.
-create or replace function public._e_dono(p_codigo_crianca text)
-returns boolean
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select exists (
-    select 1 from public.criancas c
-    where c.codigo = p_codigo_crianca and c.responsavel_id = auth.uid()
-  );
-$$;
-
-revoke all on function public._membro_de(text)              from public;
-revoke all on function public._novo_codigo(int)             from public;
--- As três funções abaixo são chamadas DENTRO das políticas, ou seja, no papel
--- da conta autenticada que consulta. Se elas ficassem sem privilégio, toda
--- leitura de jogada e de progresso daria "permission denied" — por isso a
--- autorização do RLS depende deste grant, e não de uma chave secreta.
-revoke all on function public._e_membro(text)   from public, anon;
-revoke all on function public._e_cuidador(text) from public, anon;
-revoke all on function public._e_dono(text)     from public, anon;
-grant execute on function public._e_membro(text)   to authenticated;
-grant execute on function public._e_cuidador(text) to authenticated;
-grant execute on function public._e_dono(text)     to authenticated;
+-- (os auxiliares chamados pelas políticas moram na seção 2.1: precisam
+-- existir antes delas, e os grants deles também.)
 
 -- Um código de sala não é segredo, mas também não pode ser adivinhado.
 -- 8 letras de um alfabeto sem caracteres ambíguos, com byte criptográfico
