@@ -211,7 +211,26 @@ ligado.
 
 1. `fish.audio → Developer → API Keys` → criar a chave → guardar como
    `FISH_AUDIO_API_KEY` na Vercel (Sensitive). **Nunca** em `config.js`, em HTML, em
-   JS de navegador ou em log.
+   JS de navegador ou em log. Uma chave basta: ela autoriza a **conta**, não uma voz —
+   qual voz fala é decidido por requisição, pelo `reference_id` pinado em
+   `api/_voz-nucleo.js` (a lista fechada `sara`/`bruna`/`miguel`/`evelyn`). Se a tela
+   mostrar várias chaves com nomes de voz, isso é rótulo de quem criou: qualquer uma
+   delas sintetiza as quatro, e as que sobrarem podem ser revogadas.
+   Conferência de 60 segundos, antes de qualquer deploy, no terminal de quem tem
+   rede (o modelo vai no **cabeçalho**, como na função):
+
+   ```bash
+   read -rs KEY                       # a chave não fica no histórico
+   curl -s https://api.fish.audio/v1/tts -H "Authorization: Bearer $KEY" -H "model: s2.1-pro-free" \
+     -H "Content-Type: application/json" \
+     -d '{"text":"Bruna, quanto é dois mais dois?","reference_id":"33a512796260458abe82de6293f9fbec","format":"mp3","language":"pt"}' \
+     -o /tmp/voz-bruna.mp3 -w "%{http_code}\n"
+   unset KEY
+   ```
+
+   `200` com um arquivo de dezenas de KB é a chave, o modelo e a voz funcionando;
+   `401`/`403` é conta ou plano, não código. Sem rede, nada disso se prova — e o
+   jogo segue falando pela voz do aparelho.
 2. As quatro vozes da tela (`Sara`, `Bruna`, `Miguel`, `Evelyn`) foram conferidas em
    30/10/2026 contra o catálogo público (`GET https://api.fish.audio/model?title=<nome>&language=pt`),
    escolhendo a correspondência exata de título: SARA (137 usos), Bruna (2661),
