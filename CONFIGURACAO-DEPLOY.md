@@ -106,22 +106,46 @@ confere que as duas listas batem (`testes/testar-narracao.js`).
 
    1. `github.com → Settings → SSH and GPG keys → New SSH key` e cole o conteúdo de
       `~/.ssh/id_ed25519_github.pub` (a chave privada nunca sai da máquina).
-   2. `github.com/new` → repositório **vazio**, sem README, sem `.gitignore`, sem
-      licença. Privado ou público tanto faz — o `config.js` só carrega valores
-      públicos, e é o que `testes/testar-segredos.js` garante a cada `npm test`.
-   3. Na pasta do jogo:
+   2. O repositório. Com um repositório **vazio** — `github.com/new`, sem README,
+      sem `.gitignore`, sem licença — o push vai direto no `main`:
 
       ```bash
-      git remote add origin git@github.com:SEU-USUARIO/candy-math.git
+      git remote add origin git@github.com:SEU-USUARIO/SEU-REPO.git
       git push -u origin main
       ```
+
+      Privado ou público tanto faz — o `config.js` só carrega valores públicos, e é
+      o que `testes/testar-segredos.js` garante a cada `npm test`.
+
+   **O que aconteceu de verdade com o `Yurigmorais/Cand-math`.** Ele já existia e
+   tinha 14 commits num formato diferente do nosso: um projeto Vite/Capacitor, com
+   `src/engine/`, `src/games/`, `capacitor.config.ts` e as artes em
+   `public/assets/images/*.jpg` — 97 arquivos contra os nossos 42, sem nenhum
+   ancestral em comum (`git merge-base main origin/main` não devolve nada). Nesse
+   caso o `git push -u origin main` é recusado, e a única forma de forçar é
+   reescrever o `main` alheio. Não foi feito. O push foi para uma branch:
+
+   ```bash
+   git push -u origin main:voz-supabase
+   ```
+
+   Assim o `main` antigo fica intacto, os 56 arquivos da era Vite continuam lá, e a
+   história dos nossos 7 commits pode ser lida inteira na branch `voz-supabase`. Para
+   o deploy, importa a branch: ela é o estado atual do jogo. Se depois você quiser que
+   `voz-supabase` vire o `main`, são duas escolhas diferentes — abrir a PR
+   (`github.com/Yurigmorais/Cand-math/pull/new/voz-supabase`) e ver o diff, ou trocar
+   o conteúdo do `main` apagando os commits antigos. A segunda é destrutiva e a
+   decisão é sua.
 
    O `.env` fica de fora por construção: está no `.gitignore`, não aparece entre os
    42 arquivos rastreados, e `git ls-files --error-unmatch .env` responde que o
    arquivo não é acompanhado. Depois do push, a Vercel lê o repositório — não a
    pasta local.
 1. **Add New → Project → Import** do repositório que você acabou de empurrar (ou da
-   pasta `Candy-Math-main`, via `npx vercel`).
+   pasta `Candy-Math-main`, via `npx vercel`). No import, a Vercel pergunta **em qual
+   branch ela publica** — escolha a branch do jogo (`voz-supabase`, no nosso caso),
+   não o `main` antigo. Depois de publicado, `Settings → Environment Variables` tem
+   um botão *Edit Production Branch* para trocar isso sem reimportar.
 2. Framework: **Other**. O [vercel.json](vercel.json) já declara
    `framework: null`, `buildCommand: ""`, `outputDirectory: "."`, `cleanUrls: true`,
    rewrite de `/` para `/index.html` e os cabeçalhos de cache e segurança. Não há
