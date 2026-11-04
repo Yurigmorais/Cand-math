@@ -16,7 +16,7 @@ conteúdo ficou quando ninguém ajuda.
 |---|---|
 | jogar | um navegador moderno. Nada mais — nem Node, nem internet, nem conta |
 | rodar os validadores e o auditor de layout | Node 20+ (`node --version`) |
-| ligar a nuvem (login, boletim de outro aparelho, sincronizar) | um projeto Supabase gratuito e a `anon public key` dele |
+| ligar a nuvem (login, boletim de outro aparelho, sincronizar) | um projeto Supabase gratuito e a `Publishable key` dele (a antiga `anon public key`) |
 | ligar a narração por IA | uma conta na Fish Audio AI e a hospedagem na Vercel (a chave é secreta e mora lá, nunca no navegador) |
 | ligar o duelo em rede | **só depois** de aplicar o schema e rodar os dois testes de autorização — veja "Recursos desativados por segurança" |
 
@@ -453,13 +453,15 @@ dados e a `narracoes` ainda não existe, aplique também
 `supabase/migrations/00002_cache_narracao.sql` (ele é aditivo: não mexe em
 nada que já está lá).
 
-**2. Chaves.** Em *Project Settings → API*, copie o **Project URL** e a
-**anon public key** e cole nas duas primeiras linhas de `config.js`. A anon
+**2. Chaves.** Em *Project Settings → API Keys*, copie o **Project URL** e a
+**Publishable key** (no painel antigo, **anon public key** — mesmo papel `anon`) e cole
+nas duas primeiras linhas de `config.js`. A anon
 key é pública por natureza: quem protege os dados são as políticas RLS, não a
 chave. A **service role key nunca entra em arquivo algum do navegador** — ela
 tem um único lugar legítimo neste projeto: a variável `SUPABASE_SERVICE_ROLE_KEY`
 da Vercel, que a função de voz usa para ler e escrever o cache de áudio. Se
-você colar uma chave que começa com `eyJ…` num lugar que não seja o painel da
+você colar uma chave secreta — `eyJ…` no formato antigo, o prefixo de secreta no
+formato novo (`sb_…`) — num lugar que não seja o painel da
 hospedagem, está errado. `testes/testar-segredos.js` varre os 40 arquivos
 deste repositório atrás disso.
 

@@ -9,7 +9,8 @@
    Onde pegar os valores:
      1. crie um projeto em https://supabase.com
      2. SQL Editor  → cole o conteúdo de supabase/schema.sql → Run
-     3. Project Settings → API  →  Project URL  e  anon public key
+     3. Project Settings → API Keys  →  Project URL  e  Publishable key
+        (no painel antigo ela se chama "anon public key"; é a mesma função)
      4. cole os dois aqui embaixo (e só aqui — este arquivo não tem segredo
         de servidor; a anon key é pública por natureza e o RLS do banco é o
         que protege os dados)
@@ -27,9 +28,11 @@
     // além do endereço; a chave pública faz o resto.
     supabaseUrl: 'https://jomezruaohlgvqizcsdf.supabase.co',
 
-    // anon public key. É a chave que um navegador pode usar: as políticas de
-    // segurança (RLS) do schema é que decidem o que ela consegue ler/gravar.
-    supabaseAnonKey: '',
+    // anon public key (no painel novo do Supabase ela se chama "Publishable
+    // key"; o papel dela é `anon`). É a chave que um navegador pode usar: as
+    // políticas de segurança (RLS) do schema é que decidem o que ela consegue
+    // ler/gravar.
+    supabaseAnonKey: 'sb_publishable_wKBbhztik_bqexYWPsCf_A_6rxE_WpI',
 
     // A biblioteca supabase-js vem de CDN. Se você publicar o jogo e quiser
     // servir tudo do mesmo lugar, troque pela cópia local (ex.: 'supabase.js')

@@ -34,7 +34,8 @@ continua desligado**, e nada neste arquivo autoriza ligá-lo.
   `api/voz.js` a lê da Vercel (`SUPABASE_SERVICE_ROLE_KEY`, *Sensitive*) para escrever
   e ler `public.narracoes` e o bucket privado; nada mais. É o segredo mais pesado do
   projeto, porque bypassa o RLS: se vazar, o leitor não vê só frases de Matemática,
-  vê o banco inteiro. Se algum dia aparecer uma string começando com `eyJ…` num
+  vê o banco inteiro. Se algum dia aparecer uma string começando com `eyJ…` (formato
+  antigo) ou com o prefixo da chave secreta nova (`sb_`, formato do painel atual) num
   arquivo servido ao navegador, é incidente.
 - **`reference_id` das vozes:** decisão do servidor, lista fechada em
   [api/_voz-nucleo.js:31-34](api/_voz-nucleo.js#L31). O navegador escolhe

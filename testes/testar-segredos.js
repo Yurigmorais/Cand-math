@@ -37,6 +37,10 @@ const PADROES = [
   {
     nome: 'token JWT embutido',
     re: /['"]eyJ[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}\.[A-Za-z0-9_\-]{10,}['"]/,
+    // O anon key LEGADO do Supabase tem exatamente essa cara — e ele é público
+    // por desenho, mora em config.js (SEGURANCA.md §1). A isenção é estreita:
+    // só o arquivo config.js, só a linha `supabaseAnonKey: '<valor>'`.
+    isencao: 'anon',
   },
   {
     nome: 'chave do Fish Audio no caminho do navegador',
@@ -51,10 +55,51 @@ const PADROES = [
     re: /\bSB[0-9A-Za-z_\-]{20,}\b/,
   },
   {
+    nome: 'chave secreta nova do Supabase (sb_secret_… = papel service_role)',
+    // Desde a troca de chaves do painel, o que antes era `service_role` passou a
+    // ser `sb_secret_`. O prefixo denuncia o papel sozinho, então este padrão não
+    // precisa do nome da variável — e não tem isenção nenhuma: onde aparecer, é
+    // segredo no lugar errado. A irmã pública (`sb_publishable_`) é o anon key e
+    // pode morar em config.js.
+    re: /['"]sb_secret_[A-Za-z0-9_\-]{8,}['"]/,
+  },
+  {
     nome: 'chave privada de SSH',
     re: /-----BEGIN (RSA |EC |OPENSSH |)PRIVATE KEY-----/,
   },
 ];
+
+// Só a linha legítima da anon key está isenta: config.js, campo supabaseAnonKey,
+// valor entre aspas e nada mais na linha. service_role, sb_secret_ e a chave do
+// Fish Audio nunca passam por aqui — os padrões deles não têm isenção.
+function ehLinhaDaAnonKey(texto, indice) {
+  const inicio = texto.lastIndexOf('\n', indice) + 1;
+  const fim = texto.indexOf('\n', indice);
+  const linha = texto.slice(inicio, fim < 0 ? texto.length : fim);
+  return /^\s*supabaseAnonKey\s*:\s*['"][^'"\n]+['"],?\s*$/.test(linha);
+}
+
+function varrer(texto, relativo, linhaBase) {
+  const achados = [];
+  // 'g' é obrigatório aqui: sem ele, exec() sempre devolve a primeira ocorrência
+  // e o laço abaixo não anda.
+  PADROES.forEach((p) => {
+    const flags = p.re.flags.indexOf('g') >= 0 ? p.re.flags : p.re.flags + 'g';
+    const re = new RegExp(p.re.source, flags);
+    let m;
+    while ((m = re.exec(texto))) {
+      const isento = p.isencao === 'anon' && relativo === 'config.js' &&
+        ehLinhaDaAnonKey(texto, m.index);
+      if (!isento) {
+        const linha = texto.slice(0, m.index).split('\n').length + (linhaBase || 0) - 1;
+        achados.push(p.nome + ' → ' + relativo + ':' + linha + ' — ' +
+          m[0].slice(0, 48).replace(/\s+/g, ' ') + '…');
+      }
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+  });
+  return achados;
+}
 
 // O que é "caminho do navegador": tudo que o index.html carrega, mais o que
 // mora na raiz e em assets/. A pasta api/ roda no servidor e por definição
@@ -74,13 +119,7 @@ for (const arquivo of caminhar(RAIZ)) {
   const texto = fs.readFileSync(arquivo, 'utf8');
   lidos++;
 
-  PADROES.forEach((p) => {
-    const m = p.re.exec(texto);
-    if (!m) return;
-    const linha = texto.slice(0, m.index).split('\n').length;
-    problemas.push(p.nome + ' → ' + relativo + ':' + linha + ' — ' +
-      m[0].slice(0, 48).replace(/\s+/g, ' ') + '…');
-  });
+  varrer(texto, relativo).forEach((p) => problemas.push(p));
 
   // service_role nunca deve aparecer em arquivo que o navegador baixa.
   if (NAVEGADOR.indexOf(relativo) >= 0 && /service_role/i.test(texto)) {
@@ -135,8 +174,49 @@ refs.forEach((alvo) => {
   }
 });
 
+// ── Autoconferência do próprio detector ────────────────────
+// Um detector de segredos que ninguém testa é um detector que ninguém sabe se
+// funciona. Os sete casos abaixo correm sobre texto sintético — nada é escrito
+// em disco — e cada um diz se o caça-segredos acusou o que devia acusar.
+// Os valores falsos são montados por partes. Escrito de uma vez, cada um deles
+// seria um segredo verdadeiro no próprio detector — e o caça-segredos acusaria a
+// si mesmo, que é exatamente o tipo de ruído que faz alguém desligar um teste.
+const JWT_LEGADO = ['eyJhbGciOiJIUzI1NiJ9.', 'cG9zdGdyZXN0LnN1cGFiYXNlLmNv', '.r0kK0-jLegaciaDeExemploAAA'].join('');
+const PUBLICAVEL = ['sb_', 'publishable_A1b2C3d4E5f6G7h8I9j0K1l2M3n4'].join('');
+const SUPERSECRETA = ['sb_', 'secret_UmaChaveDeServicoFalsa01'].join('');
+const DO_PEIXE = ['abcdefghij', 'klmnopqrstuvwxyz'].join('');
+const DE_SERVICO = ['um-valor-de-20-', 'caracteres-aqui'].join('');
+const linhaDe = (campo, valor) => "  " + campo + ": '" + valor + "',";
+const CASOS = [
+  { nome: 'anon key legada (eyJ…) na linha certa de config.js é pública',
+    texto: linhaDe('supabaseAnonKey', JWT_LEGADO), arquivo: 'config.js', espera: 0 },
+  { nome: 'anon key nova (o prefixo publicável) idem',
+    texto: linhaDe('supabaseAnonKey', PUBLICAVEL), arquivo: 'config.js', espera: 0 },
+  { nome: 'o MESMO valor eyJ sob outro campo continua sendo segredo',
+    texto: linhaDe('chaveAdministrador', JWT_LEGADO), arquivo: 'config.js', espera: 1 },
+  { nome: 'a isenção não viaja para outro arquivo',
+    texto: linhaDe('supabaseAnonKey', JWT_LEGADO), arquivo: 'script.js', espera: 1 },
+  { nome: 'a chave secreta nova é pega, até na linha isenta',
+    texto: linhaDe('supabaseAnonKey', SUPERSECRETA), arquivo: 'config.js', espera: 1 },
+  { nome: 'service_role atribuída é pega',
+    texto: linhaDe('service_role', DE_SERVICO), arquivo: 'config.js', espera: 1 },
+  { nome: 'chave do Fish Audio no caminho do navegador é pega',
+    texto: linhaDe('FISH_AUDIO_API_KEY', DO_PEIXE), arquivo: 'config.js', espera: 1 },
+];
+let casosRuins = 0;
+CASOS.forEach((c) => {
+  const achados = varrer(c.texto, c.arquivo).length;
+  const bom = c.espera === 0 ? achados === 0 : achados >= 1;
+  if (!bom) {
+    casosRuins++;
+    problemas.push('autoconferência do caça-segredos falhou: ' + c.nome +
+      ' (esperava ' + c.espera + ' acusação(ões), veio ' + achados + ')');
+  }
+});
+
 console.log('caça-segredos — ' + lidos + ' arquivos lidos, ' + refs.length +
-  ' referências locais do HTML conferidas');
+  ' referências locais do HTML conferidas, ' + CASOS.length +
+  ' casos de autoconferência (' + casosRuins + ' ruins)');
 if (problemas.length) console.log('\n' + problemas.join('\n'));
 if (avisos.length) console.log('\navisos:\n' + avisos.join('\n'));
 if (!problemas.length) console.log('\nencontrou segredo? nada. referências quebradas? nada.');

@@ -744,7 +744,8 @@ function painelSemConfig() {
     '<ol class="nuvem-passos">' +
       '<li>Crie um projeto gratuito em <b>supabase.com</b>.</li>' +
       '<li>No <b>SQL Editor</b>, cole o conteúdo de <code>supabase/schema.sql</code> e rode uma vez.</li>' +
-      '<li>Em <b>Project Settings → API</b>, copie a <b>Project URL</b> e a <b>anon public key</b>.</li>' +
+      '<li>Em <b>Project Settings → API Keys</b>, copie a <b>Project URL</b> e a <b>Publishable key</b> '
+        '(no painel antigo: <b>anon public key</b> — é a mesma função, com papel <code>anon</code>).</li>' +
       '<li>Cole as duas em <code>config.js</code> e recarregue esta página.</li>' +
       '<li>Em <b>Authentication → URL configuration</b>, ponha o endereço público do jogo como <b>Site URL</b>, ' +
         'para o link de confirmação voltar para cá.</li>' +
@@ -752,7 +753,8 @@ function painelSemConfig() {
         '(sem isso, a sala funciona por varredura — mesmo resultado, um pouco mais lento).</li>' +
     '</ol>' +
     '<p class="nuvem-nota"><i class="fa-solid fa-shield-halved"></i> A anon key é pública por natureza: o que ' +
-      'protege os dados são as políticas (RLS) do schema, não a chave. Já a <b>service role key</b> nunca entra ' +
+      'protege os dados são as políticas (RLS) do schema, não a chave. Já a <b>service role key</b> '
+      '(no painel novo: a chave que começa com o prefixo de secreta) nunca entra ' +
       'num navegador — deixe-a fora do projeto.</p>';
   return d;
 }

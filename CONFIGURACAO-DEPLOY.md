@@ -48,7 +48,8 @@ aparelho. A nuvem é opcional, e a voz por IA é opcional dentro da nuvem.
    nenhuma linha é apagada. Ela cria `narracoes`, as duas funções de poda e de uso
    e o bucket privado. Termina com um `SELECT` de conferência que deve devolver
    **zero linhas**. Projeto novo: pule — o item 2 já cria tudo isso.
-5. **Project Settings → API**: copiar **Project URL** e **anon public key**. São os
+5. **Project Settings → API Keys**: copiar **Project URL** e **Publishable key** (o
+   painel antigo chama isso de **anon public key**; o papel é `anon` nos dois). São os
    dois únicos valores que entram em `config.js`. A `service_role` não entra em
    arquivo nenhum do navegador: ela serve à rotina de purga da seção 6 e, agora, à
    função de voz — é com ela que `api/voz.js` lê e escreve o cache de áudio. Vai
