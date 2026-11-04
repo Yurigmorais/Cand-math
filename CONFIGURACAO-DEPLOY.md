@@ -101,7 +101,27 @@ confere que as duas listas batem (`testes/testar-narracao.js`).
 
 ## 3. Vercel
 
-1. **Add New → Project → Import** da pasta `Candy-Math-main` (Git ou `npx vercel`).
+0. **Do repositório para o GitHub** (o caminho escolhido; só funciona com a sua
+   identidade, porque é login na sua conta):
+
+   1. `github.com → Settings → SSH and GPG keys → New SSH key` e cole o conteúdo de
+      `~/.ssh/id_ed25519_github.pub` (a chave privada nunca sai da máquina).
+   2. `github.com/new` → repositório **vazio**, sem README, sem `.gitignore`, sem
+      licença. Privado ou público tanto faz — o `config.js` só carrega valores
+      públicos, e é o que `testes/testar-segredos.js` garante a cada `npm test`.
+   3. Na pasta do jogo:
+
+      ```bash
+      git remote add origin git@github.com:SEU-USUARIO/candy-math.git
+      git push -u origin main
+      ```
+
+   O `.env` fica de fora por construção: está no `.gitignore`, não aparece entre os
+   42 arquivos rastreados, e `git ls-files --error-unmatch .env` responde que o
+   arquivo não é acompanhado. Depois do push, a Vercel lê o repositório — não a
+   pasta local.
+1. **Add New → Project → Import** do repositório que você acabou de empurrar (ou da
+   pasta `Candy-Math-main`, via `npx vercel`).
 2. Framework: **Other**. O [vercel.json](vercel.json) já declara
    `framework: null`, `buildCommand: ""`, `outputDirectory: "."`, `cleanUrls: true`,
    rewrite de `/` para `/index.html` e os cabeçalhos de cache e segurança. Não há
