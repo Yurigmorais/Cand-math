@@ -216,6 +216,13 @@ ligado.
    `api/_voz-nucleo.js` (a lista fechada `sara`/`bruna`/`miguel`/`evelyn`). Se a tela
    mostrar várias chaves com nomes de voz, isso é rótulo de quem criou: qualquer uma
    delas sintetiza as quatro, e as que sobrarem podem ser revogadas.
+   **Use a chave da SUA conta**, e não a de quem emprestou uma: a `sk-fish-…` é
+   credencial de conta inteira (enxerga e gasta o que o dono tem), e o limite de
+   frases cai no plano de quem paga. As quatro vozes do projeto saíram do
+   **catálogo público** da Fish, então qualquer chave autenticada as alcança por
+   `reference_id` — não é preciso a chave de quem as clonou. Se alguma vier 404
+   ou 403, a voz saiu do ar ou virou privada: troque o id nas duas listas
+   (`api/_voz-nucleo.js` e `config.js`) por uma que a sua conta enxergue.
    Conferência de 60 segundos, antes de qualquer deploy, no terminal de quem tem
    rede (o modelo vai no **cabeçalho**, como na função):
 
