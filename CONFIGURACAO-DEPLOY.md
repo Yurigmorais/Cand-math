@@ -121,21 +121,28 @@ confere que as duas listas batem (`testes/testar-narracao.js`).
    tinha 14 commits num formato diferente do nosso: um projeto Vite/Capacitor, com
    `src/engine/`, `src/games/`, `capacitor.config.ts` e as artes em
    `public/assets/images/*.jpg` — 97 arquivos contra os nossos 42, sem nenhum
-   ancestral em comum (`git merge-base main origin/main` não devolve nada). Nesse
-   caso o `git push -u origin main` é recusado, e a única forma de forçar é
-   reescrever o `main` alheio. Não foi feito. O push foi para uma branch:
+   ancestral em comum (`git merge-base main origin/main` não devolve nada). O
+   `git push -u origin main` é recusado, e tudo faz parecer que a única saída é
+   reescrever o `main` alheio com `--force`. Não é. Existe um caminho que casa as
+   duas histórias sem apagar nada:
 
    ```bash
-   git push -u origin main:voz-supabase
+   git push origin c37fa09:refs/heads/arquivo-vite-antigo          # rede de segurança
+   git merge -s ours origin/main --allow-unrelated-histories       # árvore = a nossa
+   git push origin main:main                                       # sem --force
    ```
 
-   Assim o `main` antigo fica intacto, os 56 arquivos da era Vite continuam lá, e a
-   história dos nossos 7 commits pode ser lida inteira na branch `voz-supabase`. Para
-   o deploy, importa a branch: ela é o estado atual do jogo. Se depois você quiser que
-   `voz-supabase` vire o `main`, são duas escolhas diferentes — abrir a PR
-   (`github.com/Yurigmorais/Cand-math/pull/new/voz-supabase`) e ver o diff, ou trocar
-   o conteúdo do `main` apagando os commits antigos. A segunda é destrutiva e a
-   decisão é sua.
+   `-s ours` é a estratégia de merge que registra os dois lados na história e escolhe
+   uma única árvore — a do commit de origem, a nossa. Depois dela, o
+   `git diff 8944acd HEAD` no topo é vazio: os 42 arquivos são byte a byte os mesmos
+   que passaram nos testes. E como o `c37fa09` antigo virou **pai** do merge, o
+   `main` avança por fast-forward de grafo e o GitHub aceita sem força.
+
+   Estado do repositório hoje: `main` = o jogo com voz e cache; `voz-supabase` = o
+   mesmo commit; `arquivo-vite-antigo` = os 14 commits da era Vite, com as artes em
+   `public/assets/` intactas. Para recuperar um arquivo de lá,
+   `git checkout arquivo-vite-antigo -- public/assets/images/jaguar.jpg` — ou
+   `git log main -- src/main.js` mostra a história antiga sem sair do `main`.
 
    O `.env` fica de fora por construção: está no `.gitignore`, não aparece entre os
    42 arquivos rastreados, e `git ls-files --error-unmatch .env` responde que o
@@ -143,9 +150,11 @@ confere que as duas listas batem (`testes/testar-narracao.js`).
    pasta local.
 1. **Add New → Project → Import** do repositório que você acabou de empurrar (ou da
    pasta `Candy-Math-main`, via `npx vercel`). No import, a Vercel pergunta **em qual
-   branch ela publica** — escolha a branch do jogo (`voz-supabase`, no nosso caso),
-   não o `main` antigo. Depois de publicado, `Settings → Environment Variables` tem
-   um botão *Edit Production Branch* para trocar isso sem reimportar.
+   branch ela publica**: aqui é o `main`, que já é o jogo com voz e cache. Confira
+   essa linha antes de apertar *Deploy* — publicar a branch errada dá um site que
+   funciona e não fala, porque o `api/voz.js` e o cache não estão nela. Depois,
+   `Settings → Environment Variables` tem um botão *Edit Production Branch* para
+   trocar isso sem reimportar.
 2. Framework: **Other**. O [vercel.json](vercel.json) já declara
    `framework: null`, `buildCommand: ""`, `outputDirectory: "."`, `cleanUrls: true`,
    rewrite de `/` para `/index.html` e os cabeçalhos de cache e segurança. Não há
