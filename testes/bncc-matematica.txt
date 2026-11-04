@@ -1,0 +1,247 @@
+(EF01MA01) Utilizar nmeros naturais como indicador de quantidade ou de ordem em diferentes situaes cotidianas e reconhecer situaes em que os nmeros no indicam contagem nem ordem, mas sim cdigo de identificao.
+(EF01MA02) Contar de maneira exata ou aproximada, utilizando diferentes estratgias como o pareamento e outros agrupamentos.
+(EF01MA03) Estimar e comparar quantidades de objetos de dois conjuntos (em torno de 20 elementos), por estimativa e/ou por correspondncia (um a um, dois a dois) para indicar "tem mais", "tem menos" ou "tem a mesma quantidade".
+(EF01MA04) Contar a quantidade de objetos de colees at 100 unidades e apresentar o resultado por registros verbais e simblicos, em situaes de seu interesse, como jogos, brincadeiras, materiais da sala de aula, entre outros.
+(EF01MA05) Comparar nmeros naturais de at duas ordens em situaes cotidianas, com e sem suporte da reta numrica.
+(EF01MA06) Construir fatos bsicos da adio e utiliz-los em procedimentos de clculo para resolver problemas.
+(EF01MA07) Compor e decompor nmero de at duas ordens, por meio de diferentes adies, com o suporte de material manipulvel, contribuindo para a compreenso de caractersticas do sistema de numerao decimal e o desenvolvimento de estratgias de clculo.
+(EF01MA08) Resolver e elaborar problemas de adio e de subtrao, envolvendo nmeros de at dois algarismos, com os significados de juntar, acrescentar, separar e retirar, com o suporte de imagens e/ou material manipulvel, utilizando estratgias e formas de registro pessoais.
+(EF01MA09) Organizar e ordenar objetos familiares ou representaes por figuras, por meio de atributos, tais como cor, forma e medida.
+(EF01MA10) Descrever, aps o reconhecimento e a explicitao de um padro (ou regularidade), os elementos ausentes em sequncias recursivas de nmeros naturais, objetos ou figuras.
+(EF01MA11) Descrever a localizao de pessoas e de objetos no espao em relao sua prpria posio, utilizando termos como direita, esquerda, em frente, atrs.
+(EF01MA12) Descrever a localizao de pessoas e de objetos no espao segundo um dado ponto de referncia, compreendendo que, para a utilizao de termos que se referem  posio, como direita, esquerda, em cima, em baixo, necessrio explicitar-se o referencial.
+(EF01MA13) Relacionar figuras geomtricas espaciais (cones, cilindros, esferas e blocos retangulares) a objetos familiares do mundo fsico.
+(EF01MA14) Identificar e nomear figuras planas (crculo, quadrado, retngulo e tringulo) em desenhos apresentados em diferentes disposies ou em contornos de faces de slidos geomtricos.
+(EF01MA15) Comparar comprimentos, capacidades ou massas, utilizando termos como mais alto, mais baixo, mais comprido, mais curto, mais grosso, mais fino, mais largo, mais pesado, mais leve, cabe mais, cabe menos, entre outros, para ordenar objetos de uso cotidiano.
+(EF01MA16) Relatar em linguagem verbal ou no verbal sequncia de acontecimentos relativos a um dia, utilizando, quando possvel, os horrios dos eventos.
+(EF01MA17) Reconhecer e relacionar perodos do dia, dias da semana e meses do ano, utilizando calendrio, quando necessrio.
+(EF01MA18) Produzir a escrita de uma data, apresentando o dia, o ms e o ano, e indicar o dia da semana de uma data, consultando calendrios.
+(EF01MA19) Reconhecer e relacionar valores de moedas e cdulas do sistema monetrio brasileiro para resolver situaes simples do cotidiano do estudante.
+(EF01MA20) Classificar eventos envolvendo o acaso, tais como "acontecer com certeza", "talvez acontea" e " impossvel acontecer", em situaes do cotidiano.
+(EF01MA21) Ler dados expressos em tabelas e em grficos de colunas simples.
+(EF01MA22) Realizar pesquisa, envolvendo at duas variveis categricas de seu interesse e universo de at 30 elementos, e organizar dados por meio de representaes pessoais.
+(EF02MA01) Comparar e ordenar nmeros naturais (at a ordem de centenas) pela compreenso de caractersticas do sistema de numerao decimal (valor posicional e funo do zero).
+(EF02MA02) Fazer estimativas por meio de estratgias diversas a respeito da quantidade de objetos de colees e registrar o resultado da contagem desses objetos (at 1000 unidades).
+(EF02MA03) Comparar quantidades de objetos de dois conjuntos, por estimativa e/ou por correspondncia (um a um, dois a dois, entre outros), para indicar "tem mais", "tem menos" ou "tem a mesma quantidade", indicando, quando for o caso, quantos a mais e quantos a menos.
+(EF02MA04) Compor e decompor nmeros naturais de at trs ordens, com suporte de material manipulvel, por meio de diferentes adies.
+(EF02MA05) Construir fatos bsicos da adio e subtrao e utiliz-los no clculo mental ou escrito.
+(EF02MA06) Resolver e elaborar problemas de adio e de subtrao, envolvendo nmeros de at trs ordens, com os significados de juntar, acrescentar, separar, retirar, utilizando estratgias pessoais.
+(EF02MA07) Resolver e elaborar problemas de multiplicao (por 2, 3, 4 e 5) com a ideia de adio de parcelas iguais por meio de estratgias e formas de registro pessoais, utilizando ou no suporte de imagens e/ou material manipulvel.
+(EF02MA08) Resolver e elaborar problemas envolvendo dobro, metade, triplo e tera parte, com o suporte de imagens ou material manipulvel, utilizando estratgias pessoais.
+(EF02MA09) Construir sequncias de nmeros naturais em ordem crescente ou decrescente a partir de um nmero qualquer, utilizando uma regularidade estabelecida.
+(EF02MA10) Descrever um padro (ou regularidade) de sequncias repetitivas e de sequncias recursivas, por meio de palavras, smbolos ou desenhos.
+(EF02MA11) Descrever os elementos ausentes em sequncias repetitivas e em sequncias recursivas de nmeros naturais, objetos ou figuras.
+(EF02MA12) Identificar e registrar, em linguagem verbal ou no verbal, a localizao e os deslocamentos de pessoas e de objetos no espao, considerando mais de um ponto de referncia, e indicar as mudanas de direo e de sentido.
+(EF02MA13) Esboar roteiros a ser seguidos ou plantas de ambientes familiares, assinalando entradas, sadas e alguns pontos de referncia.
+(EF02MA14) Reconhecer, nomear e comparar figuras geomtricas espaciais (cubo, bloco retangular, pirmide, cone, cilindro e esfera), relacionando-as com objetos do mundo fsico.
+(EF02MA15) Reconhecer, comparar e nomear figuras planas (crculo, quadrado, retngulo e tringulo), por meio de caractersticas comuns, em desenhos apresentados em diferentes disposies ou em slidos geomtricos.
+(EF02MA16) Estimar, medir e comparar comprimentos de lados de salas (incluindo contorno) e de polgonos, utilizando unidades de medida no padronizadas e padronizadas (metro, centmetro e milmetro) e instrumentos adequados.
+(EF02MA17) Estimar, medir e comparar capacidade e massa, utilizando estratgias pessoais e unidades de medida no padronizadas ou padronizadas (litro, mililitro, grama e quilograma).
+(EF02MA18) Indicar a durao de intervalos de tempo entre duas datas, como dias da semana e meses do ano, utilizando calendrio, para planejamentos e organizao de agenda.
+(EF02MA19) Medir a durao de um intervalo de tempo por meio de relgio digital e registrar o horrio do incio e do fim do intervalo.
+(EF02MA20) Estabelecer a equivalncia de valores entre moedas e cdulas do sistema monetrio brasileiro para resolver situaes cotidianas.
+(EF02MA21) Classificar resultados de eventos cotidianos aleatrios como "pouco provveis", "muito provveis", "improvveis" e "impossveis".
+(EF02MA22) Comparar informaes de pesquisas apresentadas por meio de tabelas de dupla entrada e em grficos de colunas simples ou barras, para melhor compreender aspectos da realidade prxima.
+(EF02MA23) Realizar pesquisa em universo de at 30 elementos, escolhendo at trs variveis categricas de seu interesse, organizando os dados coletados em listas, tabelas e grficos de colunas simples.
+(EF03MA01) Ler, escrever e comparar nmeros naturais de at a ordem de unidade de milhar, estabelecendo relaes entre os registros numricos e em lngua materna.
+(EF03MA02) Identificar caractersticas do sistema de numerao decimal, utilizando a composio e a decomposio de nmero natural de at quatro ordens.
+(EF03MA03) Construir e utilizar fatos bsicos da adio e da multiplicao para o clculo mental ou escrito.
+(EF03MA04) Estabelecer a relao entre nmeros naturais e pontos da reta numrica para utiliz-la na ordenao dos nmeros naturais e tambm na construo de fatos da adio e da subtrao, relacionando-os com deslocamentos para a direita ou para a esquerda.
+(EF03MA05) Utilizar diferentes procedimentos de clculo mental e escrito, inclusive os convencionais, para resolver problemas significativos envolvendo adio e subtrao com nmeros naturais.
+(EF03MA06) Resolver e elaborar problemas de adio e subtrao com os significados de juntar, acrescentar, separar, retirar, comparar e completar quantidades, utilizando diferentes estratgias de clculo exato ou aproximado, incluindo clculo mental.
+(EF03MA07) Resolver e elaborar problemas de multiplicao (por 2, 3, 4, 5 e 10) com os significados de adio de parcelas iguais e elementos apresentados em disposio retangular, utilizando diferentes estratgias de clculo e registros.
+(EF03MA08) Resolver e elaborar problemas de diviso de um nmero natural por outro (at 10), com resto zero e com resto diferente de zero, com os significados de repartio equitativa e de medida, por meio de estratgias e registros pessoais.
+(EF03MA09) Associar o quociente de uma diviso com resto zero de um nmero natural por 2, 3, 4, 5 e 10 s ideias de metade, tera, quarta, quinta e dcima partes.
+(EF03MA10) Identificar regularidades em sequncias ordenadas de nmeros naturais, resultantes da realizao de adies ou subtraes sucessivas, por um mesmo nmero, descrever uma regra de formao da sequncia e determinar elementos faltantes ou seguintes.
+(EF03MA11) Compreender a ideia de igualdade para escrever diferentes sentenas de adies ou de subtraes de dois nmeros naturais que resultem na mesma soma ou diferena.
+(EF03MA12) Descrever e representar, por meio de esboos de trajetos ou utilizando croquis e maquetes, a movimentao de pessoas ou de objetos no espao, incluindo mudanas de direo e sentido, com base em diferentes pontos de referncia.
+(EF03MA13) Associar figuras geomtricas espaciais (cubo, bloco retangular, pirmide, cone, cilindro e esfera) a objetos do mundo fsico e nomear essas figuras.
+(EF03MA14) Descrever caractersticas de algumas figuras geomtricas espaciais (prismas retos, pirmides, cilindros, cones), relacionando-as com suas planificaes.
+(EF03MA15) Classificar e comparar figuras planas (tringulo, quadrado, retngulo, trapzio e paralelogramo) em relao a seus lados (quantidade, posies relativas e comprimento) e vrtices.
+(EF03MA16) Reconhecer figuras congruentes, usando sobreposio e desenhos em malhas quadriculadas ou triangulares, incluindo o uso de tecnologias digitais.
+(EF03MA17) Reconhecer que o resultado de uma medida depende da unidade de medida utilizada.
+(EF03MA18) Escolher a unidade de medida e o instrumento mais apropriado para medies de comprimento, tempo e capacidade.
+(EF03MA19) Estimar, medir e comparar comprimentos, utilizando unidades de medida no padronizadas e padronizadas mais usuais (metro, centmetro e milmetro) e diversos instrumentos de medida.
+(EF03MA20) Estimar e medir capacidade e massa, utilizando unidades de medida no padronizadas e padronizadas mais usuais (litro, mililitro, quilograma, grama e miligrama), reconhecendo-as em leitura de rtulos e embalagens, entre outros.
+(EF03MA21) Comparar, visualmente ou por superposio, reas de faces de objetos, de figuras planas ou de desenhos.
+(EF03MA22) Ler e registrar medidas e intervalos de tempo, utilizando relgios (analgico e digital) para informar os horrios de incio e trmino de realizao de uma atividade e sua durao.
+(EF03MA23) Ler horas em relgios digitais e em relgios analgicos e reconhecer a relao entre hora e minutos e entre minuto e segundos.
+(EF03MA24) Resolver e elaborar problemas que envolvam a comparao e a equivalncia de valores monetrios do sistema brasileiro em situaes de compra, venda e troca.
+(EF03MA25) Identificar, em eventos familiares aleatrios, todos os resultados possveis, estimando os que tm maiores ou menores chances de ocorrncia.
+(EF03MA26) Resolver problemas cujos dados esto apresentados em tabelas de dupla entrada, grficos de barras ou de colunas.
+(EF03MA27) Ler, interpretar e comparar dados apresentados em tabelas de dupla entrada, grficos de barras ou de colunas, envolvendo resultados de pesquisas significativas, utilizando termos como maior e menor frequncia, apropriando-se desse tipo de linguagem para compreender aspectos da realidade sociocultural significativos.
+(EF03MA28) Realizar pesquisa envolvendo variveis categricas em um universo de at 50 elementos, organizar os dados coletados utilizando listas, tabelas simples ou de dupla entrada e represent-los em grficos de colunas simples, com e sem uso de tecnologias digitais.
+(EF04MA01) Ler, escrever e ordenar nmeros naturais at a ordem de dezenas de milhar.
+(EF04MA02) Mostrar, por decomposio e composio, que todo nmero natural pode ser escrito por meio de adies e multiplicaes por potncias de dez, para compreender o sistema de numerao decimal e desenvolver estratgias de clculo.
+(EF04MA03) Resolver e elaborar problemas com nmeros naturais envolvendo adio e subtrao, utilizando estratgias diversas, como clculo, clculo mental e algoritmos, alm de fazer estimativas do resultado.
+(EF04MA04) Utilizar as relaes entre adio e subtrao, bem como entre multiplicao e diviso, para ampliar as estratgias de clculo.
+(EF04MA05) Utilizar as propriedades das operaes para desenvolver estratgias de clculo.
+(EF04MA06) Resolver e elaborar problemas envolvendo diferentes significados da multiplicao (adio de parcelas iguais, organizao retangular e proporcionalidade), utilizando estratgias diversas, como clculo por estimativa, clculo mental e algoritmos.
+(EF04MA07) Resolver e elaborar problemas de diviso cujo divisor tenha no mximo dois algarismos, envolvendo os significados de repartio equitativa e de medida, utilizando estratgias diversas, como clculo por estimativa, clculo mental e algoritmos.
+(EF04MA08) Resolver, com o suporte de imagem e/ou material manipulvel, problemas simples de contagem, como a determinao do nmero de agrupamentos possveis ao se combinar cada elemento de uma coleo com todos os elementos de outra, utilizando estratgias e formas de registro pessoais.
+(EF04MA09) Reconhecer as fraes unitrias mais usuais (1/2, 1/3, 1/4, 1/5, 1/10 e 1/100) como unidades de medida menores do que uma unidade, utilizando a reta numrica como recurso.
+(EF04MA10) Reconhecer que as regras do sistema de numerao decimal podem ser estendidas para a representao decimal de um nmero racional e relacionar dcimos e centsimos com a representao do sistema monetrio brasileiro.
+(EF04MA11) Identificar regularidades em sequncias numricas compostas por mltiplos de um nmero natural.
+(EF04MA12) Reconhecer, por meio de investigaes, que h grupos de nmeros naturais para os quais as divises por um determinado nmero resultam em restos iguais, identificando regularidades.
+(EF04MA13) Reconhecer, por meio de investigaes, utilizando a calculadora quando necessrio, as relaes inversas entre as operaes de adio e de subtrao e de multiplicao e de diviso, para aplic-las na resoluo de problemas.
+(EF04MA14) Reconhecer e mostrar, por meio de exemplos, que a relao de igualdade existente entre dois termos permanece quando se adiciona ou se subtrai um mesmo nmero a cada um desses termos.
+(EF04MA15) Determinar o nmero desconhecido que torna verdadeira uma igualdade que envolve as operaes fundamentais com nmeros naturais.
+(EF04MA16) Descrever deslocamentos e localizao de pessoas e de objetos no espao, por meio de malhas quadriculadas e representaes como desenhos, mapas, planta baixa e croquis, empregando termos como direita e esquerda, mudanas de direo e sentido, interseco, transversais, paralelas e perpendiculares.
+(EF04MA17) Associar prismas e pirmides a suas planificaes e analisar, nomear e comparar seus atributos, estabelecendo relaes entre as representaes planas e espaciais.
+(EF04MA18) Reconhecer ngulos retos e no retos em figuras poligonais com o uso de dobraduras, esquadros ou softwares de geometria.
+(EF04MA19) Reconhecer simetria de reflexo em figuras e em pares de figuras geomtricas planas e utiliz-la na construo de figuras congruentes, com o uso de malhas quadriculadas e de softwares de geometria.
+(EF04MA20) Medir e estimar comprimentos (incluindo permetros), massas e capacidades, utilizando unidades de medida padronizadas mais usuais, valorizando e respeitando a cultura local.
+(EF04MA21) Medir, comparar e estimar rea de figuras planas desenhadas em malha quadriculada, pela contagem dos quadradinhos ou de metades de quadradinho, reconhecendo que duas figuras com formatos diferentes podem ter a mesma medida de rea.
+(EF04MA22) Ler e registrar medidas e intervalos de tempo em horas, minutos e segundos em situaes relacionadas ao seu cotidiano, como informar os horrios de incio e trmino de realizao de uma tarefa e sua durao.
+(EF04MA23) Reconhecer temperatura como grandeza e o grau Celsius como unidade de medida a ela associada e utiliz-lo em comparaes de temperaturas em diferentes regies do Brasil ou no exterior ou, ainda, em discusses que envolvam problemas relacionados ao aquecimento global.
+(EF04MA24) Registrar as temperaturas mxima e mnima dirias, em locais do seu cotidiano, e elaborar grficos de colunas com as variaes dirias da temperatura, utilizando, inclusive, planilhas eletrnicas.
+(EF04MA25) Resolver e elaborar problemas que envolvam situaes de compra e venda e formas de pagamento, utilizando termos como troco e desconto, enfatizando o consumo tico, consciente e responsvel.
+(EF04MA26) Identificar, entre eventos aleatrios cotidianos, aqueles que tm maior chance de ocorrncia, reconhecendo caractersticas de resultados mais provveis, sem utilizar fraes.
+(EF04MA27) Analisar dados apresentados em tabelas simples ou de dupla entrada e em grficos de colunas ou pictricos, com base em informaes das diferentes reas do conhecimento, e produzir texto com a sntese de sua anlise.
+(EF04MA28) Realizar pesquisa envolvendo variveis categricas e numricas e organizar dados coletados por meio de tabelas e grficos de colunas simples ou agrupadas, com e sem uso de tecnologias digitais.
+(EF05MA01) Ler, escrever e ordenar nmeros naturais at a ordem das centenas de milhar com compreenso das principais caractersticas do sistema de numerao decimal.
+(EF05MA02) Ler, escrever e ordenar nmeros racionais na forma decimal com compreenso das principais caractersticas do sistema de numerao decimal, utilizando, como recursos, a composio e decomposio e a reta numrica.
+(EF05MA03) Identificar e representar fraes (menores e maiores que a unidade), associando-as ao resultado de uma diviso ou ideia de parte de um todo, utilizando a reta numrica como recurso.
+(EF05MA04) Identificar fraes equivalentes.
+(EF05MA05) Comparar e ordenar nmeros racionais positivos (representaes fracionria e decimal), relacionando-os a pontos na reta numrica.
+(EF05MA06) Associar as representaes 10%, 25%, 50%, 75% e 100% respectivamente  dcima parte, quarta parte, metade, trs quartos e um inteiro, para calcular porcentagens, utilizando estratgias pessoais, clculo mental e calculadora, em contextos de educao financeira, entre outros.
+(EF05MA07) Resolver e elaborar problemas de adio e subtrao com nmeros naturais e com nmeros racionais, cuja representao decimal seja finita, utilizando estratgias diversas, como clculo por estimativa, clculo mental e algoritmos.
+(EF05MA08) Resolver e elaborar problemas de multiplicao e diviso com nmeros naturais e com nmeros racionais cuja representao decimal finita (com multiplicador natural e divisor natural e diferente de zero), utilizando estratgias diversas, como clculo por estimativa, clculo mental e algoritmos.
+(EF05MA09) Resolver e elaborar problemas simples de contagem envolvendo o princpio multiplicativo, como a determinao do nmero de agrupamentos possveis ao se combinar cada elemento de uma coleo com todos os elementos de outra coleo, por meio de diagramas de rvore ou por tabelas.
+(EF05MA10) Concluir, por meio de investigaes, que a relao de igualdade existente entre dois membros permanece ao adicionar, subtrair, multiplicar ou dividir cada um desses membros por um mesmo nmero, para construir a noo de equivalncia.
+(EF05MA11) Resolver e elaborar problemas cuja converso em sentena matemtica seja uma igualdade com uma operao em que um dos termos desconhecido.
+(EF05MA12) Resolver problemas que envolvam variao de proporcionalidade direta entre duas grandezas, para associar a quantidade de um produto ao valor a pagar, alterar as quantidades de ingredientes de receitas, ampliar ou reduzir escala em mapas, entre outros.
+(EF05MA13) Resolver problemas envolvendo a partilha de uma quantidade em duas partes desiguais, tais como dividir uma quantidade em duas partes, de modo que uma seja o dobro da outra, com compreenso da ideia de razo entre as partes e delas com o todo.
+(EF05MA14) Utilizar e compreender diferentes representaes para a localizao de objetos no plano, como mapas, clulas em planilhas eletrnicas e coordenadas geogrficas, a fim de desenvolver as primeiras noes de coordenadas cartesianas.
+(EF05MA15) Interpretar, descrever e representar a localizao ou movimentao de objetos no plano cartesiano (1 quadrante), utilizando coordenadas cartesianas, indicando mudanas de direo e de sentido e giros.
+(EF05MA16) Associar figuras espaciais a suas planificaes (prismas, pirmides, cilindros e cones) e analisar, nomear e comparar seus atributos.
+(EF05MA17) Reconhecer, nomear e comparar polgonos, considerando lados, vrtices e ngulos, e desenh-los, utilizando material de desenho ou tecnologias digitais.
+(EF05MA18) Reconhecer a congruncia dos ngulos e a proporcionalidade entre os lados correspondentes de figuras poligonais em situaes de ampliao e de reduo em malhas quadriculadas e usando tecnologias digitais.
+(EF05MA19) Resolver e elaborar problemas envolvendo medidas das grandezas comprimento, rea, massa, tempo, temperatura e capacidade, recorrendo a transformaes entre as unidades mais usuais em contextos socioculturais.
+(EF05MA20) Concluir, por meio de investigaes, que figuras de permetros iguais podem ter reas diferentes e que, tambm, figuras que tm a mesma rea podem ter permetros diferentes.
+(EF05MA21) Reconhecer volume como grandeza associada a slidos geomtricos e medir volumes por meio de empilhamento de cubos, utilizando, preferencialmente, objetos concretos.
+(EF05MA22) Apresentar todos os possveis resultados de um experimento aleatrio, estimando se esses resultados so igualmente provveis ou no.
+(EF05MA23) Determinar a probabilidade de ocorrncia de um resultado em eventos aleatrios, quando todos os resultados possveis tm a mesma chance de ocorrer (equiprovveis).
+(EF05MA24) Interpretar dados estatsticos apresentados em textos, tabelas e grficos (colunas ou linhas), referentes a outras reas do conhecimento ou a outros contextos, como sade e trnsito, e produzir textos com o objetivo de sintetizar concluses.
+(EF05MA25) Realizar pesquisa envolvendo variveis categricas e numricas, organizar dados coletados por meio de tabelas, grficos de colunas, pictricos e de linhas, com e sem uso de tecnologias digitais, e apresentar texto escrito sobre a finalidade da pesquisa e a sntese dos resultados.
+(EF06MA01) Comparar, ordenar, ler e escrever nmeros naturais e nmeros racionais cuja representao decimal finita, fazendo uso da reta numrica.
+(EF06MA02) Reconhecer o sistema de numerao decimal, como o que prevaleceu no mundo ocidental, e destacar semelhanas e diferenas com outros sistemas, de modo a sistematizar suas principais caractersticas (base, valor posicional e funo do zero), utilizando, inclusive, a composio e decomposio de nmeros naturais e nmeros racionais em sua representao decimal.
+(EF06MA03) Resolver e elaborar problemas que envolvam clculos (mentais ou escritos, exatos ou aproximados) com nmeros naturais, por meio de estratgias variadas, com compreenso dos processos neles envolvidos com e sem uso de calculadora.
+(EF06MA04) Construir algoritmo em linguagem natural e represent-lo por fluxograma que indique a resoluo de um problema simples (por exemplo, se um nmero natural qualquer  par).
+(EF06MA05) Classificar nmeros naturais em primos e compostos, estabelecer relaes entre nmeros, expressas pelos termos " mltiplo de", " divisor de", " fator de", e estabelecer, por meio de investigaes, critrios de divisibilidade por 2, 3, 4, 5, 6, 8, 9, 10, 100 e 1000.
+(EF06MA06) Resolver e elaborar problemas que envolvam as ideias de mltiplo e de divisor.
+(EF06MA07) Compreender, comparar e ordenar fraes associadas s ideias de partes de inteiros e resultado de diviso, identificando fraes equivalentes.
+(EF06MA08) Reconhecer que os nmeros racionais positivos podem ser expressos nas formas fracionria e decimal, estabelecer relaes entre essas representaes, passando de uma representao para outra, e relacion-los a pontos na reta numrica.
+(EF06MA09) Resolver e elaborar problemas que envolvam o clculo da frao de uma quantidade e cujo resultado seja um nmero natural, com e sem uso de calculadora.
+(EF06MA10) Resolver e elaborar problemas que envolvam adio ou subtrao com nmeros racionais positivos na representao fracionria.
+(EF06MA11) Resolver e elaborar problemas com nmeros racionais positivos na representao decimal, envolvendo as quatro operaes fundamentais e a potenciao, por meio de estratgias diversas, utilizando estimativas e arredondamentos para verificar a razoabilidade de respostas, com e sem uso de calculadora.
+(EF06MA12) Fazer estimativas de quantidades e aproximar nmeros para mltiplos da potncia de 10 mais prxima.
+(EF06MA13) Resolver e elaborar problemas que envolvam porcentagens, com base na ideia de proporcionalidade, sem fazer uso da "regra de trs", utilizando estratgias pessoais, clculo mental e calculadora, em contextos de educao financeira, entre outros.
+(EF06MA14) Reconhecer que a relao de igualdade matemtica no se altera ao adicionar, subtrair, multiplicar ou dividir os seus dois membros por um mesmo nmero e utilizar essa noo para determinar valores desconhecidos na resoluo de problemas.
+(EF06MA15) Resolver e elaborar problemas que envolvam a partilha de uma quantidade em duas partes desiguais, envolvendo relaes aditivas e multiplicativas, bem como a razo entre as partes e entre uma das partes e o todo.
+(EF06MA16) Associar pares ordenados de nmeros a pontos do plano cartesiano do 1 quadrante, em situaes como a localizao dos vrtices de um polgono.
+(EF06MA17) Quantificar e estabelecer relaes entre o nmero de vrtices, faces e arestas de prismas e pirmides, em funo do seu polgono da base, para resolver problemas e desenvolver a percepo espacial.
+(EF06MA18) Reconhecer, nomear e comparar polgonos, considerando lados, vrtices e ngulos, e classific-los em regulares e no regulares, tanto em suas representaes no plano como em faces de poliedros.
+(EF06MA19) Identificar caractersticas dos tringulos e classific-los em relao s medidas dos lados e dos ngulos.
+(EF06MA20) Identificar caractersticas dos quadrilteros, classific-los em relao a lados e a ngulos e reconhecer a incluso e a interseco de classes entre eles.
+(EF06MA21) Construir figuras planas semelhantes em situaes de ampliao e de reduo, com o uso de malhas quadriculadas, plano cartesiano ou tecnologias digitais.
+(EF06MA22) Utilizar instrumentos, como rguas e esquadros, ou softwares para representaes de retas paralelas e perpendiculares e construo de quadrilteros, entre outros.
+(EF06MA23) Construir algoritmo para resolver situaes passo a passo (como na construo de dobraduras ou na indicao de deslocamento de um objeto no plano segundo pontos de referncia e distncias fornecidas etc.).
+(EF06MA24) Resolver e elaborar problemas que envolvam as grandezas comprimento, massa, tempo, temperatura, rea (tringulos e retngulos), capacidade e volume (slidos formados por blocos retangulares), sem uso de frmulas, inseridos, sempre que possvel, em contextos oriundos de situaes reais e/ou relacionadas s outras reas do conhecimento.
+(EF06MA25) Reconhecer a abertura do ngulo como grandeza associada s figuras geomtricas.
+(EF06MA26) Resolver problemas que envolvam a noo de ngulo em diferentes contextos e em situaes reais, como ngulo de viso.
+(EF06MA27) Determinar medidas da abertura de ngulos, por meio de transferidor e/ou tecnologias digitais.
+(EF06MA28) Interpretar, descrever e desenhar plantas baixas simples de residncias e vistas areas.
+(EF06MA29) Analisar e descrever mudanas que ocorrem no permetro e na rea de um quadrado ao se ampliarem ou reduzirem, igualmente, as medidas de seus lados, para compreender que o permetro proporcional medida do lado, o que no ocorre com a rea.
+(EF06MA30) Calcular a probabilidade de um evento aleatrio, expressando-a por nmero racional (forma fracionria, decimal e percentual) e comparar esse nmero com a probabilidade obtida por meio de experimentos sucessivos.
+(EF06MA31) Identificar as variveis e suas frequncias e os elementos constitutivos (ttulo, eixos, legendas, fontes e datas) em diferentes tipos de grfico.
+(EF06MA32) Interpretar e resolver situaes que envolvam dados de pesquisas sobre contextos ambientais, sustentabilidade, trnsito, consumo responsvel, entre outros, apresentadas pela mdia em tabelas e em diferentes tipos de grficos e redigir textos escritos com o objetivo de sintetizar concluses.
+(EF06MA33) Planejar e coletar dados de pesquisa referente a prticas sociais escolhidas pelos alunos e fazer uso de planilhas eletrnicas para registro, representao e interpretao das informaes, em tabelas, vrios tipos de grficos e texto.
+(EF06MA34) Interpretar e desenvolver fluxogramas simples, identificando as relaes entre os objetos representados (por exemplo, posio de cidades considerando as estradas que as unem, hierarquia dos funcionrios de uma empresa etc.).
+(EF07MA01) Resolver e elaborar problemas com nmeros naturais, envolvendo as noes de divisor e de mltiplo, podendo incluir mximo divisor comum ou mnimo mltiplo comum, por meio de estratgias diversas, sem a aplicao de algoritmos.
+(EF07MA02) Resolver e elaborar problemas que envolvam porcentagens, como os que lidam com acrscimos e decrscimos simples, utilizando estratgias pessoais, clculo mental e calculadora, no contexto de educao financeira, entre outros.
+(EF07MA03) Comparar e ordenar nmeros inteiros em diferentes contextos, incluindo o histrico, associ-los a pontos da reta numrica e utiliz-los em situaes que envolvam adio e subtrao.
+(EF07MA04) Resolver e elaborar problemas que envolvam operaes com nmeros inteiros.
+(EF07MA05) Resolver um mesmo problema utilizando diferentes algoritmos.
+(EF07MA06) Reconhecer que as resolues de um grupo de problemas que tm a mesma estrutura podem ser obtidas utilizando os mesmos procedimentos.
+(EF07MA07) Representar por meio de um fluxograma os passos utilizados para resolver um grupo de problemas.
+(EF07MA08) Comparar e ordenar fraes associadas s ideias de partes de inteiros, resultado da diviso, razo e operador.
+(EF07MA09) Utilizar, na resoluo de problemas, a associao entre razo e frao, como a frao 2/3 para expressar a razo de duas partes de uma grandeza para trs partes da mesma ou trs partes de outra grandeza.
+(EF07MA10) Comparar e ordenar nmeros racionais em diferentes contextos e associ-los a pontos da reta numrica.
+(EF07MA11) Compreender e utilizar a multiplicao e a diviso de nmeros racionais, a relao entre elas e suas propriedades operatrias.
+(EF07MA12) Resolver e elaborar problemas que envolvam as operaes com nmeros racionais.
+(EF07MA13) Compreender a ideia de varivel, representada por letra ou smbolo, para expressar relao entre duas grandezas, diferenciando-a da ideia de incgnita.
+(EF07MA14) Classificar sequncias em recursivas e no recursivas, reconhecendo que o conceito de recurso est presente no apenas na matemtica, mas tambm nas artes e na literatura.
+(EF07MA15) Utilizar a simbologia algbrica para expressar regularidades encontradas em sequncias numricas.
+(EF07MA16) Reconhecer se duas expresses algbricas obtidas para descrever a regularidade de uma mesma sequncia numrica so ou no equivalentes.
+(EF07MA17) Resolver e elaborar problemas que envolvam variao de proporcionalidade direta e de proporcionalidade inversa entre duas grandezas, utilizando sentena algbrica para expressar a relao entre elas.
+(EF07MA18) Resolver e elaborar problemas que possam ser representados por equaes polinomiais de 1 grau, redutveis forma ax + b = c, fazendo uso das propriedades da igualdade.
+(EF07MA19) Realizar transformaes de polgonos representados no plano cartesiano, decorrentes da multiplicao das coordenadas de seus vrtices por um nmero inteiro.
+(EF07MA20) Reconhecer e representar, no plano cartesiano, o simtrico de figuras em relao aos eixos e origem.
+(EF07MA21) Reconhecer e construir figuras obtidas por simetrias de translao, rotao e reflexo, usando instrumentos de desenho ou softwares de geometria dinmica e vincular esse estudo a representaes planas de obras de arte, elementos arquitetnicos, entre outros.
+(EF07MA22) Construir circunferncias, utilizando compasso, reconhec-las como lugar geomtrico e utiliz-las para fazer composies artsticas e resolver problemas que envolvam objetos equidistantes.
+(EF07MA23) Verificar relaes entre os ngulos formados por retas paralelas cortadas por uma transversal, com e sem uso de softwares de geometria dinmica.
+(EF07MA24) Construir tringulos, usando rgua e compasso, reconhecer a condio de existncia do tringulo quanto medida dos lados e verificar que a soma das medidas dos ngulos internos de um tringulo 180.
+(EF07MA25) Reconhecer a rigidez geomtrica dos tringulos e suas aplicaes, como na construo de estruturas arquitetnicas (telhados, estruturas metlicas e outras) ou nas artes plsticas.
+(EF07MA26) Descrever, por escrito e por meio de um fluxograma, um algoritmo para a construo de um tringulo qualquer, conhecidas as medidas dos trs lados.
+(EF07MA27) Calcular medidas de ngulos internos de polgonos regulares, sem o uso de frmulas, e estabelecer relaes entre ngulos internos e externos de polgonos, preferencialmente vinculadas construo de mosaicos e de ladrilhamentos.
+(EF07MA28) Descrever, por escrito e por meio de um fluxograma, um algoritmo para a construo de um polgono regular (como quadrado e tringulo equiltero), conhecida a medida de seu lado.
+(EF07MA29) Resolver e elaborar problemas que envolvam medidas de grandezas inseridos em contextos oriundos de situaes cotidianas ou de outras reas do conhecimento, reconhecendo que toda medida emprica aproximada.
+(EF07MA30) Resolver e elaborar problemas de clculo de medida do volume de blocos retangulares, envolvendo as unidades usuais (metro cbico, decmetro cbico e centmetro cbico).
+(EF07MA31) Estabelecer expresses de clculo de rea de tringulos e de quadrilteros.
+(EF07MA32) Resolver e elaborar problemas de clculo de medida de rea de figuras planas que podem ser decompostas por quadrados, retngulos e/ou tringulos, utilizando a equivalncia entre reas.
+(EF07MA33) Estabelecer o nmero como a razo entre a medida de uma circunferncia e seu dimetro, para compreender e resolver problemas, inclusive os de natureza histrica.
+(EF07MA34) Planejar e realizar experimentos aleatrios ou simulaes que envolvem clculo de probabilidades ou estimativas por meio de frequncia de ocorrncias.
+(EF07MA35) Compreender, em contextos significativos, o significado de mdia estatstica como indicador da tendncia de uma pesquisa, calcular seu valor e relacion-lo, intuitivamente, com a amplitude do conjunto de dados.
+(EF07MA36) Planejar e realizar pesquisa envolvendo tema da realidade social, identificando a necessidade de ser censitria ou de usar amostra, e interpretar os dados para comunic-los por meio de relatrio escrito, tabelas e grficos, com o apoio de planilhas eletrnicas.
+(EF07MA37) Interpretar e analisar dados apresentados em grfico de setores divulgados pela mdia e compreender quando possvel ou conveniente sua utilizao.
+(EF08MA01) Efetuar clculos com potncias de expoentes inteiros e aplicar esse conhecimento na representao de nmeros em notao cientfica.
+(EF08MA02) Resolver e elaborar problemas usando a relao entre potenciao e radiciao, para representar uma raiz como potncia de expoente fracionrio.
+(EF08MA03) Resolver e elaborar problemas de contagem cuja resoluo envolva a aplicao do princpio multiplicativo.
+(EF08MA04) Resolver e elaborar problemas, envolvendo clculo de porcentagens, incluindo o uso de tecnologias digitais.
+(EF08MA05) Reconhecer e utilizar procedimentos para a obteno de uma frao geratriz para uma dzima peridica.
+(EF08MA06) Resolver e elaborar problemas que envolvam clculo do valor numrico de expresses algbricas, utilizando as propriedades das operaes.
+(EF08MA07) Associar uma equao linear de 1 grau com duas incgnitas a uma reta no plano cartesiano.
+(EF08MA08) Resolver e elaborar problemas relacionados ao seu contexto prximo, que possam ser representados por sistemas de equaes de 1 grau com duas incgnitas e interpret-los, utilizando, inclusive, o plano cartesiano como recurso.
+(EF08MA09) Resolver e elaborar, com e sem uso de tecnologias, problemas que possam ser representados por equaes polinomiais de 2 grau do tipo ax2 = b.
+(EF08MA10) Identificar a regularidade de uma sequncia numrica ou figural no recursiva e construir um algoritmo por meio de um fluxograma que permita indicar os nmeros ou as figuras seguintes.
+(EF08MA11) Identificar a regularidade de uma sequncia numrica recursiva e construir um algoritmo por meio de um fluxograma que permita indicar os nmeros seguintes.
+(EF08MA12) Identificar a natureza da variao de duas grandezas, diretamente, inversamente proporcionais ou no proporcionais, expressando a relao existente por meio de sentena algbrica e represent-la no plano cartesiano.
+(EF08MA13) Resolver e elaborar problemas que envolvam grandezas diretamente ou inversamente proporcionais, por meio de estratgias variadas.
+(EF08MA14) Demonstrar propriedades de quadrilteros por meio da identificao da congruncia de tringulos.
+(EF08MA15) Construir, utilizando instrumentos de desenho ou softwares de geometria dinmica, mediatriz, bissetriz, ngulos de 90, 60, 45 e 30 e polgonos regulares.
+(EF08MA16) Descrever, por escrito e por meio de um fluxograma, um algoritmo para a construo de um hexgono regular de qualquer rea, a partir da medida do ngulo central e da utilizao de esquadros e compasso.
+(EF08MA17) Aplicar os conceitos de mediatriz e bissetriz como lugares geomtricos na resoluo de problemas.
+(EF08MA18) Reconhecer e construir figuras obtidas por composies de transformaes geomtricas (translao, reflexo e rotao), com o uso de instrumentos de desenho ou de softwares de geometria dinmica.
+(EF08MA19) Resolver e elaborar problemas que envolvam medidas de rea de figuras geomtricas, utilizando expresses de clculo de rea (quadrilteros, tringulos e crculos), em situaes como determinar medida de terrenos.
+(EF08MA20) Reconhecer a relao entre um litro e um decmetro cbico e a relao entre litro e metro cbico, para resolver problemas de clculo de capacidade de recipientes.
+(EF08MA21) Resolver e elaborar problemas que envolvam o clculo do volume de recipiente cujo formato o de um bloco retangular.
+(EF08MA22) Calcular a probabilidade de eventos, com base na construo do espao amostral, utilizando o princpio multiplicativo, e reconhecer que a soma das probabilidades de todos os elementos do espao amostral igual a 1.
+(EF08MA23) Avaliar a adequao de diferentes tipos de grficos para representar um conjunto de dados de uma pesquisa.
+(EF08MA24) Classificar as frequncias de uma varivel contnua de uma pesquisa em classes, de modo que resumam os dados de maneira adequada para a tomada de decises.
+(EF08MA25) Obter os valores de medidas de tendncia central de uma pesquisa estatstica (mdia, moda e mediana) com a compreenso de seus significados e relacion-los com a disperso de dados, indicada pela amplitude.
+(EF08MA26) Selecionar razes, de diferentes naturezas (fsica, tica ou econmica), que justificam a realizao de pesquisas amostrais e no censitrias, e reconhecer que a seleo da amostra pode ser feita de diferentes maneiras (amostra casual simples, sistemtica e estratificada).
+(EF08MA27) Planejar e executar pesquisa amostral, selecionando uma tcnica de amostragem adequada, e escrever relatrio que contenha os grficos apropriados para representar os conjuntos de dados, destacando aspectos como as medidas de tendncia central, a amplitude e as concluses.
+(EF09MA01) Reconhecer que, uma vez fixada uma unidade de comprimento, existem segmentos de reta cujo comprimento no expresso por nmero racional (como as medidas de diagonais de um polgono e alturas de um tringulo, quando se toma a medida de cada lado como unidade).
+(EF09MA02) Reconhecer um nmero irracional como um nmero real cuja representao decimal infinita e no peridica, e estimar a localizao de alguns deles na reta numrica.
+(EF09MA03) Efetuar clculos com nmeros reais, inclusive potncias com expoentes fracionrios.
+(EF09MA04) Resolver e elaborar problemas com nmeros reais, inclusive em notao cientfica, envolvendo diferentes operaes.
+(EF09MA05) Resolver e elaborar problemas que envolvam porcentagens, com a ideia de aplicao de percentuais sucessivos e a determinao das taxas percentuais, preferencialmente com o uso de tecnologias digitais, no contexto da educao financeira.
+(EF09MA06) Compreender as funes como relaes de dependncia unvoca entre duas variveis e suas representaes numrica, algbrica e grfica e utilizar esse conceito para analisar situaes que envolvam relaes funcionais entre duas variveis.
+(EF09MA07) Resolver problemas que envolvam a razo entre duas grandezas de espcies diferentes, como velocidade e densidade demogrfica.
+(EF09MA08) Resolver e elaborar problemas que envolvam relaes de proporcionalidade direta e inversa entre duas ou mais grandezas, inclusive escalas, diviso em partes proporcionais e taxa de variao, em contextos socioculturais, ambientais e de outras reas.
+(EF09MA09) Compreender os processos de fatorao de expresses algbricas, com base em suas relaes com os produtos notveis, para resolver e elaborar problemas que possam ser representados por equaes polinomiais do 2 grau.
+(EF09MA10) Demonstrar relaes simples entre os ngulos formados por retas paralelas cortadas por uma transversal.
+(EF09MA11) Resolver problemas por meio do estabelecimento de relaes entre arcos, ngulos centrais e ngulos inscritos na circunferncia, fazendo uso, inclusive, de softwares de geometria dinmica.
+(EF09MA12) Reconhecer as condies necessrias e suficientes para que dois tringulos sejam semelhantes.
+(EF09MA13) Demonstrar relaes mtricas do tringulo retngulo, entre elas o teorema de Pitgoras, utilizando, inclusive, a semelhana de tringulos.
+(EF09MA14) Resolver e elaborar problemas de aplicao do teorema de Pitgoras ou das relaes de proporcionalidade envolvendo retas paralelas cortadas por secantes.
+(EF09MA15) Descrever, por escrito e por meio de um fluxograma, um algoritmo para a construo de um polgono regular cuja medida do lado conhecida, utilizando rgua e compasso, como tambm softwares.
+(EF09MA16) Determinar o ponto mdio de um segmento de reta e a distncia entre dois pontos quaisquer, dadas as coordenadas desses pontos no plano cartesiano, sem o uso de frmulas, e utilizar esse conhecimento para calcular, por exemplo, medidas de permetros e reas de figuras planas construdas no plano.
+(EF09MA17) Reconhecer vistas ortogonais de figuras espaciais e aplicar esse conhecimento para desenhar objetos em perspectiva.
+(EF09MA18) Reconhecer e empregar unidades usadas para expressar medidas muito grandes ou muito pequenas, tais como distncia entre planetas e sistemas solares, tamanho de vrus ou de clulas, capacidade de armazenamento de computadores, entre outros.
+(EF09MA19) Resolver e elaborar problemas que envolvam medidas de volumes de prismas e de cilindros retos, inclusive com uso de expresses de clculo, em situaes cotidianas.
+(EF09MA20) Reconhecer, em experimentos aleatrios, eventos independentes e dependentes e calcular a probabilidade de sua ocorrncia, nos dois casos.
+(EF09MA21) Analisar e identificar, em grficos divulgados pela mdia, os elementos que podem induzir, s vezes propositadamente, erros de leitura, como escalas inapropriadas, legendas no explicitadas corretamente, omisso de informaes importantes (fontes e datas), entre outros.
+(EF09MA22) Escolher e construir o grfico mais adequado (colunas, setores, linhas), com ou sem uso de planilhas eletrnicas, para apresentar um determinado conjunto de dados, destacando aspectos como as medidas de tendncia central.
+(EF09MA23) Planejar e executar pesquisa amostral envolvendo tema da realidade social e comunicar os resultados por meio de relatrio contendo avaliao de medidas de tendncia central e da amplitude, tabelas e grficos adequados, construdos com o apoio de planilhas eletrnicas.
