@@ -78,14 +78,13 @@
       // o navegador não poder pedir uma voz que o projeto não aprovou — nem
       // uma que exista fora da lista.
       //
-      // As quatro vozes foram conferidas em 30/10/2026 contra o catálogo público
-      // (GET https://api.fish.audio/model?title=<nome>&language=pt): são as
-      // vozes em português mais usadas para cada nome — SARA (137 usos),
-      // Bruna (2661), Miguel (308), Evelyn (60). NÃO são vozes oficiais da
-      // plataforma, e sim da comunidade: podem mudar de nome ou sair do ar, e
-      // a leitura de números em pt-BR só se confirma ouvindo. Se alguma não
-      // servir, clone a sua própria voz, adicione o id nas duas listas (aqui e
-      // no núcleo da função) e o rótulo na tela continua o mesmo.
+      // Os quatro ids atuais são as vozes do projeto, indicadas pelo dono em
+      // 04/11/2026 e conferidas uma a uma contra a API real (200 + mp3 em
+      // todas, com a chave da conta dele). Não é lista do catálogo público
+      // desta vez: se alguma voz for movida ou ficar privada na conta de
+      // origem, a chamada passa a falhar e o jogo cai para a voz do aparelho
+      // sozinha. Para trocar, mexa o id nas duas listas (aqui e no núcleo da
+      // função) — o rótulo na tela continua o mesmo.
       vozes: [
         { id: 'sara', rotulo: 'Sara' },
         { id: 'bruna', rotulo: 'Bruna' },

@@ -354,7 +354,7 @@
     if (notaV) {
       notaV.textContent = s.preferencia === 'aparelho'
         ? 'No modo aparelho a voz escolhida só muda o tom: quem fala é o sintetizador do seu sistema.'
-        : (s.vozes.length > 0 ? 'Amostra: ' + s.rotulo + '. São vozes da comunidade Fish Audio, conferidas no catálogo público; se uma delas não servir, o dono do projeto troca o id no config.js.' : '');
+        : (s.vozes.length > 0 ? 'Amostra: ' + s.rotulo + '. São as vozes do projeto, gravadas na Fish Audio e fixadas pelo código da voz — se uma delas não servir, o dono troca o código no config.js e na lista do servidor.' : '');
     }
     const estado = d.getElementById('vozEstadoModal');
     if (estado) {

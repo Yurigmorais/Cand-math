@@ -680,6 +680,14 @@ body::after {
 .bha-shop    { background:linear-gradient(135deg,#FF6B9D,#9B5DE5); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(155,93,229,0.35); }
 .bha-records { background:linear-gradient(135deg,#FFD93D,#FF9A3C); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(255,154,60,0.35); }
 .bha-sound   { background:linear-gradient(135deg,#4ECDC4,#3DBBFF); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(78,205,196,0.35); }
+/* O botão Voz não tinha regra nenhuma: herda de .btn-hub-action só o
+   `color:#fff`, e texto branco sobre o hub branco é o botão invisível — a
+   criança (e quem revisa) não acha onde clicar para trocar a voz. Ele veste o
+   azul da ficha de voz escolhida (.chip-voz.ativa) e do botão Testar
+   (.btn-pais), um degrau mais fundo que os irmãos para o rótulo branco chegar
+   a ~5,4:1 em vez dos 2,1:1 do #3DBBFF puro: azul = voz em todo o jogo, e dá
+   para ler. */
+.bha-voz     { background:linear-gradient(135deg,#2A8FE0,#1E4FA8); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(61,187,255,0.35); }
 .btn-hub-action:hover { transform:translateY(-3px); }
 
 /* ===== QUIZ SCREEN ===== */
@@ -1565,14 +1573,43 @@ body::after {
 /* No celular o rótulo sobe e as fichas viram grade de colunas iguais: com
    flex-wrap o 9º ano ficava órfão num segundo renglão, e nove colunas numa
    linha só dariam fichas de 18 px em 320 px — abaixo do alvo de toque. */
+/* ===== AS FAIXAS DO HUB NO CELULAR ===== */
+/* Medido em 390x844 com o jogo aberto no hub: cabeçalho 101 + seletor 251 +
+   atalhos 156 = 508 px das 844 da tela, e a lista de jogos ficava com 315. É
+   exatamente a barra comendo metade da tela de que a reclamação fala. Cada
+   faixa encurta por um motivo próprio, sem esconder informação:
+   1. Cabeçalho: as três fichas do placar quebravam para uma segunda linha
+      (243 + 211 = 454 px numa janela de 365). Ano e nível já estão nos chips
+      selecionados dois dedos abaixo, então só as estrelas ficam: uma linha de
+      ~61 px. O balão da onça continua inteiro - corte com reticências seria
+      texto invisível para quem não alcança o mouse.
+   2. Seletor: com nove fichas de 40 px de alvo de toque, cinco colunas custam
+      duas linhas (84 px). De 352 px para cima entra uma linha só de nove
+      colunas (34 px cada); abaixo disso o nove-em-linha daria fichas de 29 px,
+      menores que o alvo, então ele continua em cinco colunas.
+   3. Atalhos: três colunas em duas linhas, com respiro lateral menor para o
+      rótulo caber numa linha só.
+   Nenhum botão perde os 40x32 de alvo e nenhuma faixa vira trilho de rolagem. */
 @media (max-width: 559px) {
-  .hsl-row { flex-direction: column; align-items: stretch; gap: 4px; }
+  .hub-header { padding: 6px var(--pad); }
+  .hub-stats .hub-stat:not(.hs-estrelas) { display: none; }
+  .hub-seletor { margin: 6px auto; padding: 7px 8px; gap: 4px; }
+  .hsl-row { flex-direction: column; align-items: stretch; gap: 3px; }
+  .hsl-rotulo { min-width: 0; }
   #chipsAno, #chipsNivel { display: grid; gap: 4px; min-width: 0; }
-  #chipsAno   { grid-template-columns: repeat(5, minmax(0, 72px)); }
-  #chipsNivel { grid-template-columns: repeat(4, minmax(0, 88px)); }
-  #chipsAno .stab, #chipsNivel .stab { padding: 4px 0; justify-content: center; }
-  /* 2x2 em vez de 3+1: com flex o "Som" sobrava órfão num segundo renglão. */
-  .hub-actions { gap: var(--gap-sm); }
+  #chipsAno   { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  #chipsNivel { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #chipsAno .stab, #chipsNivel .stab { padding: 4px 0; min-height: 40px; justify-content: center; }
+  .hsl-regra { line-height: 1.35; }
+  .hub-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap-sm);
+    padding-bottom: 8px;
+  }
+  .btn-hub-action { padding: 8px 4px; gap: 4px; }
+}
+@media (min-width: 352px) and (max-width: 559px) {
+  #chipsAno { grid-template-columns: repeat(9, minmax(0, 1fr)); }
 }
 .hsl-rotulo {
   font-family:'Fredoka One',cursive; font-size:var(--fs-apoio); color:var(--purple);
@@ -2854,7 +2891,16 @@ button, [role="button"], .mode-card { touch-action: manipulation; }
   display:inline-flex; align-items:center; justify-content:center;
   padding:0 clamp(11px, 1.8vw, 16px);
   border-radius:var(--r-pill);
-  background:#FFFDF7; color:var(--text2);
+  /* Dentro do modal de vidro fosco (rgba(255,255,255,.75)) a ficha era texto
+     `--text2` (4,8:1 — passa, mas é o mínimo) sobre `#FFFDF7` com borda de
+     30% de opacidade, que dá ~2,1:1: abaixo dos 3:1 que uma borda precisa
+     para ser vista como contorno. Resultado: quatro fichas brancas iguais, e
+     nenhuma dica de qual delas é a escolhida. Texto quase preto (12,8:1) +
+     contorno de adesivo inteiro (11,1:1) devolve a hierarquia, e a `.ativa`
+     abaixo passa a contrastar com algo comparável ao lado. */
+  background:#FFFDF7; color:var(--text);
+  border:2px solid var(--linha-boneco);
+  box-shadow:0 3px 0 var(--linha-boneco-suave);
   font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); line-height:1.15;
   cursor:pointer;
 }
@@ -2863,6 +2909,10 @@ button, [role="button"], .mode-card { touch-action: manipulation; }
   border-color:var(--linha-boneco);
   box-shadow:0 3px 0 var(--linha-boneco), 0 6px 14px rgba(61,187,255,0.32);
 }
+/* Teclado e leitor de tela: .chip-opcao já tinha; a ficha de voz não, e ela é
+   um grupo de rádio (role=radio em narracao.js), onde o foco é a única coisa
+   que diz qual opção vai receber o Enter. */
+.chip-voz:focus-visible { outline:3px solid var(--purple); outline-offset:2px; }
 /* A ficha "Voz por IA" se apaga quando não há função publicada: oferecer o
    botão e deixar a criança falhar sozinha seria pior do que mostrar o motivo. */
 .chip-voz:disabled {

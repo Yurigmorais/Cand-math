@@ -23,15 +23,19 @@
 const { createHash } = require('crypto');
 
 // Lista fechada de vozes. O rótulo é o que a criança vê; o id é o
-// reference_id da Fish Audio, conferido contra o catálogo público em
-// 30/10/2026 (as vozes em português com mais usos para cada nome). Voz de
-// comunidade muda de nome e pode sair do ar — por isso ela é pinada por id
-// aqui, e não por texto livre vindo do navegador.
+// reference_id da Fish Audio. Estes quatro ids são os das vozes do projeto,
+// indicados pelo dono em 04/11/2026, e cada um foi chamado de verdade contra
+// POST https://api.fish.audio/v1/tts antes de entrar aqui: os quatro
+// devolveram 200 com mp3 (22 a 30 KB para a frase de teste). A chave usada na
+// conferência foi a da conta do dono — as quatro vozes respondem com ela, o
+// que dispensa uma segunda chave no servidor. Voz de comunidade muda de nome e
+// pode sair do ar; por isso ela é pinada por id aqui, e não por texto livre
+// vindo do navegador.
 const VOZES = {
-  sara: { rotulo: 'Sara', referenceId: 'a3267483966a42419bce7bae6d52a010' },
-  bruna: { rotulo: 'Bruna', referenceId: '33a512796260458abe82de6293f9fbec' },
-  miguel: { rotulo: 'Miguel', referenceId: 'b69b3cb9884848cfbedd0c295ac8d90b' },
-  evelyn: { rotulo: 'Evelyn', referenceId: '8b8bd346d3484f7ca0485667b2e5b410' },
+  sara: { rotulo: 'Sara', referenceId: '4e78ff4db2184b9f83cd7dbf296ac509' },
+  bruna: { rotulo: 'Bruna', referenceId: '67e90549433041759a61e2272367e160' },
+  miguel: { rotulo: 'Miguel', referenceId: '8c3a3634d6e24b8aac93418336d72f45' },
+  evelyn: { rotulo: 'Evelyn', referenceId: '0e3026e889bb4c038aeb2421a894b44b' },
 };
 
 const MODELO_PADRAO = 's2.1-pro-free';
