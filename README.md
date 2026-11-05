@@ -72,7 +72,7 @@ package.json          npm start, npm test e um comando por validador
 .gitignore            .env, capturas e lixo de editor
 ```
 
-Mais quatro documentos, no mesmo nível do README:
+Mais seis documentos, no mesmo nível do README:
 
 | Arquivo | O que responde |
 |---|---|
@@ -80,6 +80,7 @@ Mais quatro documentos, no mesmo nível do README:
 | `RELATORIO-TESTES.md` | resultado real de cada teste, nesta máquina, e o que não rodou |
 | `SEGURANCA.md` | modelo de ameaça, matriz de autorização por tabela e o contrato da função de voz |
 | `CONFIGURACAO-DEPLOY.md` | passo a passo de Supabase, Vercel, Fish Audio e a ordem de publicação |
+| `APRESENTACAO-ONLINE.md` | roteiro de apresentação: como o jogo foi parar na internet, em 15 blocos |
 | `RELATORIO-BNCC.md` | cobertura por unidade, ano e código — gerado por `npm run bncc` |
 
 Os dados ficam separados da interface. `script.js` só consome a API pública
