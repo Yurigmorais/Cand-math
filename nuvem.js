@@ -786,22 +786,29 @@ function fecharSala() {
 }
 
 // ── 6. A TELA DA CONEXÃO ────────────────────────────────
+// A linha de estado (config.js / e-mail / sincronia / sala) é um painel de
+// diagnóstico. Ela estava sempre em primeiro lugar, e isso colocava quatro
+// fichas de 10,5 px acima do botão de entrar — exatamente o contrário do que
+// quem abre a tela procura. Onde a conexão É o assunto (conta ativa, projeto
+// vazio, cliente carregando) ela continua no topo; onde o assunto é entrar, ela
+// desce para o fim, logo antes de "não lembro a senha" virar um mistério.
 function pintar() {
   const caixa = document.getElementById('nuvemCorpo');
   if (!caixa) return;
   const cfg = config();
   caixa.innerHTML = '';
-  caixa.appendChild(estadoLinha(cfg));
-  if (!cfg.valido) { caixa.appendChild(painelSemConfig()); return; }
-  if (!N.cliente) { caixa.appendChild(painelCarregando()); return; }
+  if (!cfg.valido) { caixa.appendChild(estadoLinha(cfg)); caixa.appendChild(painelSemConfig()); return; }
+  if (!N.cliente) { caixa.appendChild(estadoLinha(cfg)); caixa.appendChild(painelCarregando()); return; }
   // O link de "esqueci a senha" trouxe uma sessão de recuperação: a única
   // coisa que faz sentido pedir agora é a senha nova.
-  if (N.redefinir && logado()) { caixa.appendChild(painelRedefinir()); return; }
+  if (N.redefinir && logado()) { caixa.appendChild(painelRedefinir()); caixa.appendChild(estadoLinha(cfg)); return; }
   if (!logado()) {
     caixa.appendChild(aVerificar() ? painelVerificacao() : painelEntrar());
+    caixa.appendChild(estadoLinha(cfg));
     return;
   }
-  if (!verificado()) { caixa.appendChild(painelVerificacao()); return; }
+  if (!verificado()) { caixa.appendChild(painelVerificacao()); caixa.appendChild(estadoLinha(cfg)); return; }
+  caixa.appendChild(estadoLinha(cfg));
   caixa.appendChild(painelLigado());
 }
 
@@ -873,11 +880,14 @@ function painelEntrar() {
   titulo.className = 'nuvem-titulo';
   titulo.innerHTML = '<i class="fa-solid fa-user-shield"></i> Conta de quem acompanha';
   d.appendChild(titulo);
+  // Uma frase, e o formulário vem junto. A explicação inteira de privacidade
+  // continua disponível — embaixo, aberta por quem a quer — mas deixou de
+  // ficar na frente do botão, que era o motivo de a tela parecer longa antes
+  // de parecer clara.
   const explic = document.createElement('p');
   explic.className = 'nuvem-texto';
-  explic.textContent = 'A conta é do adulto, não da criança. Ela serve para duas coisas: ler o boletim em ' +
-    'outro aparelho e abrir salas do duelo por código. Nenhum dado sai deste aparelho antes de você ' +
-    'registrar a criança — e o vínculo é feito com um código de dez letras gerado aqui.';
+  explic.textContent = 'A conta é do adulto, não da criança. Entre para ler o boletim ' +
+    'deste mesmo jogo em outro aparelho.';
   d.appendChild(explic);
 
   const forms = [];
@@ -887,20 +897,49 @@ function painelEntrar() {
 
   const abas = document.createElement('div');
   abas.className = 'nuvem-abas';
-  ['Criar conta', 'Entrar'].forEach((texto, i) => {
+  abas.setAttribute('role', 'tablist');
+  ['Criar conta', 'Já tenho conta'].forEach((texto, i) => {
     const b = document.createElement('button');
     b.type = 'button';
     b.className = 'nuvem-aba' + (i === 0 ? ' ativa' : '');
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
     b.textContent = texto;
     b.onclick = () => {
-      Array.prototype.forEach.call(abas.children, (c) => c.classList.remove('ativa'));
-      b.classList.add('ativa');
+      Array.prototype.forEach.call(abas.children, (c, j) => {
+        c.classList.remove('ativa');
+        c.setAttribute('aria-selected', 'false');
+        if (j === i) { c.classList.add('ativa'); c.setAttribute('aria-selected', 'true'); }
+      });
       forms.forEach((f, j) => { f.hidden = j !== i; });
+      const alvo = forms[i].querySelector('input');
+      if (alvo) alvo.focus();
     };
     abas.appendChild(b);
   });
   d.appendChild(abas);
   forms.forEach((f) => d.appendChild(f));
+
+  d.appendChild(detalhes('Por que a conta é do adulto?',
+    'Ela serve para duas coisas: ler o boletim em outro aparelho e abrir salas do duelo por código. ' +
+    'Nenhum dado sai deste aparelho antes de você registrar a criança, e o vínculo é feito com um ' +
+    'código de dez letras gerado aqui — a criança não tem login, não tem e-mail e não tem nome, só o ' +
+    'apelido que você escolher.'));
+  return d;
+}
+
+// Um parágrafo que não desaparece quando a tela é redesenhada: <details> é HTML
+// puro, o estado aberto/fechado é do navegador, e o conteúdo não compete com o
+// formulário por atenção nem por rolagem.
+function detalhes(resumo, texto) {
+  const d = document.createElement('details');
+  d.className = 'nuvem-detalhes';
+  const s = document.createElement('summary');
+  s.textContent = resumo;
+  const p = document.createElement('p');
+  p.className = 'nuvem-texto';
+  p.textContent = texto;
+  d.appendChild(s); d.appendChild(p);
   return d;
 }
 
@@ -1191,7 +1230,24 @@ function campo(tipo, rotulo, nome, placeholder) {
   i.id = nome;
   i.name = nome;
   i.placeholder = placeholder || '';
-  i.autocomplete = tipo === 'email' ? 'email' : 'off';
+  // O gerenciador de senha do navegador só ajuda se for convidado. 'off' num
+  // campo de senha de login é o mesmo que exigir que a pessoa digite de novo
+  // uma senha de 12 caracteres num teclado de 390 px — e foi exatamente o que
+  // esteve aqui.
+  const autocompletar = {
+    nuvemEmail: 'email', nuvemEmail2: 'email', nuvemEmailVerificar: 'email',
+    nuvemApelido: 'nickname',
+    nuvemSenha: 'new-password', nuvemSenha2: 'current-password',
+    nuvemSenhaNova: 'new-password', nuvemSenhaNova2: 'new-password',
+  };
+  i.autocomplete = autocompletar[nome] || (tipo === 'email' ? 'email' : 'off');
+  if (tipo === 'password') {
+    i.spellcheck = false;
+    // Sem isto, o Android coloca a primeira letra em maiúscula sozinho e a
+    // senha digitada não é a senha guardada — um "senha errada" que não é.
+    i.setAttribute('autocapitalize', 'none');
+    i.setAttribute('autocorrect', 'off');
+  }
   r.appendChild(i);
   // Devolvemos os dois: `caixa` é o que se anexa (rótulo + campo), e
   // `valor` é o que se lê. Anexar só o input deixaria o formulário muda.

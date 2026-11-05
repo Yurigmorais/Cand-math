@@ -4,7 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Candy Math</title>
+  <!-- Os três domínios de fora aparecem no `<head>` e o navegador só descobre
+       o que eles realmente servem depois de baixar o CSS deles: as fontes
+       moram em `fonts.gstatic.com`, não em `fonts.googleapis.com`, e os
+       `.woff2` do Font Awesome idem. `preconnect` abre o TLS dos três antes, e
+       o `cdn.jsdelivr.net` é o do supabase-js, que o jogo pede em seguida.
+       Não é superstição: sem isto, cada um desses arquivos paga um handshake
+       no meio do caminho crítico até o primeiro pixel. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">

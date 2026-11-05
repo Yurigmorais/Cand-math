@@ -73,21 +73,41 @@ html, body {
   -webkit-tap-highlight-color: transparent;
   position: relative;
 }
-/* Duas manchas de cor que respiram. Ficam inteiramente dentro da janela,
-   para nenhum tamanho de tela ganhar rolagem horizontal por causa delas. */
+/* Duas manchas de cor — o mesmo degradê de antes, desenhado como gradiente em
+   vez de círculo sólido + blur(80px). Medido no endereço publicado, com o modal
+   de login aberto (janela de 1.5 s, quadro a quadro):
+
+     como estava (blur 80 px + deriva infinita)  37 fps · mediana 33 ms · pior 117 ms · 29 de 55 quadros atrasados
+     só parar a deriva                           61 fps · mediana 17 ms · pior  17 ms ·  0 de 85
+     só tirar o blur, deixando a deriva          37 fps · mediana 17 ms · pior 133 ms · 20 de 52
+     gradiente + deriva                          45 fps · mediana 17 ms · pior 100 ms · 16 de 58
+     gradiente parado                            60 fps · mediana 17 ms · pior  33 ms ·  1 de 78
+
+   O que pesa não é o blur nem o movimento isoladamente: é uma área grande
+   repintada a cada quadro, que obriga o `backdrop-filter` de cima a borrar o
+   modal inteiro outra vez. `will-change: transform` não salvou (35 fps), animar
+   só `translate` também não (32 fps), só `opacity` idem (40 fps). A deriva de
+   12 s, em `alternate`, é a coisa menos notável da tela e a que mais custa;
+   ficou parada. As manchas continuam no mesmo lugar, com o mesmo aspecto — um
+   círculo borrado de raio 80 px é, para todos os efeitos, um gradiente radial. */
 body::before, body::after {
-  content: ""; position: absolute; border-radius: 50%;
-  width: min(60vmin, 340px); height: min(60vmin, 340px);
-  filter: blur(80px); z-index: -1; pointer-events: none;
+  content: ""; position: absolute;
+  width: min(84vmin, 520px); height: min(84vmin, 520px);
+  z-index: -1; pointer-events: none;
 }
 body::before {
-  background: var(--pink); top: 0; left: 0; opacity: 0.5;
-  animation: derivaA 12s infinite alternate ease-in-out;
+  background: radial-gradient(circle at 32% 32%,
+    rgba(255,107,157,0.55), rgba(255,107,157,0.22) 46%, rgba(255,107,157,0) 72%);
+  top: 0; left: 0;
 }
 body::after {
-  background: var(--mint); right: 0; bottom: 0; opacity: 0.45;
-  animation: derivaB 14s infinite alternate ease-in-out;
+  background: radial-gradient(circle at 68% 68%,
+    rgba(78,205,196,0.5), rgba(78,205,196,0.2) 46%, rgba(78,205,196,0) 72%);
+  right: 0; bottom: 0;
 }
+/* As derivaA/derivaB ficaram sem uso quando as manchas pararam. Não são
+   removidas às cegas: quem quiser a respiração de volta precisa primeiro tirar
+   o `backdrop-filter` das superfícies fixas, ou o custo volta junto. */
 @keyframes derivaA {
   from { transform: translate(0, 0) scale(1); }
   to   { transform: translate(40px, 34px) scale(1.15); }
@@ -125,9 +145,7 @@ body::after {
   flex-wrap: wrap;
   gap: 4px var(--gap);
   padding: 10px var(--pad);
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 253, 251, 0.96);
   border-bottom: 3px solid rgba(255, 107, 157, 0.5);
   box-shadow: 0 2px 12px rgba(255,107,157,0.15);
   flex-shrink: 0;
@@ -213,19 +231,26 @@ body::after {
   position: absolute;
   font-size: calc(clamp(20px, 4vw, 32px) * var(--s, 1));
   left: var(--x);
-  top: -60px;
+  /* O deslocamento de partida (-60 px, para o doce nascer fora da tela) passou
+     para dentro do `transform` do keyframe: `top` fixo em 0 e só transform
+     animado, que é a versão barata do mesmo movimento. */
+  top: 0;
   animation: candyFall 5s ease-in infinite;
   animation-delay: var(--d);
   opacity: 0.8;
   color: rgba(255,255,255,0.7);
+  will-change: transform;
 }
 /* Queda das versões antigas, pedida de volta pelo dono: o doce desce girando uma
    volta inteira, com ease-in acelerando no fim — é o que dá o ar de doce caindo
-   de verdade, não de ícone descendo reto. */
+   de verdade, não de ícone descendo reto. A descida era animada em `top`, que é
+   geometria: dez doces x 60 quadros por segundo = 600 recalculos de layout por
+   segundo numa tela que ainda tem o boneco se mexendo. Agora é `transform`, que
+   o navegador compõe sem tocar no layout — o movimento é o mesmo, o custo não. */
 @keyframes candyFall {
-  0%   { top: -60px; transform: rotate(0deg);   opacity: 0.8; }
+  0%   { transform: translateY(-60px) rotate(0deg);   opacity: 0.8; }
   80%  { opacity: 0.8; }
-  100% { top: 110%;  transform: rotate(360deg); opacity: 0; }
+  100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
 }
 .splash-content {
   text-align: center;
@@ -401,9 +426,10 @@ body::after {
 }
 .hub-header {
   padding: 8px var(--pad);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Fixa no topo e rolando por cima da lista: o pior lugar do mundo para um
+     `backdrop-filter`, porque cada quadro de rolagem pede um borrado novo da
+     faixa inteira. Quase-opaca fica visualmente igual sobre o hub claro. */
+  background: rgba(255, 250, 253, 0.96);
   border-bottom: 3px solid rgba(255, 107, 157, 0.45);
   box-shadow: var(--shadow-card);
   flex-shrink: 0;
@@ -672,13 +698,25 @@ body::after {
   min-width:0;
   min-height:var(--alvo);
   border:none; border-radius:var(--r-pill); padding:clamp(9px, 1.3vw, 12px) clamp(10px, 1.6vw, 18px);
-  font-family:'Nunito',sans-serif; font-size:var(--fs-apoio); font-weight:800;
+  font-family:'Nunito',sans-serif; font-size:clamp(13px, 1.35vw, 14.5px); font-weight:800;
   cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
-  color:#fff;
+  /* Tinta sobre o doce, não branco sobre o doce. Medido no ponto mais escuro
+     do degradê de cada um — que é onde o rótulo se dá pior:
+
+       Recordes      branco sobre #FFD93D → 1,38:1  (o pior da tela: letra branca em amarelo-ovo)
+       Guarda-Roupa  branco sobre #FF6B9D → 2,68:1
+       Som           branco sobre #4ECDC4 → 1,94:1
+       Responsáveis  branco sobre #9B5DE5 → 4,10:1
+
+     Com `var(--text)` (#3A2A4D) sobre os fundos de duas cores estreitados para
+     uma família só, a conta passa a 4,9:1–10:1. Os dois botões que continuam
+     escuros — Voz e Responsáveis — declaram `color:#fff` embaixo e seguem com
+     rótulo claro sobre degradê escuro (5,3:1 e 5,4:1). */
+  color:var(--text);
 }
 .btn-hub-action > i { font-size:clamp(15px, 1.8vw, 19px); }
-.bha-shop    { background:linear-gradient(135deg,#FF6B9D,#9B5DE5); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(155,93,229,0.35); }
-.bha-records { background:linear-gradient(135deg,#FFD93D,#FF9A3C); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(255,154,60,0.35); }
+.bha-shop    { background:linear-gradient(135deg,#FF8FB3,#FF6B9D); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(155,93,229,0.35); }
+.bha-records { background:linear-gradient(135deg,#FFE477,#FFC24D); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(255,154,60,0.35); }
 .bha-sound   { background:linear-gradient(135deg,#4ECDC4,#3DBBFF); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(78,205,196,0.35); }
 /* O botão Voz não tinha regra nenhuma: herda de .btn-hub-action só o
    `color:#fff`, e texto branco sobre o hub branco é o botão invisível — a
@@ -687,7 +725,7 @@ body::after {
    (.btn-pais), um degrau mais fundo que os irmãos para o rótulo branco chegar
    a ~5,4:1 em vez dos 2,1:1 do #3DBBFF puro: azul = voz em todo o jogo, e dá
    para ler. */
-.bha-voz     { background:linear-gradient(135deg,#2A8FE0,#1E4FA8); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(61,187,255,0.35); }
+.bha-voz     { color:#fff; background:linear-gradient(135deg,#2A8FE0,#1E4FA8); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(61,187,255,0.35); }
 .btn-hub-action:hover { transform:translateY(-3px); }
 
 /* ===== QUIZ SCREEN ===== */
@@ -1036,7 +1074,6 @@ body::after {
   background:rgba(40,15,70,0.55);
   z-index:1000; display:none;
   animation:fadeIn 0.25s ease;
-  backdrop-filter: blur(4px);
 }
 .modal-overlay.open { display:block; }
 
@@ -1052,12 +1089,16 @@ body::after {
 
 .modal-box {
   --modal-pad: clamp(14px, 2.6vw, 24px);
-  /* Mesmo papel das telas: o diálogo é vidro fosco com açúcar por cima, não uma
-     folha branca colada em cima do jogo. */
-  background: var(--malha-acucar), rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 2px solid rgba(255, 255, 255, 0.4);
+  /* Antes: `rgba(255,255,255,0.75)` + `backdrop-filter: blur(15px)` — vidro
+     fosco de verdade, e caro de verdade. Com as manchas do fundo paradas o
+     modal ainda custava 12 de 70 quadros atrasados; com elas movendo, o
+     `backdrop-filter` obrigava o navegador a borrar o diálogo inteiro a cada
+     quadro (37 fps, pior 117 ms). O papel granulado por cima continua, e a
+     folha passa a quase-opaca: sobre o hub branco a diferença entre borrar o
+     que está atrás e simplesmente cobri-lo é invisível; a diferença de
+     fluidez é a apresentação inteira. */
+  background: var(--malha-acucar), rgba(255, 253, 250, 0.97);
+  border: 2px solid rgba(255, 255, 255, 0.55);
   padding: var(--modal-pad);
 }
 /* Cabeçalho colado na borda e fixo: ao rolar um modal longo, o título e o
@@ -1071,7 +1112,9 @@ body::after {
   border-bottom:2px solid var(--border);
 }
 .modal-hdr h2 {
-  font-family:'Fredoka One',cursive; font-size:clamp(17px, 2vw, 22px); color:var(--purple);
+  /* --purple (#9B5DE5) a 17 px dava 3,4:1 — o título de todos os diálogos do
+     jogo, inclusive o de login. #7B32C9 é o mesmo roxo, 6,5:1. */
+  font-family:'Fredoka One',cursive; font-size:clamp(17px, 2vw, 22px); color:#7B32C9;
   flex:1; min-width:0;
   display: flex;
   align-items: center;
@@ -1938,7 +1981,7 @@ button, [role="button"], .mode-card { touch-action: manipulation; }
   color: var(--text2);
   max-width: 74ch;
 }
-.bha-pais { background:linear-gradient(135deg,#9B5DE5,#3DBBFF); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(61,187,255,0.35); }
+.bha-pais { color:#fff; background:linear-gradient(135deg,#8B45D6,#7B32C9); box-shadow:0 3px 0 rgba(58,42,77,0.22), 0 4px 14px rgba(61,187,255,0.35); }
 
 .pais-box { border-top:5px solid var(--blue); border-radius:var(--r); text-align:left; }
 .pais-intro { font-size:var(--fs-corpo); color:var(--text2); margin-bottom:8px; line-height:1.4; }
@@ -2443,7 +2486,7 @@ button, [role="button"], .mode-card { touch-action: manipulation; }
 .duelo-passagem {
   position:fixed; inset:0; z-index:60;
   display:flex; align-items:center; justify-content:center; padding:var(--pad);
-  background:rgba(58,42,77,0.72); backdrop-filter:blur(4px);
+  background:rgba(58,42,77,0.86);
 }
 .duelo-passagem[hidden] { display:none; }
 .duelo-passagem-caixa {
@@ -2748,34 +2791,58 @@ button, [role="button"], .mode-card { touch-action: manipulation; }
    =================================================== */
 .nuvem-box { border-top:5px solid var(--mint); border-radius:var(--r); text-align:left; }
 .nuvem-corpo { display:flex; flex-direction:column; gap:var(--gap-sm); }
+/* A régua desta seção foi medida no painel aberto em 390×844, com o dublê do
+   cliente (testes/capturas/medidor-nuvem.html). O que os números disseram:
+
+     o que era                    medido      problema
+     .nuvem-fit span              10,5 px     menor texto da tela, e é diagnóstico
+     .nuvem-rotulo                11,5 px     rótulo de campo — o que se lê antes de digitar
+     .nuvem-aba                   11,5 px     o nome das duas abas
+     .nuvem-campo input           14 px       o que a pessoa DIGITA, em Fredoka One
+     .btn-nuvem (mint)  texto #fff   3,35:1   abaixo de 4,5:1
+     .btn-nuvem-primario (azul)     2,17:1    o botão principal do login
+     .btn-nuvem-perigo              3,05:1    "Apagar da conta"
+     .nuvem-titulo (roxo #9B5DE5)   3,40:1    todos os títulos dos painéis
+
+   Três decisões saíram daí: (1) nada de texto funcional abaixo de 13 px;
+   (2) Fredoka One é a fonte da marca, não do formulário — rótulo, campo, aba e
+   botão passaram para Nunito, e o que a pessoa escreve no e-mail dela deixa de
+   ser escrito em letra de convite; (3) todo fundo claro o suficiente para
+   segurar texto escuro, e todo gradê escuro o suficiente para segurar branco.
+   O campo de digitação sobe a 16 px por um motivo que não é tipografia: abaixo
+   disso o iOS da Apple dá zoom automático no foco e a tela embaixo do teclado
+   vira um recorte sem sentido. */
 .nuvem-estado {
-  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:#1F7C75;
+  font-family:'Nunito',sans-serif; font-size:clamp(14px, 1.4vw, 16px); font-weight:800; color:#16665F;
   overflow-wrap:anywhere;
 }
 .nuvem-fit {
   display:flex; flex-wrap:wrap; gap:6px;
-  font-size:clamp(10.5px, 1.1vw, 12px); font-weight:800; color:var(--text2);
+  font-size:clamp(12px, 1.2vw, 13px); font-weight:800; color:#3F5C58;
 }
 .nuvem-fit span {
   display:inline-flex; align-items:center; gap:5px;
-  background:rgba(78,205,196,0.14); border:1px solid rgba(78,205,196,0.4);
-  border-radius:var(--r-pill); padding:4px 10px; overflow-wrap:anywhere;
+  background:rgba(78,205,196,0.14); border:1px solid rgba(31,124,117,0.5);
+  border-radius:var(--r-pill); padding:5px 11px; overflow-wrap:anywhere;
 }
-.nuvem-painel { display:flex; flex-direction:column; gap:var(--gap-sm); }
+.nuvem-painel { display:flex; flex-direction:column; gap:var(--gap); }
 .nuvem-titulo {
-  font-family:'Fredoka One',cursive; font-size:clamp(15px, 1.9vw, 19px); color:var(--purple);
+  /* #7B32C9 sobre o papel do modal: 6,5:1. O roxo de marca, #9B5DE5, dava 3,4:1
+     — passava como cor, não passava como texto. */
+  font-family:'Nunito',sans-serif; font-weight:900;
+  font-size:clamp(17px, 2.1vw, 20px); line-height:1.3; color:#7B32C9;
   overflow-wrap:anywhere;
 }
-.nuvem-texto { font-size:var(--fs-corpo); line-height:1.5; color:var(--text); overflow-wrap:anywhere; }
+.nuvem-texto { font-size:clamp(15px, 1.45vw, 17px); line-height:1.55; color:var(--text); overflow-wrap:anywhere; }
 .nuvem-nota, .nuvem-msg, .nuvem-erro {
-  font-size:var(--fs-apoio); line-height:1.45; color:var(--text2); overflow-wrap:anywhere;
+  font-size:clamp(13px, 1.3vw, 14.5px); line-height:1.5; color:#4A3A5C; overflow-wrap:anywhere;
 }
 /* O recado do formulário tem três caras, e elas não podem se confundir:
    neutro enquanto trabalha, verde quando deu, vermelho quando não deu. As
    regras compostas (.nuvem-msg.nuvem-x) vencem por especificidade, senão a
    ordem do arquivo decidiria no lugar da intenção. */
-.nuvem-msg { font-weight:800; color:var(--text2); }
-.nuvem-msg.nuvem-ok { color:#1F7C75; }
+.nuvem-msg { font-weight:800; color:#4A3A5C; }
+.nuvem-msg.nuvem-ok { color:#16665F; }
 .nuvem-msg.nuvem-erro, .nuvem-erro { color:#9A2733; font-weight:800; }
 .nuvem-nota {
   background:#FFF8E7; border:2px dashed rgba(255,217,61,0.7);
@@ -2785,61 +2852,110 @@ button, [role="button"], .mode-card { touch-action: manipulation; }
   list-style:none; counter-reset:passo; display:flex; flex-direction:column; gap:var(--gap-sm);
 }
 .nuvem-passos li {
-  font-size:var(--fs-apoio); line-height:1.5; color:var(--text);
-  padding-left:clamp(24px, 4vw, 30px); position:relative; overflow-wrap:anywhere;
+  font-size:clamp(13.5px, 1.35vw, 15px); line-height:1.55; color:var(--text);
+  padding-left:clamp(28px, 4.4vw, 34px); position:relative; overflow-wrap:anywhere;
 }
 .nuvem-passos li::before {
   counter-increment:passo; content:counter(passo);
-  position:absolute; left:0; top:0;
-  width:clamp(18px, 2.6vw, 22px); height:clamp(18px, 2.6vw, 22px);
+  position:absolute; left:0; top:2px;
+  width:clamp(21px, 3vw, 25px); height:clamp(21px, 3vw, 25px);
   display:flex; align-items:center; justify-content:center;
-  font-family:'Fredoka One',cursive; font-size:clamp(10.5px, 1.1vw, 12px); color:#fff;
-  background:linear-gradient(135deg,var(--mint),var(--blue));
+  /* Branco sobre degradê: o extremo claro é o que manda. #4ECDC4 dava 1,9:1 a
+     um número de passo; #1F7268 dá 5,7:1 e continua sendo o mesmo verde. */
+  font-family:'Nunito',sans-serif; font-weight:900;
+  font-size:clamp(12px, 1.2vw, 13px); color:#fff;
+  background:linear-gradient(135deg,#1F7268,#1E4FA8);
   border-radius:50%;
 }
 .nuvem-passos code {
-  font-size:clamp(10.5px, 1.1vw, 12.5px); background:#F3ECFF;
-  padding:1px 5px; border-radius:6px; overflow-wrap:anywhere;
+  font-size:clamp(12.5px, 1.25vw, 13.5px); background:#F3ECFF; color:#3A2A4D;
+  padding:2px 6px; border-radius:6px; overflow-wrap:anywhere;
 }
 
+/* As duas abas são a primeira escolha da tela, e antes eram a coisa mais
+   difícil de ler nela: 11,5 px em Fredoka One, com a aba inativa em cinza-roxo
+   quase invisível. Agora: Nunito 14-15 px peso 800, inativa com contorno e
+   texto escuro (8,7:1), ativa em branco sobre roxo escuro (7,8:1) — e as duas
+   com 48 px de altura, porque aba de 44 px num celular é alvo no limite. */
 .nuvem-abas { display:flex; flex-wrap:wrap; gap:var(--gap-sm); }
 .nuvem-aba {
-  flex:1 1 clamp(120px, 40%, 200px); min-height:var(--alvo);
+  flex:1 1 clamp(140px, 40%, 220px); min-height:48px;
   display:flex; align-items:center; justify-content:center;
-  font-family:'Fredoka One',cursive; font-size:var(--fs-apoio); color:var(--text2);
-  background:rgba(255,255,255,0.7); border:2px solid var(--linha-boneco-suave);
+  font-family:'Nunito',sans-serif; font-weight:800;
+  font-size:clamp(14px, 1.5vw, 15px); color:#4A3A5C;
+  background:rgba(255,255,255,0.9); border:2px solid rgba(58,42,77,0.42);
   border-radius:var(--r-pill) var(--r-sm) var(--r-pill) var(--r-sm);
-  cursor:pointer; padding:clamp(6px, 1vw, 10px);
+  cursor:pointer; padding:clamp(8px, 1.2vw, 12px) clamp(10px, 1.6vw, 14px);
 }
+.nuvem-aba:hover { border-color:rgba(58,42,77,0.7); }
+.nuvem-aba:focus-visible { outline:3px solid #7B32C9; outline-offset:2px; }
 .nuvem-aba.ativa {
-  color:#fff; background:linear-gradient(135deg,var(--purple),#7B3BC8);
+  color:#fff; background:linear-gradient(135deg,#6A2FB8,#5A1F9E);
   border-color:var(--linha-boneco);
+  box-shadow:0 3px 0 var(--linha-boneco);
 }
-.nuvem-form { display:flex; flex-direction:column; gap:var(--gap-sm); }
-.nuvem-campo { display:flex; flex-direction:column; gap:4px; min-width:0; }
-.nuvem-rotulo { font-size:var(--fs-apoio); font-weight:800; color:var(--text2); overflow-wrap:anywhere; }
+.nuvem-form { display:flex; flex-direction:column; gap:var(--gap); }
+/* A explicação que não é o botão. Fica abaixo do formulário, com a cara de
+   link de apoio — não de mais uma caixa competindo por atenção. */
+.nuvem-detalhes {
+  border-top:1px solid rgba(58,42,77,0.18); padding-top:var(--gap-sm);
+}
+.nuvem-detalhes summary {
+  font-family:'Nunito',sans-serif; font-weight:800;
+  font-size:clamp(13.5px, 1.35vw, 14.5px); color:#4A3A5C; cursor:pointer;
+  padding:4px 0; list-style-position:inside;
+}
+.nuvem-detalhes summary:focus-visible { outline:3px solid #1E4FA8; outline-offset:2px; border-radius:6px; }
+.nuvem-detalhes[open] summary { color:#7B32C9; }
+.nuvem-detalhes p { margin-top:6px; }
+.nuvem-campo { display:flex; flex-direction:column; gap:6px; min-width:0; }
+.nuvem-rotulo {
+  font-size:clamp(13px, 1.3vw, 14px); font-weight:800; color:#4A3A5C;
+  letter-spacing:0.1px; overflow-wrap:anywhere;
+}
 .nuvem-campo input {
-  min-height:var(--alvo); width:100%; min-width:0;
-  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:var(--text);
-  background:#FFFDF7; border:3px solid var(--linha-boneco-suave);
-  border-radius:var(--r-sm); padding:0 clamp(9px, 1.4vw, 13px);
+  min-height:48px; width:100%; min-width:0;
+  /* Nunito, não Fredoka One, e 16 px, não 14: o que a pessoa escreve no próprio
+     e-mail é a coisa mais importante desta tela, e estava escrita em letra de
+     convite com contraste de 12:1 só porque o fundo era claro. Abaixo de 16 px
+     o Safari do iPhone dá zoom no foco e joga o formulário para fora da tela. */
+  font-family:'Nunito',sans-serif; font-weight:700;
+  font-size:clamp(16px, 1.6vw, 17px); color:var(--text);
+  background:#FFFDF7; border:2px solid rgba(58,42,77,0.55);
+  border-radius:var(--r-sm); padding:0 clamp(10px, 1.5vw, 14px);
 }
-.nuvem-campo input:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+.nuvem-campo input::placeholder { color:#8A7A96; opacity:1; }
+.nuvem-campo input:focus-visible { outline:3px solid #1E4FA8; outline-offset:2px; border-color:#1E4FA8; }
 
 .btn-nuvem {
-  min-height:var(--alvo); width:100%; min-width:0;
+  min-height:48px; width:100%; min-width:0;
   display:flex; align-items:center; justify-content:center; gap:8px;
-  font-family:'Fredoka One',cursive; font-size:var(--fs-corpo); color:#fff;
-  background:linear-gradient(135deg,var(--mint),#2A9D8F);
+  font-family:'Nunito',sans-serif; font-weight:800;
+  font-size:clamp(15px, 1.55vw, 17px); color:var(--text);
+  /* O secundário deixa de ser branco-sobre-menta (3,35:1) e vira papel com
+     contorno de adesivo: é o mesmo tratamento dado às fichas de voz, e a
+     diferença entre o botão de agir e o de ajuda passa a ser de forma, não de
+     uma cor que o celular mostra como um borrão claro. */
+  background:#FFFDF7; border:2px solid var(--linha-boneco);
+  box-shadow:0 3px 0 var(--linha-boneco-suave);
   border-radius:var(--r-pill); cursor:pointer;
-  padding:clamp(8px, 1.4vw, 12px) clamp(12px, 2vw, 18px);
+  padding:clamp(9px, 1.5vw, 13px) clamp(12px, 2vw, 18px);
   overflow-wrap:anywhere;
 }
-.btn-nuvem-primario { background:linear-gradient(135deg,var(--blue),#2A65CC); }
-.btn-nuvem-perigo { background:linear-gradient(135deg,#9B8FA8,#6E6480); }
+.btn-nuvem:hover { border-color:var(--linha-boneco); box-shadow:0 3px 0 var(--linha-boneco); }
+.btn-nuvem:focus-visible { outline:3px solid #1E4FA8; outline-offset:2px; }
+.btn-nuvem-primario {
+  background:linear-gradient(135deg,#2A65CC,#1E4FA8); color:#fff;
+  border-color:var(--linha-boneco); box-shadow:0 4px 0 var(--linha-boneco-suave);
+}
+.btn-nuvem-primario:hover { box-shadow:0 4px 0 var(--linha-boneco); }
+.btn-nuvem-perigo {
+  background:linear-gradient(135deg,#5F5570,#463E52); color:#fff;
+  border-color:var(--linha-boneco);
+}
 .btn-nuvem-mini {
-  font-size:var(--fs-apoio); min-height:var(--alvo);
-  background:linear-gradient(135deg,var(--purple),#7B3BC8);
+  font-size:clamp(13.5px, 1.35vw, 14.5px); min-height:44px;
+  background:linear-gradient(135deg,#6A2FB8,#5A1F9E); color:#fff;
 }
 
 .nuvem-criancas { display:flex; flex-direction:column; gap:var(--gap-sm); }
