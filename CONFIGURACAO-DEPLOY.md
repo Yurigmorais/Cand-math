@@ -359,6 +359,21 @@ botões, painel *Definir a senha nova*, painel *Conta ativa*, e o recado de erro
 sobrevivendo à repintura. O que o dublê **não** prova: resposta real de e-mail,
 link de verdade, `updateUser` de verdade.
 
+**Depois do push, conferido no endereço publicado** (`https://candy-math-eight.vercel.app`,
+build do commit `59bd0bd`):
+
+| o que foi olhado | o que deu |
+|---|---|
+| `style.css`, `config.js`, `nuvem.js`, `script.js`, `narracao.js`, `avaliacao.js` | os seis bytes a bytes **idênticos** aos desta máquina — o build pegou a rodada inteira, não um pedaço |
+| `GET /.env` | 404 (continua) |
+| cabeçalhos de `/` | CSP, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `Permissions-Policy` no lugar |
+| `POST /api/voz` com as quatro vozes novas | 200 `audio/mpeg` — Sara 53 KB, Bruna 38 KB, Miguel 43 KB, Evelyn 50 KB; `file` confirma MP3 128 kbps 44,1 kHz em todos |
+| hub no navegador, no ar | cabeçalho com **61 px** de altura; `.bha-voz` com o degradê azul e rótulo branco; as quatro fichas novas no DOM, cada uma com texto `rgb(58,42,77)` sobre `rgb(255,253,247)` e a escolhida em degradê azul |
+| console do navegador no ar | vazio — nenhum erro ao carregar |
+
+O que continua sem prova de gente: ouvir as quatro e escolher, logar de verdade no
+projeto certo, e o `testes/auditar-layout.js` numa máquina Windows.
+
 ---
 
 ## 4. Ligar o duelo em rede (só depois disto)
@@ -575,9 +590,11 @@ Estado em 04/11/2026, depois do primeiro deploy real: `[x]` é o que foi conferi
       acima.
 - [x] `curl -I` confirmando CSP, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`
       no endereço publicado.
-- [x] As quatro vozes respondendo `audio/mpeg` na função publicada — e o `blob:` de
-      mídia no navegador provando que a fala tocou. **Falta ouvir uma por uma e dizer
-      qual serve**: a leitura de números em pt-BR é a que mais muda de voz para voz.
+- [x] As quatro vozes respondendo `audio/mpeg` na função publicada — refeito depois da
+      troca dos `reference_id`: Sara, Bruna, Miguel e Evelyn devolveram MP3 válido no
+      endereço publicado — e o `blob:` de mídia no navegador provando que a fala tocou.
+      **Falta ouvir uma por uma e dizer qual serve**: a leitura de números em pt-BR é a
+      que mais muda de voz para voz.
 - [x] `dueloRedeHabilitado: false` — continua false, e só muda depois dos itens 2 e 3
       da seção 4 rodados contra o projeto certo.
 - [ ] Preencher os campos de controlador em `privacidade.html` (hoje marcados "a
