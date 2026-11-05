@@ -2298,6 +2298,11 @@ function openModal(id) {
   // A tela de apagar tem de dizer a verdade sobre a conta naquele momento,
   // senão o botão de cima promete uma exclusão que não tem quem assine.
   if (id === 'modalApagar') pintarApagar();
+  // A tela da conexão é desenhada pelo nuvem.js e muda sozinha - login, clique
+  // no e-mail, sair da conta. Abrir sem repintar é mostrar o retrato de quando
+  // a página carregou: a pessoa entrava, fechava, voltava e continuava
+  // "sem conta".
+  if (id === 'modalNuvem' && window.CM_NUVEM && CM_NUVEM.repintar) CM_NUVEM.repintar();
   const jaHavia = !!dialogoAberto();
   $(id).style.display = 'block';
   $('modalOverlay').classList.add('open');

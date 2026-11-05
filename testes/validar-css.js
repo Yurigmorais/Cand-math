@@ -12,7 +12,48 @@ const css = fs.readFileSync(path.join(RAIZ, 'style.css'), 'utf8');
 const html = fs.readFileSync(path.join(RAIZ, 'index.html'), 'utf8');
 
 // ---- varredura por "seletor { corpo }", com o número da linha ----
-const R = varrer(css, 0);
+/* Faixas de cada bloco de arroba (@media, @supports, @keyframes...).
+   Regra dentro de @media é ajuste deliberado de janela, não duplicata que se
+   desarma: o validador precisa saber disso para TODAS as regras do bloco. O
+   jeito antigo olhava só os 500 caracteres antes do seletor, então a primeira
+   linha de um @media era reconhecida e o resto do bloco não - um bloco com
+   comentário longo na frente passava a ser lido como regras soltas. */
+function faixasDeArroba(texto) {
+  const pilha = [], faixas = [];
+  let i = 0, inicioCabeca = 0;
+  while (i < texto.length) {
+    const c = texto[i];
+    if (c === '/' && texto[i + 1] === '*') {
+      i += 2;
+      while (i < texto.length && !(texto[i] === '*' && texto[i + 1] === '/')) i++;
+      i++;
+      continue;
+    }
+    if (c === '{') {
+      pilha.push({ rotulo: texto.slice(inicioCabeca, i).replace(/\/\*[\s\S]*?\*\//g, ' ').trim(), abre: i });
+      inicioCabeca = i + 1;
+      i++;
+      continue;
+    }
+    if (c === '}') {
+      const topo = pilha.pop();
+      if (topo && topo.rotulo.startsWith('@')) faixas.push({ abre: topo.abre, fecha: i, rotulo: topo.rotulo });
+      inicioCabeca = i + 1;
+      i++;
+      continue;
+    }
+    i++;
+  }
+  return faixas;
+}
+const FAIXAS = faixasDeArroba(css);
+function arrobaDe(pos) {
+  let maisInterna = null;
+  for (const f of FAIXAS) {
+    if (f.abre < pos && pos < f.fecha && (!maisInterna || f.abre > maisInterna.abre)) maisInterna = f;
+  }
+  return maisInterna ? maisInterna.rotulo : '';
+}
 
 function varrer(texto, deslocamentoLinha) {
   const achadas = [];
@@ -22,18 +63,15 @@ function varrer(texto, deslocamentoLinha) {
     const sel = m[1].replace(/\/\*[\s\S]*?\*\//g, '').trim();
     const corpo = m[2];
     if (!sel || sel.startsWith('@')) continue;
-    /* Antes do seletor: retira comentários e conta chaves para saber se a regra
-       está dentro de um @media. Override de media query é intencional, não é
-       regra desarmada — por isso o contexto viaja junto. */
-    const antes = texto.slice(0, m.index).replace(/\/\*[\s\S]*?\*\//g, ' ');
-    const profundidade = (antes.match(/\{/g) || []).length - (antes.match(/\}/g) || []).length;
-    const env = /@[^{}]*\{\s*$/.exec(antes.slice(-500));
-    const media = profundidade > 0 && env ? env[0].replace(/\{\s*$/, '').trim() : '';
+    /* O contexto viaja junto da regra: override de media query é intencional. */
+    const media = deslocamentoLinha === 0 ? arrobaDe(m.index) : '';
     const ate = texto.slice(0, m.index).split('\n').length + deslocamentoLinha - 1;
     achadas.push({ sel, corpo, linha: ate, media });
   }
   return achadas;
 }
+
+const R = varrer(css, 0);
 
 // ---- 1. variáveis usadas sem definição ----
 // As variáveis do enfeite do splash (--x, --d) vêm inline no HTML, por isso

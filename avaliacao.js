@@ -641,6 +641,10 @@ function montarConta(g) {
   alvo.hidden = false;
   const nuvem = root.CM_NUVEM;
   const logado = !!(nuvem && nuvem.logado && nuvem.logado());
+  const resumo = (nuvem && nuvem.resumo) ? nuvem.resumo() : {};
+  // Conta criada é outra coisa: existe, mas ainda não assinou nada. O boletim
+  // não pode dizer "não há cadastro" para quem acabou de receber o link.
+  const pendente = !logado && !!resumo.pendente;
   // As duas frases não podem se contradizer: com a conexão ligada existe,
   // sim, uma conta de adulto com e-mail. O boletim tem que dizer isso.
   const origem = logado
@@ -648,19 +652,28 @@ function montarConta(g) {
       'somente o pacote desse mesmo arquivo — estrelas, histórico por conteúdo e provas. A conta é do adulto ' +
       '(e-mail verificado); a criança não tem login nem e-mail: ela entra no vínculo pelo código gerado aqui, ' +
       'e o único nome que viaja é o apelido que você escolher.'
-    : 'O progresso fica guardado neste navegador, na chave <code>candymath_v3</code>. Não há cadastro, nome, ' +
-      'e-mail ou qualquer dado que identifique a criança, e nada é enviado a um servidor enquanto a conexão ' +
-      'estiver desligada.';
+    : pendente
+      ? 'O progresso fica guardado neste navegador, na chave <code>candymath_v3</code>. Há uma conta de ' +
+        'responsável criada a partir deste aparelho, mas ela ainda não tem valor nenhum: enquanto o link do ' +
+        'e-mail não for clicado, nada sobe para o banco e nenhuma informação sai daqui. Feche isso em ' +
+        '"Conta e conexão" abaixo.'
+      : 'O progresso fica guardado neste navegador, na chave <code>candymath_v3</code>. Não há cadastro, nome, ' +
+        'e-mail ou qualquer dado que identifique a criança, e nada é enviado a um servidor enquanto a conexão ' +
+        'estiver desligada.';
   alvo.innerHTML =
     '<p class="bol-texto">' + origem + '</p>' +
     '<p class="bol-texto">' + (logado
       ? '<i class="fa-solid fa-cloud"></i> A conexão está <b>ativada</b>: com login confirmado, o ' +
         'mesmo boletim pode ser lido pelo responsável vinculado, e o histórico aparece sincronizado. ' +
         'A vinculação usa um código gerado aqui — nada é público.'
-      : '<i class="fa-solid fa-plug"></i> A conexão está <b>desligada</b>: tudo acontece neste aparelho. ' +
-        'Para acompanhar de outro aparelho, abra "Conta e conexão" abaixo e crie um login de responsável ' +
-        'com e-mail verificado — o e-mail serve só para confirmar a conta, e nenhuma outra informação ' +
-        'sai daqui sem essa conta ativa.') +
+      : pendente
+        ? '<i class="fa-solid fa-envelope-circle-check"></i> A conexão está <b>esperando o clique</b>: ' +
+          'a conta existe no papel, e só depois de confirmar o e-mail ela passa a ler o boletim em outro ' +
+          'aparelho. Até aqui, o jogo é inteiro deste aparelho.'
+        : '<i class="fa-solid fa-plug"></i> A conexão está <b>desligada</b>: tudo acontece neste aparelho. ' +
+          'Para acompanhar de outro aparelho, abra "Conta e conexão" abaixo e crie um login de responsável ' +
+          'com e-mail verificado — o e-mail serve só para confirmar a conta, e nenhuma outra informação ' +
+          'sai daqui sem essa conta ativa.') +
     '</p>' +
     // Onde apagar: dito no documento, porque é direito do titular e o boletim
     // é o documento que ele abre.

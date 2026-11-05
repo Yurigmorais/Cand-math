@@ -45,6 +45,8 @@ const PADRAO_BANCO = /^https:\/\/[a-z0-9-]+\.supabase\.(co|in)(\/[^\s]*)?$/i;
 const N = {
   cliente: null,        // cliente do supabase-js, só existe com config válida
   sessao: null,         // sessão devolvida pelo banco (null = sem login)
+  pendente: null,       // {email} de quem criou conta e ainda não clicou no link
+  recado: null,         // {painel, texto, tipo} — sobrevive à repintura da tela
   erro: '',             // último erro visto por quem acompanha
   aoMudar: [],          // funções que redrawem a tela da conexão
   subida: null,         // timer do debounce da sincronização
@@ -54,6 +56,7 @@ const N = {
   porSegundo: false,    // true = estamos varrendo em vez de escutar
   vistoUltimamente: 0,  // carimbo da última jogada recebida
   nublado: false,       // true enquanto uma exclusão de conta está em curso
+  redefinir: false,     // true quando o link de "esqueci a senha" acabou de chegar
 };
 
 // G é const no script.js: mora no escopo global, mas não aparece em window.
@@ -106,6 +109,15 @@ function verificado() {
   if (!u) return false;
   return !!(u.email_confirmed_at || u.confirmed_at);
 }
+// Criar conta com confirmação de e-mail não devolve sessão. Sem esta memória
+// o navegador acha que ninguém tem conta, a tela volta para "Criar conta" e a
+// pessoa recomeça o cadastro para sempre - o e-mail já existe, e o banco
+// responde a isso com um erro que não explica nada.
+function aVerificar() { return !logado() && !!(N.pendente && N.pendente.email); }
+function emailPendente() {
+  const u = N.sessao && N.sessao.user;
+  return (u && u.email) || (N.pendente && N.pendente.email) || '';
+}
 // Só há sincronização depois de registrar a criança: é o consentimento do
 // adulto traduzido em estado. Antes disso o jogo inteiro fica local.
 function vinculada() {
@@ -141,8 +153,22 @@ function codigoDe(n) {
 
 function mensagemDe(e) {
   if (!e) return 'erro desconhecido';
-  if (typeof e === 'string') return e;
-  return e.message || e.error_description || e.msg || 'erro inesperado';
+  if (typeof e === 'string') return traduzErro(e);
+  return traduzErro(e.message || e.error_description || e.msg || 'erro inesperado');
+}
+
+/* "Failed to fetch" é o navegador dizendo que a requisição não chegou a lugar
+   nenhum. É o que aparece quando o Project URL do config.js está errado (ou
+   quando o avião decolou), e a frase sozinha não diz o que fazer com ela. */
+function traduzErro(m) {
+  const t = String(m || '');
+  if (/failed to fetch|networkerror|network request failed|load failed|net::err/i.test(t)) {
+    return 'o banco não respondeu. Confira o Project URL no config.js e a sua conexão. (detalhe: ' + t + ')';
+  }
+  if (/invalid login credentials|incorrect password|invalid password/i.test(t)) {
+    return 'e-mail e senha não batem. Se a senha esquecida for o caso, use "Não lembro a senha".';
+  }
+  return t;
 }
 
 // A biblioteca chega por CDN apenas quando faz diferença. Abrir o jogo do
@@ -204,6 +230,10 @@ async function registrar(dados) {
     });
     if (error) return { ok: false, erro: mensagemDe(error) };
     N.sessao = data.session || null;
+    // Sem sessão quer dizer "falta o clique no e-mail". Guardamos o endereço
+    // para a tela de verificação poder mostrar o reenvio em vez de devolver a
+    // pessoa ao formulário de cadastro.
+    N.pendente = data.session ? null : { email: dados.email };
     if (data.user) await criarPerfil(data.user, dados.apelido);
     avisouMudanca();
     return { ok: true, precisaVerificar: !data.session, email: dados.email };
@@ -217,8 +247,20 @@ async function entrar(email, senha) {
   if (!N.cliente) return { ok: false, erro: N.erro || 'conexão não configurada' };
   try {
     const { data, error } = await N.cliente.auth.signInWithPassword({ email: email, password: senha });
-    if (error) return { ok: false, erro: mensagemDe(error) };
+    if (error) {
+      // Conta criada e não confirmada responde com erro de credencial, que leva
+      // a pessoa a tentar senha errada para sempre. É a verificação que falta:
+      // mostramos a tela dela.
+      const msg = mensagemDe(error);
+      if (/not confirmed|não confirmad|unconfirmed|verify your email/i.test(msg + ' ' + String(error.code || ''))) {
+        N.pendente = { email: email };
+        avisouMudanca();
+        return { ok: false, verificar: true, erro: 'falta confirmar o e-mail' };
+      }
+      return { ok: false, erro: msg };
+    }
     N.sessao = data.session || null;
+    N.pendente = null;
     // O cadastro com confirmação de e-mail não devolve sessão: o perfil nasce
     // aqui, na primeira entrada depois de verificar. Sem essa linha a criança
     // não tem para onde apontar a FK e o registro quebra silenciosamente.
@@ -232,9 +274,45 @@ async function entrar(email, senha) {
   }
 }
 
+// Esqueci a senha: o link sai do banco e volta para cá com a sessão de
+// recuperação no endereço (#redefinir-senha). O supabase-js já sabe ler esse
+// pedaço da URL; o que falta é a tela que pede a senha nova.
+async function recuperar(email) {
+  await montarCliente();
+  if (!N.cliente) return { ok: false, erro: N.erro || 'conexão não configurada' };
+  try {
+    const destino = root.location
+      ? root.location.origin + root.location.pathname + '#redefinir-senha'
+      : undefined;
+    const { error } = await N.cliente.auth.resetPasswordForEmail(email, { redirectTo: destino });
+    if (error) return { ok: false, erro: mensagemDe(error) };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: mensagemDe(e) };
+  }
+}
+
+async function redefinirSenha(senha) {
+  await montarCliente();
+  if (!N.cliente) return { ok: false, erro: N.erro || 'conexão não configurada' };
+  if (!senha || senha.length < 6) return { ok: false, erro: 'a senha precisa de pelo menos 6 caracteres' };
+  try {
+    const { error } = await N.cliente.auth.updateUser({ password: senha });
+    if (error) return { ok: false, erro: mensagemDe(error) };
+    N.redefinir = false;
+    avisouMudanca();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, erro: mensagemDe(e) };
+  }
+}
+
 async function sair() {
   try { if (N.cliente) await N.cliente.auth.signOut(); } catch (e) {}
   N.sessao = null;
+  N.pendente = null;
+  N.redefinir = false;
+  N.recado = null;
   avisouMudanca();
 }
 
@@ -255,6 +333,8 @@ async function lerSessao() {
   try {
     const { data } = await N.cliente.auth.getSession();
     N.sessao = data && data.session ? data.session : null;
+    // Sessão viva apaga a memória da verificação pendente: o clique aconteceu.
+    if (N.sessao) N.pendente = null;
   } catch (e) {
     N.sessao = null;
     N.erro = 'não foi possível ler a sessão: ' + mensagemDe(e);
@@ -714,7 +794,13 @@ function pintar() {
   caixa.appendChild(estadoLinha(cfg));
   if (!cfg.valido) { caixa.appendChild(painelSemConfig()); return; }
   if (!N.cliente) { caixa.appendChild(painelCarregando()); return; }
-  if (!logado()) { caixa.appendChild(painelEntrar()); return; }
+  // O link de "esqueci a senha" trouxe uma sessão de recuperação: a única
+  // coisa que faz sentido pedir agora é a senha nova.
+  if (N.redefinir && logado()) { caixa.appendChild(painelRedefinir()); return; }
+  if (!logado()) {
+    caixa.appendChild(aVerificar() ? painelVerificacao() : painelEntrar());
+    return;
+  }
   if (!verificado()) { caixa.appendChild(painelVerificacao()); return; }
   caixa.appendChild(painelLigado());
 }
@@ -723,12 +809,14 @@ function estadoLinha(cfg) {
   const p = document.createElement('p');
   p.className = 'nuvem-fit';
   const transporte = N.sala ? (N.porSegundo ? 'varredura' : 'Realtime') : '—';
+  const situacao = logado()
+    ? (verificado() ? 'confirmado' : 'aguardando clique')
+    : (aVerificar() ? 'aguardando clique' : 'sem conta');
   p.innerHTML = '<span><i class="fa-solid fa-key"></i> config.js: <b>' +
     (cfg.valido ? 'chave válida' : 'vazia') + '</b></span>' +
-    '<span><i class="fa-solid fa-envelope-circle-check"></i> e-mail: <b>' +
-    (logado() ? (verificado() ? 'confirmado' : 'aguardando clique') : 'sem conta') + '</b></span>' +
+    '<span><i class="fa-solid fa-envelope-circle-check"></i> e-mail: <b>' + situacao + '</b></span>' +
     '<span><i class="fa-solid fa-cloud-arrow-up"></i> sincronia: <b>' +
-    (vinculada() ? 'ligada a ' + esc(estado().codigoVinculo) : 'desligada') + '</b></span>' +
+    (vinculada() ? 'ligada a ' + esc((estado() || {}).codigoVinculo || '—') : 'desligada') + '</b></span>' +
     '<span><i class="fa-solid fa-wifi"></i> sala: <b>' + transporte + '</b></span>';
   return p;
 }
@@ -822,7 +910,7 @@ function painelCriarConta() {
   const nome = campo('text', 'Como você quer ser chamada(o)', 'nuvemApelido', 'Mãe, pai, tio…');
   const email = campo('email', 'Seu e-mail', 'nuvemEmail', 'voce@exemplo.com');
   const senha = campo('password', 'Senha (mínimo de 6 caracteres)', 'nuvemSenha', '••••••');
-  const msg = recado();
+  const msg = recado('criar');
   f.appendChild(nome.caixa); f.appendChild(email.caixa); f.appendChild(senha.caixa);
   f.appendChild(botao('<i class="fa-solid fa-envelope"></i> Criar conta e enviar o link', 'btn-nuvem-primario', async () => {
     if (nome.valor.trim().length < 2) { msg.dizer('Diga como quer ser chamada(o).', 'erro'); return; }
@@ -846,14 +934,28 @@ function painelEntrarConta() {
   f.hidden = true;
   const email = campo('email', 'Seu e-mail', 'nuvemEmail2', 'voce@exemplo.com');
   const senha = campo('password', 'Senha', 'nuvemSenha2', '••••••');
-  const msg = recado();
+  const msg = recado('entrar');
   f.appendChild(email.caixa); f.appendChild(senha.caixa);
   f.appendChild(botao('<i class="fa-solid fa-right-to-bracket"></i> Entrar', 'btn-nuvem-primario', async () => {
+    if (!/\S+@\S+\.\S+/.test(email.valor)) { msg.dizer('Falta escrever o e-mail.', 'erro'); return; }
     msg.dizer('Entrando…');
     const r = await entrar(email.valor.trim(), senha.valor);
-    if (!r.ok) { msg.dizer('Não entrou: ' + r.erro, 'erro'); return; }
+    if (!r.ok) {
+      // "falta confirmar" não é falha para ler e fechar: a tela de verificação
+      // já tem o reenvio do link, e é para ela que a pessoa deve ir.
+      if (r.verificar) { msg.dizer('Falta confirmar o e-mail. Abrimos a tela de verificação.', 'erro'); pintar(); return; }
+      msg.dizer('Não entrou: ' + r.erro, 'erro');
+      return;
+    }
     msg.dizer('Entrou.', 'ok');
     pintar();
+  }));
+  f.appendChild(botao('<i class="fa-solid fa-key"></i> Não lembro a senha', '', async () => {
+    if (!/\S+@\S+\.\S+/.test(email.valor)) { msg.dizer('Escreva o e-mail primeiro: é para ele que vai o link.', 'erro'); return; }
+    msg.dizer('Mandando o link…');
+    const r = await recuperar(email.valor.trim());
+    if (!r.ok) { msg.dizer('Não mandou: ' + r.erro, 'erro'); return; }
+    msg.dizer('Se o e-mail existir no projeto, o link de redefinição chega em alguns minutos. Abra no mesmo aparelho deste jogo e clique nele.', 'ok');
   }));
   f.appendChild(msg);
   return f;
@@ -862,15 +964,33 @@ function painelEntrarConta() {
 function painelVerificacao() {
   const d = document.createElement('div');
   d.className = 'nuvem-painel';
-  const email = (N.sessao && N.sessao.user && N.sessao.user.email) || '';
+  const email = emailPendente();
   const t = document.createElement('h3');
   t.className = 'nuvem-titulo';
   t.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Falta confirmar o e-mail';
   d.appendChild(t);
-  d.appendChild(linha('A conta existe, mas ainda não vale para acompanhar ninguém. Mandamos um link para ' +
-    email + '. Enquanto o clique não acontecer, nada sobe deste aparelho — o boletim continua só local.'));
-  const msg = recado();
+  d.appendChild(linha(email
+    ? 'A conta existe, mas ainda não vale para acompanhar ninguém. Mandamos um link para ' + email +
+      '. Enquanto o clique não acontecer, nada sobe deste aparelho — o boletim continua só local.'
+    : 'A conta existe, mas este aparelho perdeu o endereço dela. Digite o e-mail abaixo para receber o link de novo.'));
+  const msg = recado('verificar');
+  if (!email) {
+    const email2 = campo('email', 'Seu e-mail', 'nuvemEmailVerificar', 'voce@exemplo.com');
+    d.appendChild(email2.caixa);
+    d.appendChild(botao('<i class="fa-solid fa-paper-plane"></i> Enviar o link para este e-mail', 'btn-nuvem-primario', async () => {
+      if (!/\S+@\S+\.\S+/.test(email2.valor)) { msg.dizer('O e-mail não parece válido.', 'erro'); return; }
+      msg.dizer('Mandando…');
+      const r = await reenviar(email2.valor.trim());
+      if (!r.ok) { msg.dizer('Não mandou: ' + r.erro, 'erro'); return; }
+      N.pendente = { email: email2.valor.trim() };
+      msg.dizer('Link enviado. Confira também a caixa de spam.', 'ok');
+      pintar();
+    }));
+    d.appendChild(msg);
+    return d;
+  }
   d.appendChild(botao('<i class="fa-solid fa-paper-plane"></i> Reenviar o link', 'btn-nuvem-primario', async () => {
+    msg.dizer('Mandando de novo…');
     const r = await reenviar(email);
     if (r.ok) msg.dizer('Reenviado. Confira também a caixa de spam.', 'ok');
     else msg.dizer('Não reenviou: ' + r.erro, 'erro');
@@ -880,8 +1000,46 @@ function painelVerificacao() {
     await montarCliente();
     await lerSessao();
     if (verificado()) msg.dizer('E-mail confirmado.', 'ok');
-    else if (!logado()) msg.dizer('Ainda sem sessão neste aparelho.', 'erro');
+    else if (!logado()) msg.dizer('O clique ainda não apareceu no banco. Espere alguns segundos e confira de novo.', 'erro');
     else msg.dizer('O clique ainda não apareceu no banco. Espere alguns segundos e confira de novo.', 'erro');
+    pintar();
+  }));
+  d.appendChild(botao('<i class="fa-solid fa-user-pen"></i> Usar outro e-mail', '', () => {
+    N.pendente = null;
+    N.recado = null;
+    pintar();
+  }));
+  d.appendChild(msg);
+  return d;
+}
+
+// Volta do link de "esqueci a senha": o navegador já tem uma sessão viva que só
+// serve para isso, e a única saída honesta é pedir a senha nova agora.
+function painelRedefinir() {
+  const d = document.createElement('div');
+  d.className = 'nuvem-painel';
+  const t = document.createElement('h3');
+  t.className = 'nuvem-titulo';
+  t.innerHTML = '<i class="fa-solid fa-lock"></i> Definir a senha nova';
+  d.appendChild(t);
+  d.appendChild(linha('O link fez diferença: esta janela está aberta só para trocar a senha. ' +
+    'Escolha a senha nova e pronto — o jogo continua com a mesma conta de antes.'));
+  const uma = campo('password', 'Senha nova (mínimo de 6 caracteres)', 'nuvemSenhaNova', '••••••');
+  const duas = campo('password', 'Repita a senha nova', 'nuvemSenhaNova2', '••••••');
+  const msg = recado('redefinir');
+  d.appendChild(uma.caixa);
+  d.appendChild(duas.caixa);
+  d.appendChild(botao('<i class="fa-solid fa-floppy-disk"></i> Guardar a senha nova', 'btn-nuvem-primario', async () => {
+    if (uma.valor.length < 6) { msg.dizer('A senha precisa de pelo menos 6 caracteres.', 'erro'); return; }
+    if (uma.valor !== duas.valor) { msg.dizer('As duas senhas não são iguais.', 'erro'); return; }
+    msg.dizer('Guardando…');
+    const r = await redefinirSenha(uma.valor);
+    if (!r.ok) { msg.dizer('Não guardou: ' + r.erro, 'erro'); return; }
+    msg.dizer('Senha nova no lugar. Já dá para acompanhar o boletim deste aparelho.', 'ok');
+    pintar();
+  }));
+  d.appendChild(botao('<i class="fa-solid fa-xmark"></i> Deixar para depois', '', () => {
+    N.redefinir = false;
     pintar();
   }));
   d.appendChild(msg);
@@ -901,7 +1059,7 @@ function painelLigado() {
     'aplicadas, registro dos duelos e as jogadas da sala enquanto ela estiver aberta. Não fica: nome real, ' +
     'foto, endereço ou qualquer coisa que identificasse a criança além do código de vínculo.'));
 
-  const msg = recado();
+  const msg = recado('ligado');
   d.appendChild(botao('<i class="fa-solid fa-child"></i> Registrar a criança deste aparelho', 'btn-nuvem-primario', async () => {
     const g = estado();
     msg.dizer('Registrando…');
@@ -993,13 +1151,22 @@ function linha(texto, classe) {
 // Recado de formulário: a mesma linha, três caras — neutro enquanto trabalha,
 // erro quando não deu, ok quando deu. Sem isso, "Não deu: Failed to fetch"
 // tem exatamente a mesma roupa de uma instrução e passa despercebido.
-function recado() {
+function recado(chave) {
   const p = document.createElement('p');
   p.className = 'nuvem-msg';
+  function desenhar(reg) {
+    p.className = 'nuvem-msg' + (reg.tipo === 'erro' ? ' nuvem-erro' : reg.tipo === 'ok' ? ' nuvem-ok' : '');
+    p.textContent = reg.texto;
+  }
   p.dizer = function (texto, tipo) {
-    p.className = 'nuvem-msg' + (tipo === 'erro' ? ' nuvem-erro' : tipo === 'ok' ? ' nuvem-ok' : '');
-    p.textContent = texto;
+    N.recado = { painel: chave || '', texto: texto, tipo: tipo || '' };
+    desenhar(N.recado);
   };
+  // A repintura destrói este parágrafo e cria outro no lugar dele. Sem guardar
+  // o recado, "Não deu: ..." e "Abra seu e-mail e clique no link" somem antes
+  // de a pessoa terminar de ler - e a tela da conexão parece que ignorou o
+  // clique. O recado volta junto do painel que o escreveu.
+  if (chave && N.recado && N.recado.painel === chave) desenhar(N.recado);
   return p;
 }
 
@@ -1038,24 +1205,53 @@ function esc(s) {
 
 // ── 8. ENTRADA ──────────────────────────────────────────
 async function iniciar() {
+  // O link de "esqueci a senha" devolve a pessoa a esta página com
+  // #redefinir-senha no endereço. É o único sinal de que ela está no meio de
+  // uma troca de senha, e a tela abaixo é a resposta.
+  N.redefinir = /#redefinir-senha/.test(String((root.location || {}).hash || ''));
   await montarCliente();
   if (N.cliente) {
     await lerSessao();
     try {
-      N.cliente.auth.onAuthStateChange((_evento, sessao) => {
+      N.cliente.auth.onAuthStateChange((evento, sessao) => {
+        if (evento === 'PASSWORD_RECOVERY') N.redefinir = true;
         N.sessao = sessao;
+        if (sessao) N.pendente = null;
         avisouMudanca();
       });
     } catch (e) { /* versão da biblioteca sem escuta de estado */ }
   }
-  pintar();
+  try {
+    pintar();
+  } catch (e) {
+    // Uma tela que estoura não pode levar o jogo junto: a criança continua
+    // jogando neste aparelho, e quem publica precisa ver o motivo na tela.
+    N.erro = mensagemDe(e);
+    const caixa = document.getElementById('nuvemCorpo');
+    if (caixa) {
+      caixa.textContent = 'A tela da conexão não conseguiu ser desenhada: ' + N.erro +
+        '. O jogo continua funcionando neste aparelho.';
+    }
+  }
   // Abrir a tela de conexão mais de uma vez não pode dobrar a escuta: a
   // pintura sairia duas vezes para cada mudança de estado.
   if (N.aoMudar.indexOf(pintar) < 0) N.aoMudar.push(pintar);
 }
 
+// Abrir a tela da conexão tem de mostrar o estado de agora, e não o de quando
+// a página carregou: sessão, verificação e vínculo mudam sem recarregar nada.
+async function repintar() {
+  try { if (N.cliente) await lerSessao(); } catch (e) { /* fica como está */ }
+  try {
+    pintar();
+  } catch (e) {
+    N.erro = mensagemDe(e);
+  }
+}
+
 root.CM_NUVEM = {
   iniciar: iniciar,
+  repintar: repintar,
   aoSalvar: aoSalvar,
   ativa: ativa,
   logado: logado,
@@ -1075,6 +1271,7 @@ root.CM_NUVEM = {
       cliente: !!N.cliente,
       sessao: logado(),
       verificado: verificado(),
+      pendente: aVerificar(),
       vinculada: vinculada(),
       erro: N.erro,
       sala: N.sala ? N.sala.codigo : null,

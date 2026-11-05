@@ -281,6 +281,84 @@ síntese — que estourou os 15 s e devolveu 502. O desenho está certo (a crian
 ouve metade de uma frase longa, e a cota não estoura), mas ele significa que frase
 demais custa: o navegador já corta em `narracao.maximoCaracteres` antes de perguntar.
 
+### O que mudou na rodada de 04/11 (noite): celular, vozes novas e login
+
+**As vozes.** Os quatro `reference_id` agora são os códigos das vozes do próprio
+projeto (Sara `4e78…`, Bruna `67e9…`, Miguel `8c3a…`, Evelyn `0e30…`), conferidos um
+por um contra `POST https://api.fish.audio/v1/tts` com a chave da conta do dono: as
+quatro devolveram `audio/mpeg`. Uma chave autoriza a conta, não uma voz — por isso a
+conta do Thalisson **não** entrou em lugar nenhum; o que estava errado era o
+`reference_id`, que apontava para vozes da comunidade. As duas listas pinadas
+(`config.js` e `api/_voz-nucleo.js`) batem, e o `testes/testar-narracao.js` confere.
+
+**O hub no celular, medido no navegador** (janela de 390×844, jogo aberto no hub, com
+`testes/capturas/medidor.html` — arquivo de trabalho, gitignored):
+
+| faixa | antes | depois |
+|---|---|---|
+| cabeçalho | 101 px | 61 px |
+| seletor de ano/nível | 251 px | 200 px |
+| atalhos (5 botões) | 156 px | 101 px |
+| **as três juntas** | **508 px (60% da tela)** | **362 px (43%)** |
+| lista de jogos | 315 px | 470 px |
+
+O corte não esconde informação nenhuma: as fichas de *ano* e *nível* do placar saíram
+do cabeçalho porque repetem os chips selecionados dois dedos abaixo (as estrelas
+ficaram); o 1º–9º virou uma linha só de 34 px por ficha acima de 352 px de largura
+— abaixo disso continua em cinco colunas, porque nove numa linha dariam fichas de
+29 px, menores que o alvo de toque; e os atalhos passaram de três linhas para duas.
+Nenhum botão ficou abaixo de 40×32 e nenhuma faixa virou trilho de rolagem lateral
+(essa é a checagem do `testes/auditar-layout.js`, que aqui não roda: os binários
+listados são de Windows). Em 320×640 as faixas somam 416 px, mas o hub já rola
+inteiro nesse caso (o `@media (max-height: 780px)` cuida disso).
+
+**O botão Voz e os chips de voz.** `.btn-hub-action` só definia `color:#fff` e o
+`.bha-voz` não tinha regra nenhuma: letra branca sobre o hub branco. Agora o Voz veste
+o degradê `#2A8FE0 → #1E4FA8` (5,5:1 com o rótulo branco) e os `.chip-voz` do modal
+ganham texto `var(--text)` sobre `#FFFDF7` com borda forte (11:1) e um
+`:focus-visible` de 3 px. Conferido em tela, não só na conta.
+
+**Login dos responsáveis.** Quatro defeitos reais, cada um com a correção do lado:
+
+1. Criar conta com confirmação de e-mail não devolve sessão, então `logado()` era
+   falso e a tela voltava para "Criar conta". Quem tentava entrar depois recebia
+   "Email not confirmed" — que a tela tratava como senha errada. Agora
+   `registrar()` guarda `N.pendente = {email}` e `entrar()` reconhece o erro de
+   e-mail não confirmado; `pintar()` manda os dois para o painel de verificação, que
+   ganhou "Usar outro e-mail" para sair do beco.
+2. O `pintar()` destrói o `.nuvem-msg` a cada repintura: a mensagem de erro morria
+   antes de ser lida. `recado(chave)` agora guarda o último recado por painel
+   (`criar`, `entrar`, `verificar`, `ligado`, `redefinir`) e o devolve ao mesmo
+   painel.
+3. Abrir "Conta e conexão" mostrava o retrato de quando a página carregou. O
+   `openModal` do `script.js` chama `CM_NUVEM.repintar()`, que rele a sessão e
+   redesenha.
+4. `iniciar()` pintava sem try/catch: um erro de desenho derrubava a inicialização da
+   nuvem inteira. Agora o erro aparece escrito na tela e o jogo segue local.
+
+**"Não lembro a senha" (novo).** `recuperar()` chama `resetPasswordForEmail` com
+`redirectTo = <endereço do jogo>#redefinir-senha`; o `supabase-js` já traz a sessão de
+recuperação no retorno, `iniciar()` lê o hash (e o evento `PASSWORD_RECOVERY`) e abre
+o painel que pede a senha nova via `updateUser`. **Depende de duas coisas no painel do
+Supabase**, e nenhuma delas foi exercitada em projeto real ainda — o Project URL
+correto continua pendente:
+
+- `Authentication → URL Configuration → Redirect URLs` precisa conter
+  `https://candy-math-eight.vercel.app/#redefinir-senha` (e o mesmo para o preview);
+- o `Site URL` precisa ser o endereço publicado, ou o link de confirmação volta para
+  outro lugar.
+
+Até o Project URL ser o verdadeiro, nada do acima funciona de fato — e a tela agora
+diz isso em português: `traduzErro()` transforma "Failed to fetch" em "o banco não
+responde. Confira o Project URL no config.js e a sua conexão."
+
+**Os painéis foram conferidos no navegador** com um dublê do `supabase-js`
+(`testes/capturas/medidor-nuvem.html`, instalado no `window` do iframe antes de o jogo
+pedir o cliente): "Criar conta" → painel *Falta confirmar o e-mail* com os três
+botões, painel *Definir a senha nova*, painel *Conta ativa*, e o recado de erro
+sobrevivendo à repintura. O que o dublê **não** prova: resposta real de e-mail,
+link de verdade, `updateUser` de verdade.
+
 ---
 
 ## 4. Ligar o duelo em rede (só depois disto)
@@ -327,11 +405,12 @@ ligado.
    delas sintetiza as quatro, e as que sobrarem podem ser revogadas.
    **Use a chave da SUA conta**, e não a de quem emprestou uma: a `sk-fish-…` é
    credencial de conta inteira (enxerga e gasta o que o dono tem), e o limite de
-   frases cai no plano de quem paga. As quatro vozes do projeto saíram do
-   **catálogo público** da Fish, então qualquer chave autenticada as alcança por
-   `reference_id` — não é preciso a chave de quem as clonou. Se alguma vier 404
-   ou 403, a voz saiu do ar ou virou privada: troque o id nas duas listas
-   (`api/_voz-nucleo.js` e `config.js`) por uma que a sua conta enxergue.
+   frases cai no plano de quem paga. Os quatro `reference_id` do projeto respondem
+   à chave da conta do dono — foi com ela que os testei um a um, e os quatro
+   voltaram com áudio — o que dispensa uma segunda chave no servidor. Se alguma
+   vier 404 ou 403, a voz saiu do ar ou ficou privada na conta de origem: troque o
+   id nas duas listas (`api/_voz-nucleo.js` e `config.js`) por uma que a sua conta
+   enxergue.
    Conferência de 60 segundos, antes de qualquer deploy, no terminal de quem tem
    rede (o modelo vai no **cabeçalho**, como na função):
 
@@ -339,7 +418,7 @@ ligado.
    read -rs KEY                       # a chave não fica no histórico
    curl -s https://api.fish.audio/v1/tts -H "Authorization: Bearer $KEY" -H "model: s2.1-pro-free" \
      -H "Content-Type: application/json" \
-     -d '{"text":"Bruna, quanto é dois mais dois?","reference_id":"33a512796260458abe82de6293f9fbec","format":"mp3","language":"pt"}' \
+     -d '{"text":"Bruna, quanto é dois mais dois?","reference_id":"67e90549433041759a61e2272367e160","format":"mp3","language":"pt"}' \
      -o /tmp/voz-bruna.mp3 -w "%{http_code}\n"
    unset KEY
    ```
@@ -347,12 +426,10 @@ ligado.
    `200` com um arquivo de dezenas de KB é a chave, o modelo e a voz funcionando;
    `401`/`403` é conta ou plano, não código. Sem rede, nada disso se prova — e o
    jogo segue falando pela voz do aparelho.
-2. As quatro vozes da tela (`Sara`, `Bruna`, `Miguel`, `Evelyn`) foram conferidas em
-   30/10/2026 contra o catálogo público (`GET https://api.fish.audio/model?title=<nome>&language=pt`),
-   escolhendo a correspondência exata de título: SARA (137 usos), Bruna (2661),
-   Miguel (308), Evelyn (60). **São vozes da comunidade, não oficiais** — podem
-   mudar de nome ou sair do ar, e a leitura de números em português só se confirma
-   ouvindo.
+2. As quatro vozes da tela (`Sara`, `Bruna`, `Miguel`, `Evelyn`) são os ids
+   indicados pelo dono em 04/11/2026, cada um chamado de verdade contra a API antes
+   de entrar no código. **Não foi mais uma escolha de catálogo** — são as vozes do
+   projeto, e a leitura de números em português só se confirma ouvindo.
 3. **Obrigar-se a ouvir antes de publicar:** abrir o jogo no preview, ir em **Voz**,
    escolher cada uma das quatro e tocar o botão "Testar". Se alguma não servir,
    crie a sua voz no painel da Fish e troque **nas duas listas** — `config.js` (id +
@@ -411,22 +488,25 @@ ligado.
    tudo", e o `revoke all ... from anon, authenticated` é a segunda fechadura.
 9. **Duas contas, duas chaves — e uma só chega.** O jogo tem quatro vozes
    (`sara`, `bruna`, `miguel`, `evelyn`), e elas vieram de dois lugares: Bruna e
-   Sara de uma conta, Miguel e Evelyn de outra. A pergunta natural é se a função
-   precisa das duas chaves. **Não precisa, e isto foi medido** em 04/11/2026 com a
-   chave de uma única conta, chamando `POST https://api.fish.audio/v1/tts` com os
-   quatro `reference_id` pinados em `api/_voz-nucleo.js:31-34`:
+   Sara na conta do dono do projeto, Miguel e Evelyn na conta de um amigo. A
+   pergunta natural é se a função precisa das duas chaves. **Não precisa, e isto foi
+   medido** em 04/11/2026 com a chave de uma única conta, chamando
+   `POST https://api.fish.audio/v1/tts` com os quatro `reference_id` pinados em
+   `api/_voz-nucleo.js` — a mesma frase, `"Que bom, você acertou!"`:
 
-   | voz | HTTP | mp3 | duração |
+   | voz | HTTP | mp3 | ~duração |
    |---|---|---|---|
-   | sara | 200 | 44.302 B | ~2,8 s |
-   | bruna | 200 | 42.630 B | ~2,7 s |
-   | miguel | 200 | 40.959 B | ~2,6 s |
-   | evelyn | 200 | 52.243 B | ~3,3 s |
+   | sara | 200 | 22.568 B | 1,4 s |
+   | bruna | 200 | 24.240 B | 1,5 s |
+   | miguel | 200 | 27.166 B | 1,7 s |
+   | evelyn | 200 | 30.092 B | 1,9 s |
 
    O motivo é o desenho da plataforma: a chave autoriza **uma conta** (o faturamento
-   e os modelos dela), e a voz é escolhida por `reference_id` **no catálogo global**.
-   Voz de comunidade não é propriedade de quem a clonou — qualquer chave válida pode
-   chamá-la, e as cobranças caem na conta da chave usada. Por isso:
+   e os modelos dela), e a voz é escolhida por `reference_id`. Voz pública do
+   catálogo qualquer chave alcança; voz da própria conta também. O que não se faz é
+   a conta A pagar a voz que só existe, privada, na conta B — para isso seria
+   preciso um segundo segredo no servidor. Como as quatro responderam, o projeto
+   fica com uma chave só:
 
    - `FISH_AUDIO_API_KEY` é **uma** string, a da sua conta. Não há segunda variável,
      e adicionar a chave do amigo seria pior: o gasto da voz dele sairia no
@@ -482,6 +562,13 @@ Estado em 04/11/2026, depois do primeiro deploy real: `[x]` é o que foi conferi
       isso não é o mesmo que copiá-lo. Sem ele certo, cache de áudio, login e duelo
       ficam no escuro; o jogo e a voz seguem funcionando.
 - [ ] Site URL e Redirect URLs apontando para `https://candy-math-eight.vercel.app`.
+      A lista de redirects precisa conter também
+      `https://candy-math-eight.vercel.app/#redefinir-senha`, que é para onde o link de
+      "Não lembro a senha" devolve a pessoa; sem essa linha o fluxo para no meio.
+- [ ] Login de responsável conferido em projeto real: criar conta → clicar no link →
+      "Já cliquei — conferir" → registrar a criança → trocar a senha pelo link de
+      recuperação. Os painéis foram vistos no navegador com um dublê do cliente, o que
+      não prova nada do caminho de e-mail.
 - [ ] SMTP configurado (senão a verificação de e-mail não chega em produção).
 - [x] Variáveis secretas na Vercel, *Sensitive*, sem "Exposed to the Browser" —
       `FISH_AUDIO_API_KEY` e `CM_ORIGENS` no ar; as duas do Supabase dependem do item
