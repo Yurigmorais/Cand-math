@@ -30,7 +30,7 @@
       ]
     },
     {
-      "source": "/(conteudo|banco-itens|guarda-roupa|como-jogar|avaliacao|duelo|nuvem|narracao|config|script).js",
+      "source": "/(conteudo|banco-itens|guarda-roupa|como-jogar|avaliacao|duelo|nuvem|narracao|config|script|vercel-analytics).js",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
     },
     {
